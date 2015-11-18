@@ -1,0 +1,22 @@
+{
+  "name": "looker-slackbot",
+  "version": "0.0.1",
+  "description": "Slackbot for Looker integration",
+  "main": "index.js",
+  "scripts": {
+    "start": "coffee index.coffee"
+  },
+  "dependencies": {
+    "slackbots": "^0.3.0",
+    "coffee-script": ">0.0.0",
+    "get-urls": "^5.0.0"
+  },
+  "engines": {
+    "node": "0.12.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/looker/looker-slackbot"
+  },
+  "license": "MIT"
+}
