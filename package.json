@@ -9,7 +9,8 @@
   "dependencies": {
     "slackbots": "^0.3.0",
     "coffee-script": ">0.0.0",
-    "get-urls": "^5.0.0"
+    "get-urls": "^5.0.0",
+    "request": "^2.66.0"
   },
   "engines": {
     "node": "0.12.7"
