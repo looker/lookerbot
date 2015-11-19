@@ -39,17 +39,21 @@ checkMessage = (message) ->
       if url.lastIndexOf(looker.url, 0) == 0
         annotatePublicLook(url, message, looker)
 
-annotatePublicLook = (url, message, looker) ->
+annotatePublicLook = (url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
+    console.log "Expanding URL #{url}"
+
     looker.client.request {path: "looks/#{matches[1]}"}, (look) ->
+
       params =
         attachments: JSON.stringify([
           fallback: look.title
           title: look.title
           text: look.description
           title_link: "#{looker.url}#{look.short_url}"
-          author_name: "#{look.user.first_name} #{look.user.last_name}"
-          author_icon: look.user.avatar_url
-          image_url: look.image_embed_url
+          image_url: if look.public then "#{look.image_embed_url}?width=606" else null
         ])
-      bot.postMessage message.channel, null, params
+        as_user: true
+
+      bot.postMessage(sourceMessage.channel, null, params)
+
