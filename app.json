@@ -1,0 +1,6 @@
+{
+  "name": "Looker Slackbot",
+  "description": "A Slack bot for Looker, to make sharing data easier!",
+  "repository": "https://github.com/looker/looker-slackbot",
+  "keywords": ["looker", "bi", "analytics", "slack", "chat", "data"]
+}
