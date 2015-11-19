@@ -53,7 +53,7 @@ annotatePublicLook = (url, sourceMessage, looker) ->
           title_link: "#{looker.url}#{look.short_url}"
           image_url: if look.public then "#{look.image_embed_url}?width=606" else null
         ])
-        as_user: true
+        icon_url: "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-10-13/12436816609_c9dab244c5db8f0d218a_88.jpg"
 
       bot.postMessage(sourceMessage.channel, null, params)
 
