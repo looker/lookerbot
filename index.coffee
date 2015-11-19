@@ -14,6 +14,12 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
   looker
 )
 
+# Update access tokens every half hour
+setInterval(->
+  for looker in lookers
+    looker.client.fetchAccessToken()
+, 30 * 60 * 1000)
+
 bot = new Bot(
   token: process.env.SLACK_API_KEY
   name: 'Looker'

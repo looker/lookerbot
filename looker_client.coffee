@@ -3,9 +3,7 @@ request = require("request")
 module.exports = class LookerAPIClient
 
   constructor: (@options) ->
-    @_fetchAccessToken((token) =>
-      @token = token
-    )
+    @fetchAccessToken()
 
   request: (requestConfig, successCallback, errorCallback) ->
     throw new Error("Access token not ready") unless @token
@@ -22,7 +20,7 @@ module.exports = class LookerAPIClient
         errorCallback?(JSON.parse(body))
     )
 
-  _fetchAccessToken: (callback) ->
+  fetchAccessToken: ->
 
     options =
       method: "POST"
@@ -36,7 +34,8 @@ module.exports = class LookerAPIClient
         throw new Error(error)
       else if response.statusCode == 200
         json = JSON.parse(body)
-        callback(json.access_token)
+        @token = json.access_token
+        console.log("Updated API token for #{@options.baseUrl}")
       else
         throw new Error("Failed to login to the Looker: #{body}")
     )
