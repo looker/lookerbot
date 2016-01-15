@@ -1,4 +1,4 @@
-Bot = require('slackbots')
+Botkit = require('Botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
 
@@ -20,40 +20,46 @@ setInterval(->
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
 
-bot = new Bot(
-  token: process.env.SLACK_API_KEY
-  name: 'Looker'
+controller = Botkit.slackbot(
+  debug: false
 )
+controller.spawn({
+  token: process.env.SLACK_API_KEY,
+}).startRTM()
 
-bot.on 'message', (data) ->
-  checkMessage(data)
+controller.on 'ambient', (bot, message) ->
+  checkMessage(bot, message)
 
-checkMessage = (message) ->
+controller.on 'direct_mention', (bot, message) ->
+  bot.reply(message, 'Hello!')
+
+checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"
 
+  # URL Expansion
   for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
 
     for looker in lookers
 
       # Starts with Looker base URL?
       if url.lastIndexOf(looker.url, 0) == 0
-        annotatePublicLook(url, message, looker)
+        annotatePublicLook(bot, url, message, looker)
 
-annotatePublicLook = (url, sourceMessage, looker) ->
+annotatePublicLook = (bot, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
     console.log "Expanding URL #{url}"
 
     looker.client.request {path: "looks/#{matches[1]}"}, (look) ->
 
-      params =
-        attachments: JSON.stringify([
+      message =
+        attachments: [
           fallback: look.title
           title: look.title
           text: look.description
           title_link: "#{looker.url}#{look.short_url}"
           image_url: if look.public then "#{look.image_embed_url}?width=606" else null
-        ])
+        ]
         icon_url: "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-10-13/12436816609_c9dab244c5db8f0d218a_88.jpg"
 
-      bot.postMessage(sourceMessage.channel, null, params)
+      bot.reply(sourceMessage, message)
 

@@ -7,7 +7,7 @@
     "start": "coffee index.coffee"
   },
   "dependencies": {
-    "slackbots": "^0.3.0",
+    "botkit": "^0.0.5",
     "coffee-script": ">0.0.0",
     "get-urls": "^5.0.0",
     "request": "^2.66.0"
