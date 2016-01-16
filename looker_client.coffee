@@ -20,6 +20,12 @@ module.exports = class LookerAPIClient
         errorCallback?(JSON.parse(body))
     )
 
+  get: (path, successCallback, errorCallback) ->
+    @request({method: "GET", path: path}, successCallback, errorCallback)
+
+  post: (path, body, successCallback, errorCallback) ->
+    @request({method: "POST", path: path, body: JSON.stringify(body)}, successCallback, errorCallback)
+
   fetchAccessToken: ->
 
     options =

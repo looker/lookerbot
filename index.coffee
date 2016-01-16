@@ -1,6 +1,7 @@
 Botkit = require('Botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
+QueryRunner = require('./query_runner')
 
 # Local dev only
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
@@ -23,6 +24,7 @@ setInterval(->
 controller = Botkit.slackbot(
   debug: false
 )
+
 controller.spawn({
   token: process.env.SLACK_API_KEY,
 }).startRTM()
@@ -30,8 +32,16 @@ controller.spawn({
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
-controller.on 'direct_mention', (bot, message) ->
-  bot.reply(message, 'Hello!')
+controller.hears ['query( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
+  [txt, ignore, lookerName, query] = message.match
+
+  looker = if lookerName
+    lookers.filter((l) -> l.url.indexOf(lookerName) != -1)[0] || lookers[0]
+  else
+    lookers[0]
+
+  runner = new QueryRunner(looker, query, bot, message)
+  runner.run()
 
 checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"
@@ -49,7 +59,7 @@ annotatePublicLook = (bot, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
     console.log "Expanding URL #{url}"
 
-    looker.client.request {path: "looks/#{matches[1]}"}, (look) ->
+    looker.client.get "looks/#{matches[1]}", (look) ->
 
       message =
         attachments: [
