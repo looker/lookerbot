@@ -32,7 +32,7 @@ controller.spawn({
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
-controller.hears ['query( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
+controller.hears ['(?:query|q)( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
   [txt, ignore, lookerName, query] = message.match
 
   looker = if lookerName
