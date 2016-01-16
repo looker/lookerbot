@@ -17,7 +17,10 @@ module.exports = class LookerAPIClient
       else if response.statusCode == 200
         successCallback?(JSON.parse(body))
       else
-        errorCallback?(JSON.parse(body))
+        try
+          errorCallback?(JSON.parse(body))
+        catch
+          errorCallback({error: body})
     )
 
   get: (path, successCallback, errorCallback) ->
