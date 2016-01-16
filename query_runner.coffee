@@ -1,3 +1,5 @@
+_ = require("underscore")
+
 module.exports = class QueryRunner
 
   constructor: (@looker, @query, @bot, @message) ->
@@ -15,15 +17,32 @@ module.exports = class QueryRunner
       @reply("You've got to specify the model and explore!")
       return
 
+    fullyQualified = fields.split(",").map((f) -> f.trim()).map((f) ->
+      if f.indexOf(".") == -1
+        "#{pathParts[1]}.#{f}"
+      else
+        f
+    )
+
+    fields = []
+    filters = {}
+    sorts = []
+
+    for field in fullyQualified
+      matches = field.match(/([A-Za-z.]+)(\[(.+)\])? ?(asc|desc)?/i)
+      [__, field, __, filter, sort] = matches
+      if filter
+        filters[field] = _.unescape filter
+      if sort
+        sorts.push "#{field} #{sort}"
+      fields.push field
+
     queryDef =
       model: pathParts[0]
       view: pathParts[1]
-      fields: fields.split(",").map((f) -> f.trim()).map((f) ->
-        if f.indexOf(".") == -1
-          "#{pathParts[1]}.#{f}"
-        else
-          f
-      )
+      fields: fields
+      filters: filters
+      sorts: sorts
 
     error = (response) =>
       @reply("Something went wrong. #{JSON.stringify(response)}")
@@ -34,7 +53,9 @@ module.exports = class QueryRunner
     , error)
 
   postResult: (query, result) ->
-    if result.fields.dimensions.length == 0
+    if result.data.length == 0
+      @reply("#{query.share_url}\nNo results.")
+    else if result.fields.dimensions.length == 0
       @reply(
         attachments: [
           fields: result.fields.measures.map((m) ->
