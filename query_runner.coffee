@@ -4,10 +4,45 @@ module.exports = class QueryRunner
 
   constructor: (@looker, @query, @bot, @message, @visualization) ->
 
-  reply: (obj) ->
-    @bot.reply(@message, obj)
+  reply: (obj, cb) ->
 
-  run: ->
+    if @loadingMessage
+      # Hacky stealth update of message to preserve chat order
+
+      if typeof(obj) == 'string'
+        obj = {text: obj, channel: @message.channel}
+
+      params = {ts: @loadingMessage.ts, channel: @message.channel}
+
+      update = _.extend(params, obj)
+      update.attachments = if update.attachments then JSON.stringify(update.attachments) else null
+      update.text = update.text || " "
+
+      @bot.api.chat.update(update)
+    else
+      @bot.reply(@message, obj, cb)
+
+  startLoading: (cb) ->
+    params =
+      text: "Working on it..."
+      channel: @message.channel
+      as_user: true
+      attachments: [] # Override some Botkit stuff
+
+    @bot.say(params, (err, res) =>
+      @loadingMessage = res
+      cb()
+    )
+
+  run:  ->
+    if process.env.LOOKER_SLACKBOT_STEALTH_EDIT == "true"
+      @startLoading(=>
+        @_runInternal()
+      )
+    else
+      @_runInternal()
+
+  _runInternal: ->
 
     [txt, limit, path, ignore, fields] = @query.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/)
 
@@ -90,8 +125,8 @@ module.exports = class QueryRunner
           fields: result.fields.measures.map((m) ->
             {title: m.label, value: result.data[0][m.name].rendered, short: true}
           )
-          text: query.share_url
         ]
+        text: query.share_url
       )
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 0
       @reply(
@@ -102,8 +137,8 @@ module.exports = class QueryRunner
               d[result.fields.dimensions[0].name].rendered
             ).join("\n")
           ]
-          text: query.share_url
         ]
+        text: query.share_url
       )
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 1
       dim = result.fields.dimensions[0]
@@ -116,8 +151,8 @@ module.exports = class QueryRunner
               "#{d[dim.name].rendered} – #{d[mes.name].rendered}"
             ).join("\n")
           ]
-          text: query.share_url
         ]
+        text: query.share_url
       )
     else
       @reply(query.share_url)
