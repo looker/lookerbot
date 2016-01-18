@@ -29,7 +29,7 @@ module.exports = class QueryRunner
     sorts = []
 
     for field in fullyQualified
-      matches = field.match(/([A-Za-z.]+)(\[(.+)\])? ?(asc|desc)?/i)
+      matches = field.match(/([A-Za-z._]+)(\[(.+)\])? ?(asc|desc)?/i)
       [__, field, __, filter, sort] = matches
       if filter
         filters[field] = _.unescape filter
