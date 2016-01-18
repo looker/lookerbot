@@ -9,7 +9,9 @@ module.exports = class QueryRunner
 
   run: ->
 
-    [txt, path, ignore, fields] = @query.match(/(([\w]+\/){0,2})(.+)/)
+    [txt, limit, path, ignore, fields] = @query.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/)
+
+    limit = +(limit.trim()) if limit
 
     pathParts = path.split("/").filter((p) -> p)
 
@@ -43,6 +45,7 @@ module.exports = class QueryRunner
       fields: fields
       filters: filters
       sorts: sorts
+      limit: limit
 
     error = (response) =>
       if response.error
