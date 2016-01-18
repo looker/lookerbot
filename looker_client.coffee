@@ -22,7 +22,10 @@ module.exports = class LookerAPIClient
       if error
         errorCallback?(error)
       else if response.statusCode == 200
-        successCallback?(JSON.parse(body))
+        if response.headers['content-type'].indexOf("application/json") != -1
+          successCallback?(JSON.parse(body))
+        else
+          successCallback?(body)
       else
         try
           errorCallback?(JSON.parse(body))
@@ -30,8 +33,8 @@ module.exports = class LookerAPIClient
           errorCallback({error: body})
     )
 
-  get: (path, successCallback, errorCallback) ->
-    @request({method: "GET", path: path}, successCallback, errorCallback)
+  get: (path, successCallback, errorCallback, options = {}) ->
+    @request(_.extend({method: "GET", path: path}, options), successCallback, errorCallback)
 
   post: (path, body, successCallback, errorCallback) ->
     @request(

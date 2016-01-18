@@ -11,6 +11,7 @@
     "coffee-script": ">0.0.0",
     "get-urls": "^5.0.0",
     "underscore": ">0.0.0",
+    "aws-sdk": ">0.0.0",
     "request": "^2.66.0"
   },
   "engines": {

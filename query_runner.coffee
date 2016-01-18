@@ -2,7 +2,7 @@ _ = require("underscore")
 
 module.exports = class QueryRunner
 
-  constructor: (@looker, @query, @bot, @message) ->
+  constructor: (@looker, @query, @bot, @message, @visualization) ->
 
   reply: (obj) ->
     @bot.reply(@message, obj)
@@ -47,6 +47,10 @@ module.exports = class QueryRunner
       sorts: sorts
       limit: limit
 
+    if @visualization
+      queryDef.vis_config =
+        type: "looker_column"
+
     error = (response) =>
       if response.error
         @reply(":warning: #{response.error}")
@@ -55,10 +59,27 @@ module.exports = class QueryRunner
       else
         @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
     @looker.client.post("queries", queryDef, (query) =>
-      @looker.client.get("queries/#{query.id}/run/unified", (result) =>
-        @postResult(query, result)
-      , error)
+      if @visualization
+        @looker.client.get("queries/#{query.id}/run/png", (result) =>
+          @postImage(query, result)
+        , error, {encoding: null})
+      else
+        @looker.client.get("queries/#{query.id}/run/unified", (result) =>
+          @postResult(query, result)
+        , error)
     , error)
+
+  postImage: (query, imageData) ->
+    success = (url) =>
+      @reply(
+        attachments: [
+          image_url: url
+          text: query.share_url
+        ]
+      )
+    error = (error) =>
+      @reply(":warning: #{error}")
+    @looker.storeBlob(imageData, success, error)
 
   postResult: (query, result) ->
     if result.data.length == 0

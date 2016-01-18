@@ -2,6 +2,8 @@ Botkit = require('Botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
 QueryRunner = require('./query_runner')
+AWS = require('aws-sdk')
+crypto = require('crypto')
 
 # Local dev only
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
@@ -12,6 +14,20 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
     clientId: looker.clientId
     clientSecret: looker.clientSecret
   )
+  looker.storeBlob = (blob, success, error) ->
+    key = "#{crypto.randomBytes(256).toString('hex')}.png"
+    params =
+      Bucket: process.env.SLACKBOT_S3_BUCKET
+      Key: key
+      Body: blob
+      ACL: 'public-read'
+      ContentType: "image/png"
+    s3 = new AWS.S3()
+    s3.putObject params, (err, data) ->
+      if err
+        error(err)
+      else
+        success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
   looker
 )
 
