@@ -23,8 +23,24 @@ module.exports = class QueryRunner
       @bot.reply(@message, obj, cb)
 
   startLoading: (cb) ->
+
+    sassyMessages = [
+      "Just a second..."
+      "Working on it..."
+      "One moment please..."
+      "Give me a minute..."
+      "Hold on..."
+      "Looking into it..."
+      "One sec..."
+      "Hold please..."
+      "Wait a moment..."
+      "Un momento, por favor..."
+    ]
+
+    sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+
     params =
-      text: "Working on it..."
+      text: sass
       channel: @message.channel
       as_user: true
       attachments: [] # Override some Botkit stuff
