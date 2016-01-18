@@ -47,9 +47,9 @@ module.exports = class QueryRunner
       sorts: sorts
       limit: limit
 
-    if @visualization
+    unless @visualization == "data"
       queryDef.vis_config =
-        type: "looker_column"
+        type: "looker_#{@visualization}"
 
     error = (response) =>
       if response.error
@@ -59,14 +59,14 @@ module.exports = class QueryRunner
       else
         @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
     @looker.client.post("queries", queryDef, (query) =>
-      if @visualization
-        @looker.client.get("queries/#{query.id}/run/png", (result) =>
-          @postImage(query, result)
-        , error, {encoding: null})
-      else
+      if @visualization == "data"
         @looker.client.get("queries/#{query.id}/run/unified", (result) =>
           @postResult(query, result)
         , error)
+      else
+        @looker.client.get("queries/#{query.id}/run/png", (result) =>
+          @postImage(query, result)
+        , error, {encoding: null})
     , error)
 
   postImage: (query, imageData) ->

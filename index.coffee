@@ -15,7 +15,11 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
     clientSecret: looker.clientSecret
   )
   looker.storeBlob = (blob, success, error) ->
-    key = "#{crypto.randomBytes(256).toString('hex')}.png"
+    path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
+    key = "#{path.join("/")}.png"
+    unless blob.length
+      error("No image data returned.")
+      return
     params =
       Bucket: process.env.SLACKBOT_S3_BUCKET
       Key: key
@@ -48,15 +52,17 @@ controller.spawn({
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
-controller.hears ['(?:query|q)( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
-  [txt, ignore, lookerName, query] = message.match
+controller.hears ['(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
+  [txt, type, ignore, lookerName, query] = message.match
 
   looker = if lookerName
     lookers.filter((l) -> l.url.indexOf(lookerName) != -1)[0] || lookers[0]
   else
     lookers[0]
 
-  runner = new QueryRunner(looker, query, bot, message)
+  type = "data" if type == "q" || type == "query"
+
+  runner = new QueryRunner(looker, query, bot, message, type)
   runner.run()
 
 checkMessage = (bot, message) ->
