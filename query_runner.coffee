@@ -125,8 +125,8 @@ module.exports = class QueryRunner
       @reply(
         attachments: [
           image_url: url
-          text: query.share_url
         ]
+        text: query.share_url
       )
     error = (error) =>
       @reply(":warning: #{error}")
