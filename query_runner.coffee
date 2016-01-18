@@ -46,7 +46,9 @@ module.exports = class QueryRunner
 
     error = (response) =>
       if response.error
-        @reply(response.error)
+        @reply(":warning: #{response.error}")
+      else if response.message
+        @reply(":warning: #{response.message}")
       else
         @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
     @looker.client.post("queries", queryDef, (query) =>
