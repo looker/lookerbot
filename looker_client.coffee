@@ -1,4 +1,5 @@
 request = require("request")
+_ = require("underscore")
 
 module.exports = class LookerAPIClient
 
@@ -14,8 +15,9 @@ module.exports = class LookerAPIClient
       return
 
     requestConfig.url = "#{@options.baseUrl}/#{requestConfig.path}"
-    requestConfig.headers =
+    headers =
       Authorization: "token #{@token}"
+    requestConfig.headers = _.extend(headers, requestConfig.headers || {})
     request(requestConfig, (error, response, body) =>
       if error
         errorCallback?(error)
@@ -32,7 +34,17 @@ module.exports = class LookerAPIClient
     @request({method: "GET", path: path}, successCallback, errorCallback)
 
   post: (path, body, successCallback, errorCallback) ->
-    @request({method: "POST", path: path, body: JSON.stringify(body)}, successCallback, errorCallback)
+    @request(
+      {
+        method: "POST"
+        path: path
+        body: JSON.stringify(body)
+        headers:
+          "content-type": "application/json"
+      },
+      successCallback,
+      errorCallback
+    )
 
   fetchAccessToken: ->
 
