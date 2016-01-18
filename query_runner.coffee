@@ -45,7 +45,10 @@ module.exports = class QueryRunner
       sorts: sorts
 
     error = (response) =>
-      @reply("Something went wrong. #{JSON.stringify(response)}")
+      if response.error
+        @reply(response.error)
+      else
+        @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
     @looker.client.post("queries", queryDef, (query) =>
       @looker.client.get("queries/#{query.id}/run/unified", (result) =>
         @postResult(query, result)

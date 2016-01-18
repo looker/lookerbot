@@ -5,8 +5,13 @@ module.exports = class LookerAPIClient
   constructor: (@options) ->
     @fetchAccessToken()
 
+  reachable: ->
+    @token?
+
   request: (requestConfig, successCallback, errorCallback) ->
-    throw new Error("Access token not ready") unless @token
+    unless @reachable()
+      errorCallback({error: "Looker #{@options.baseUrl} not reachable"})
+      return
 
     requestConfig.url = "#{@options.baseUrl}/#{requestConfig.path}"
     requestConfig.headers =
@@ -40,11 +45,13 @@ module.exports = class LookerAPIClient
 
     request(options, (error, response, body) =>
       if error
-        throw new Error(error)
+        console.warn("Couldn't fetchAccessToken for Looker #{@options.baseUrl}: #{error}")
+        @token = null
       else if response.statusCode == 200
         json = JSON.parse(body)
         @token = json.access_token
         console.log("Updated API token for #{@options.baseUrl}")
       else
-        throw new Error("Failed to login to the Looker: #{body}")
+        @token = null
+        console.warn("Failed fetchAccessToken for Looker #{@options.baseUrl}: #{body}")
     )
