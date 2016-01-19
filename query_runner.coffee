@@ -25,16 +25,26 @@ module.exports = class QueryRunner
   startLoading: (cb) ->
 
     sassyMessages = [
-      "Just a second..."
-      "Working on it..."
-      "One moment please..."
-      "Give me a minute..."
-      "Hold on..."
-      "Looking into it..."
-      "One sec..."
-      "Hold please..."
-      "Wait a moment..."
-      "Un momento, por favor..."
+      ":flag-us: Just a second..."
+      ":flag-gb: Working on it..."
+      ":flag-ca: One moment please..."
+      ":flag-in: Give me a minute..."
+      ":flag-pk: Hold on..."
+      ":flag-ng: Looking into it..."
+      ":flag-ph: One sec..."
+      ":flag-us: Hold please..."
+      ":flag-eg: Wait a moment..."
+      ":flag-es: Un momento, por favor..."
+      ":flag-mx: Por favor espera..."
+      ":flag-de: Bitte warten Sie einen Augenblick..."
+      ":flag-jp: お待ちください..."
+      ":flag-ca: Un moment s'il vous plait..."
+      ":flag-cn: 稍等一會兒..."
+      ":flag-nl: Even geduld aub..."
+      ":flag-so: Ka shaqeeya waxaa ku..."
+      ":flag-th: กรุณารอสักครู่..."
+      ":flag-ru: один момент, пожалуйста..."
+      ":flag-fi: Hetkinen..."
     ]
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
