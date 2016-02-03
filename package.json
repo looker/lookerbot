@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "botkit": "^0.0.5",
+    "ws": "^0.8.1",
     "coffee-script": ">0.0.0",
     "get-urls": "^5.0.0",
     "underscore": ">0.0.0",
