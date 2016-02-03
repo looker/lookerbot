@@ -1,4 +1,4 @@
-Botkit = require('Botkit')
+Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
 QueryRunner = require('./query_runner')
