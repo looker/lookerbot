@@ -7,8 +7,7 @@
     "start": "coffee index.coffee"
   },
   "dependencies": {
-    "botkit": "^0.0.5",
-    "ws": ">1.0.0",
+    "botkit": "howdyai/botkit#cf717feae727223351cfe76d871afa64529a0833",
     "coffee-script": ">0.0.0",
     "get-urls": "^5.0.0",
     "underscore": ">0.0.0",
