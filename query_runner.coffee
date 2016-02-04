@@ -84,30 +84,6 @@ module.exports.FancyReplier = class FancyReplier
 
     # implement in subclass
 
-module.exports.LookFinder = class LookFinder extends FancyReplier
-
-  constructor: (@replyContext, @type, @query) ->
-    super @replyContext
-
-  work: ->
-    @replyContext.looker.client.get("looks?fields=title,short_url,space(name,id)", (looks) =>
-      fuzzySearch = new FuzzySearch(looks, {termPath: "title"})
-      fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}))
-      results = fuzzySearch.search(@query)
-      shortResults = results.slice(0, 5)
-      @reply({
-        text: "Matching Looks:"
-        attachments: shortResults.map((v) =>
-          look = v.value
-          {
-            title: look.title
-            title_link: "#{@replyContext.looker.url}#{look.short_url}"
-            text: "in #{look.space.name}"
-          }
-        )
-      })
-    (r) => @replyError(r))
-
 module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
   constructor: (@replyContext, @querySlug) ->
@@ -158,9 +134,9 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         attachments: [attachment]
         text: if @showShareUrl() then query.share_url else ""
       )
-    else if result.fields.dimensions.length == 1 && result.fields.measures.length == 1
+    else if (result.fields.dimensions.length == 1 && result.fields.measures.length == 1) || (result.fields.dimensions.length == 2 && result.fields.measures.length == 0)
       dim = result.fields.dimensions[0]
-      mes = result.fields.measures[0]
+      mes = result.fields.measures[0] || result.fields.dimensions[1]
       attachment = _.extend({}, options, {
         fields: [
           title: "#{dim.label} – #{mes.label}"
@@ -174,7 +150,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         text: if @showShareUrl() then query.share_url else ""
       )
     else
-      @reply(query.share_url)
+      @reply("#{query.share_url}\n_Result table too large to display in Slack._")
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
@@ -282,3 +258,65 @@ module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
         (r) => @replyError(r)
         {encoding: null})
     , (r) => @replyError(r))
+
+module.exports.LookFinder = class LookFinder extends QueryRunner
+
+  constructor: (@replyContext, @type, @query) ->
+    super @replyContext
+
+  matchLooks: (query, cb) ->
+    @replyContext.looker.client.get("looks?fields=id,title,short_url,space(name,id)", (looks) =>
+      fuzzySearch = new FuzzySearch(looks, {termPath: "title"})
+      fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}))
+      results = fuzzySearch.search(query)
+      cb(results)
+    (r) => @replyError(r))
+
+  work: ->
+    @matchLooks(@query, (results) =>
+      if results
+        shortResults = results.slice(0, 5)
+        @reply({
+          text: "Matching Looks:"
+          attachments: shortResults.map((v) =>
+            look = v.value
+            {
+              title: look.title
+              title_link: "#{@replyContext.looker.url}#{look.short_url}"
+              text: "in #{look.space.name}"
+            }
+          )
+        })
+      else
+        @reply("No Looks match \"#{@query}\".")
+    )
+
+module.exports.LookParameterizer = class LookParameterizer extends LookFinder
+
+  constructor: (@replyContext, @paramQuery, @filterValue) ->
+    super @replyContext
+
+  work: ->
+    @matchLooks(@paramQuery, (results) =>
+      if results
+        lookId = results[0].value.id
+        @replyContext.looker.client.get("looks/#{lookId}", (look) =>
+
+          queryDef = look.query
+          if _.values(queryDef.filters).length > 0
+
+            filterKey = _.keys(queryDef.filters)[0]
+            queryDef.filters[filterKey] = @filterValue
+            queryDef.filter_config = null
+
+            @replyContext.looker.client.post("queries", queryDef, (query) =>
+              @runQuery(query)
+            , (r) => @replyError(r))
+
+          else
+            @reply("Look #{look.title} has no filters.")
+
+        (r) => @replyError(r))
+      else
+        @reply("No Looks match \"#{@paramQuery}\".")
+    )

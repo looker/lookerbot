@@ -1,7 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{CLIQueryRunner, LookFinder, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, LookFinder, LookParameterizer, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
@@ -63,6 +63,7 @@ controller.on 'ambient', (bot, message) ->
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
+GET_REGEX = 'get (.+)=(.+)'
 
 CLI_HELP = "pie model/view/field,another_field[filter_value],more_field desc"
 
@@ -75,17 +76,25 @@ controller.on 'slash_command', (bot, message) ->
   if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
     runCLI(spawnedBot, message)
-  else if match = message.text.match(new RegExp(FIND_REGEX))
+  else if match = message.text.match(new RegExp(GET_REGEX))
     message.match = match
     find(spawnedBot, message)
+  else if match = message.text.match(new RegExp(FIND_REGEX))
+    message.match = match
+    get(spawnedBot, message)
   else
     spawnedBot.reply(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
+  return
   runCLI(bot, message)
 
 controller.hears [FIND_REGEX], ['direct_mention'], (bot, message) ->
+  return
   find(bot, message)
+
+controller.hears [GET_REGEX], ['direct_mention'], (bot, message) ->
+  get(bot, message)
 
 runCLI = (bot, message) ->
   [txt, type, ignore, lookerName, query] = message.match
@@ -116,7 +125,23 @@ find = (bot, message) ->
   runner = new LookFinder(context, type, query)
   runner.start()
 
+get = (bot, message) ->
+  [__, query, filterValue] = message.match
+
+  firstWord = query.split(" ")[0]
+  foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
+  if foundLooker
+    words = query.split(" ")
+    words.shift()
+    query = words.join(" ")
+  looker = foundLooker || lookers[0]
+
+  context = new ReplyContext(looker, bot, message)
+  runner = new LookParameterizer(context, query.trim(), filterValue.trim())
+  runner.start()
+
 checkMessage = (bot, message) ->
+  return
   return if !message.text || message.subtype == "bot_message"
 
   # URL Expansion
