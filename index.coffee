@@ -66,7 +66,7 @@ QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 controller.on 'slash_command', (bot, message) ->
 
   # Return 200 immediately
-  res.setHeader 'Content-Type', 'application/json'
+  bot.res.setHeader 'Content-Type', 'application/json'
   bot.res.send JSON.stringify({response_type: "in_channel"})
 
   regex = new RegExp(QUERY_REGEX)
