@@ -49,9 +49,14 @@ controller = Botkit.slackbot(
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
-controller.spawn({
+spawned = controller.spawn({
   token: process.env.SLACK_API_KEY,
 }).startRTM()
+
+spawned.api.team.info {}, (err, response) ->
+  controller.saveTeam(response.team, ->
+    console.log "Saved the team information..."
+  )
 
 controller.on 'slash_command', (bot, message) ->
   console.log message
