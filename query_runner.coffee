@@ -85,7 +85,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     success = (url) =>
       @reply(
         attachments: [
-          _.extend(options, {image_url: url})
+          _.extend({}, options, {image_url: url})
         ]
         text: if @showShareUrl() then query.share_url else ""
       )
@@ -101,19 +101,17 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       else
         @reply("#{query.share_url}\nNo results.")
     else if result.fields.dimensions.length == 0
-      attachment = _.extend(options, {
-        fields: [
-          fields: result.fields.measures.map((m) ->
-            {title: m.label, value: result.data[0][m.name].rendered, short: true}
-          )
-        ]
+      attachment = _.extend({}, options, {
+        fields: result.fields.measures.map((m) ->
+          {title: m.label, value: result.data[0][m.name].rendered, short: true}
+        )
       })
       @reply(
         attachments: [attachment]
         text: if @showShareUrl() then query.share_url else ""
       )
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 0
-      attachment = _.extend(options, {
+      attachment = _.extend({}, options, {
         fields: [
           title: result.fields.dimensions[0].label
           value: result.data.map((d) ->
@@ -128,7 +126,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 1
       dim = result.fields.dimensions[0]
       mes = result.fields.measures[0]
-      attachment = _.extend(options, {
+      attachment = _.extend({}, options, {
         fields: [
           title: "#{dim.label} – #{mes.label}"
           value: result.data.map((d) ->
