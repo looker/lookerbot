@@ -147,23 +147,23 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     else if response?.message
       @reply(":warning: #{response.message}")
     else
-      @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
+      @reply(":warning: Something unexpected went wrong: #{JSON.stringify(response)}")
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
       @runQuery(query)
-    => @replyError())
+    (r) => @replyError(r))
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
     if type == "table"
       @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
         @postResult(query, result, options)
-      => @replyError())
+      (r) => @replyError(r))
     else
       @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
         @postImage(query, result, options)
-      => @replyError()
+      (r) => @replyError(r)
       {encoding: null})
 
 module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
@@ -189,7 +189,7 @@ module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
       if !look.public
         @runQuery(look.query, message.attachments[0])
 
-    => @replyError())
+    (r) => @replyError(r))
 
 module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
 
@@ -247,10 +247,10 @@ module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
       if @visualization == "data"
         @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
           @postResult(query, result)
-        => @replyError())
+        (r) => @replyError(r))
       else
         @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
           @postImage(query, result)
-        => @replyError()
+        (r) => @replyError(r)
         {encoding: null})
-    , => @replyError())
+    , (r) => @replyError(r))
