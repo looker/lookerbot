@@ -76,10 +76,10 @@ controller.on 'slash_command', (bot, message) ->
   if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
     runCLI(spawnedBot, message)
-  else if match = message.text.match(new RegExp(GET_REGEX))
+  else if match = message.text.match(new RegExp(FIND_REGEX))
     message.match = match
     find(spawnedBot, message)
-  else if match = message.text.match(new RegExp(FIND_REGEX))
+  else if match = message.text.match(new RegExp(GET_REGEX))
     message.match = match
     get(spawnedBot, message)
   else

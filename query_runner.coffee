@@ -296,6 +296,8 @@ module.exports.LookParameterizer = class LookParameterizer extends LookFinder
   constructor: (@replyContext, @paramQuery, @filterValue) ->
     super @replyContext
 
+  showShareUrl: -> true
+
   work: ->
     @matchLooks(@paramQuery, (results) =>
       if results
