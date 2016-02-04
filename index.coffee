@@ -62,6 +62,7 @@ controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
+CLI_HELP = "pie model/view/field,another_field[filter_value],more_field desc"
 
 controller.on 'slash_command', (bot, message) ->
 
@@ -74,7 +75,7 @@ controller.on 'slash_command', (bot, message) ->
     message.match = match
     runCLI(spawnedBot, message)
   else
-    spawnedBot.reply(message, "Unknown command! Sorry...")
+    bot.replyPrivate(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
   runCLI(bot, message)
