@@ -76,6 +76,9 @@ module.exports.FancyReplier = class FancyReplier
 
 module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
+  constructor: (@replyContext, @querySlug) ->
+    super @replyContext
+
   showShareUrl: -> true
 
   postImage: (query, imageData, options = {}) ->
@@ -148,10 +151,26 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     else
       @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
 
+  work: ->
+    @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
+      @runQuery(query)
+    , @replyError)
+
+  runQuery: (query, options = {}) ->
+    type = query.vis_config?.type || "table"
+    if type == "table"
+      @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
+        @postResult(query, result, options)
+      , @replyError)
+    else
+      @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
+        @postImage(query, result, options)
+      , @replyError, {encoding: null})
+
 module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
 
   constructor: (@replyContext, @lookId) ->
-    super @replyContext
+    super @replyContext, null
 
   showShareUrl: -> false
 
@@ -169,15 +188,7 @@ module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
       @reply(message)
 
       if !look.public
-        type = look.query.vis_config?.type || "table"
-        if type == "table"
-          @replyContext.looker.client.get("queries/#{look.query.id}/run/unified", (result) =>
-            @postResult(look.query, result, message.attachments[0])
-          , @replyError)
-        else
-          @replyContext.looker.client.get("queries/#{look.query.id}/run/png", (result) =>
-            @postImage(look.query, result, message.attachments[0])
-          , @replyError, {encoding: null})
+        @runQuery(look.query, message.attachments[0])
 
     , @replyError)
 

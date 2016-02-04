@@ -1,7 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{CLIQueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
@@ -78,10 +78,18 @@ checkMessage = (bot, message) ->
       # Starts with Looker base URL?
       if url.lastIndexOf(looker.url, 0) == 0
         annotateLook(bot, url, message, looker)
+        annotateShareUrl(bot, url, message, looker)
 
 annotateLook = (bot, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
     console.log "Expanding Look URL #{url}"
     context = new ReplyContext(looker, bot, sourceMessage)
     runner = new LookQueryRunner(context, matches[1])
+    runner.start()
+
+annotateShareUrl = (bot, url, sourceMessage, looker) ->
+  if matches = url.match(/\/x\/([A-Za-z0-9]+)$/)
+    console.log "Expanding Share URL #{url}"
+    context = new ReplyContext(looker, bot, sourceMessage)
+    runner = new QueryRunner(context, matches[1])
     runner.start()
