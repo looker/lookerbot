@@ -144,7 +144,7 @@ module.exports = class QueryRunner
 
   postResult: (query, result) ->
     if result.data.length == 0
-      if result.errors.length
+      if result.errors?.length
         txt = result.errors.map((e) -> "#{e.message}```#{e.message_details}```").join("\n")
         @reply(":warning: #{query.share_url}\n#{txt}")
       else
