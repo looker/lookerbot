@@ -83,11 +83,12 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
   postImage: (query, imageData, options = {}) ->
     success = (url) =>
+      share = if @showShareUrl() then query.share_url else ""
       @reply(
         attachments: [
-          _.extend({}, options, {image_url: url})
+          _.extend({}, options, {image_url: url, title: share, title_link: share})
         ]
-        text: if @showShareUrl() then query.share_url else ""
+        text: ""
       )
     error = (error) =>
       @reply(":warning: #{error}")
