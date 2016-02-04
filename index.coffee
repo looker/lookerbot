@@ -46,9 +46,15 @@ controller = Botkit.slackbot(
   debug: false
 )
 
+controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
+  controller.createWebhookEndpoints(expressWebserver)
+
 controller.spawn({
   token: process.env.SLACK_API_KEY,
 }).startRTM()
+
+controller.on 'slash_command', (bot, message) ->
+  console.log message
 
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
