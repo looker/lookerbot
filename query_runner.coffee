@@ -1,8 +1,10 @@
 _ = require("underscore")
 
-module.exports = class QueryRunner
+module.exports = {}
 
-  constructor: (@replyContext, @query, @visualization) ->
+module.exports.FancyReplier = class FancyReplier
+
+  constructor: (@replyContext) ->
 
   reply: (obj, cb) ->
 
@@ -60,15 +62,24 @@ module.exports = class QueryRunner
       cb()
     )
 
-  run:  ->
+  start: ->
     if process.env.LOOKER_SLACKBOT_STEALTH_EDIT == "true"
       @startLoading(=>
-        @_runInternal()
+        @work()
       )
     else
-      @_runInternal()
+      @work()
 
-  _runInternal: ->
+  work: ->
+
+    # implement in subclass
+
+module.exports.QueryRunner = class QueryRunner extends FancyReplier
+
+  constructor: (@replyContext, @query, @visualization) ->
+    super @replyContext
+
+  work: ->
 
     [txt, limit, path, ignore, fields] = @query.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/)
 
@@ -186,4 +197,3 @@ module.exports = class QueryRunner
       )
     else
       @reply(query.share_url)
-
