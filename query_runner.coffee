@@ -222,18 +222,19 @@ module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
     sorts = []
 
     for field in fullyQualified
-      matches = field.match(/([A-Za-z._]+)(\[(.+)\])?(-)? ?(asc|desc)?/i)
+      matches = field.match(/([A-Za-z._ ]+)(\[(.+)\])?(-)? ?(asc|desc)?/i)
       [__, field, __, filter, minus, sort] = matches
+      field = field.toLowerCase().trim().split(" ").join("_")
       if filter
         filters[field] = _.unescape filter
       if sort
-        sorts.push "#{field} #{sort}"
+        sorts.push "#{field} #{sort.toLowerCase()}"
       unless minus
         fields.push field
 
     queryDef =
-      model: pathParts[0]
-      view: pathParts[1]
+      model: pathParts[0].toLowerCase()
+      view: pathParts[1].toLowerCase()
       fields: fields
       filters: filters
       sorts: sorts
