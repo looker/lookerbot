@@ -154,18 +154,19 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
       @runQuery(query)
-    , @replyError)
+    => @replyError())
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
     if type == "table"
       @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
         @postResult(query, result, options)
-      , @replyError)
+      => @replyError())
     else
       @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
         @postImage(query, result, options)
-      , @replyError, {encoding: null})
+      => @replyError()
+      {encoding: null})
 
 module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
 
@@ -190,7 +191,7 @@ module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
       if !look.public
         @runQuery(look.query, message.attachments[0])
 
-    , @replyError)
+    => @replyError())
 
 module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
 
@@ -247,9 +248,10 @@ module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
       if @visualization == "data"
         @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
           @postResult(query, result)
-        , @replyError)
+        => @replyError())
       else
         @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
           @postImage(query, result)
-        , @replyError, {encoding: null})
-    , @replyError)
+        => @replyError()
+        {encoding: null})
+    , => @replyError())
