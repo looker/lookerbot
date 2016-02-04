@@ -49,11 +49,11 @@ controller = Botkit.slackbot(
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
-spawned = controller.spawn({
+spawnedBot = controller.spawn({
   token: process.env.SLACK_API_KEY,
 }).startRTM()
 
-spawned.api.team.info {}, (err, response) ->
+spawnedBot.api.team.info {}, (err, response) ->
   controller.saveTeam(response.team, ->
     console.log "Saved the team information..."
   )
@@ -72,9 +72,9 @@ controller.on 'slash_command', (bot, message) ->
   regex = new RegExp(QUERY_REGEX)
   if match = message.text.match(regex)
     message.match = match
-    runCLI(bot, message)
+    runCLI(spawnedBot, message)
   else
-    bot.reply("Unknown command! Sorry...")
+    spawnedBot.reply(message, "Unknown command! Sorry...")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
   runCLI(bot, message)
