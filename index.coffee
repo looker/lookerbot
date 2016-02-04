@@ -66,10 +66,11 @@ QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 controller.on 'slash_command', (bot, message) ->
 
   # Return 200 immediately
-  bot.res.send()
+  res.setHeader 'Content-Type', 'application/json'
+  bot.res.send JSON.stringify({response_type: "in_channel"})
 
   regex = new RegExp(QUERY_REGEX)
-  if match = regex.match(message.text)
+  if match = message.text.match(regex)
     message.match = match
     runCLI(bot, message)
   else
