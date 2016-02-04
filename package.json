@@ -12,7 +12,8 @@
     "get-urls": "^5.0.0",
     "underscore": ">0.0.0",
     "aws-sdk": ">0.0.0",
-    "request": "^2.66.0"
+    "request": "^2.66.0",
+    "fuzzysearch-js": "^0.2.0"
   },
   "engines": {
     "node": "0.12.7"

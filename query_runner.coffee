@@ -1,4 +1,6 @@
 _ = require("underscore")
+FuzzySearch = require('fuzzysearch-js')
+levenshteinFS = require('fuzzysearch-js/js/modules/LevenshteinFS')
 
 module.exports = {}
 
@@ -70,9 +72,41 @@ module.exports.FancyReplier = class FancyReplier
     else
       @work()
 
+  replyError: (response) ->
+    if response?.error
+      @reply(":warning: #{response.error}")
+    else if response?.message
+      @reply(":warning: #{response.message}")
+    else
+      @reply(":warning: Something unexpected went wrong: #{JSON.stringify(response)}")
+
   work: ->
 
     # implement in subclass
+
+module.exports.LookFinder = class LookFinder extends FancyReplier
+
+  constructor: (@replyContext, @type, @query) ->
+    super @replyContext
+
+  work: ->
+    @replyContext.looker.client.get("looks?fields=title,short_url,space(name,id)", (looks) =>
+      fuzzySearch = new FuzzySearch(looks, {termPath: "title"})
+      fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}))
+      results = fuzzySearch.search(@query)
+      shortResults = results.slice(0, 5)
+      @reply({
+        text: "Matching Looks:"
+        attachments: shortResults.map((v) =>
+          look = v.value
+          {
+            title: look.title
+            title_link: "#{@replyContext.looker.url}#{look.short_url}"
+            text: "in #{look.space.name}"
+          }
+        )
+      })
+    (r) => @replyError(r))
 
 module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
@@ -141,14 +175,6 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       )
     else
       @reply(query.share_url)
-
-  replyError: (response) ->
-    if response?.error
-      @reply(":warning: #{response.error}")
-    else if response?.message
-      @reply(":warning: #{response.message}")
-    else
-      @reply(":warning: Something unexpected went wrong: #{JSON.stringify(response)}")
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>

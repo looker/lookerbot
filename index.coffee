@@ -1,7 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{CLIQueryRunner, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, LookFinder, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
@@ -62,6 +62,8 @@ controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
+FIND_REGEX = 'find (dashboard|look )? ?(.+)'
+
 CLI_HELP = "pie model/view/field,another_field[filter_value],more_field desc"
 
 controller.on 'slash_command', (bot, message) ->
@@ -70,15 +72,20 @@ controller.on 'slash_command', (bot, message) ->
   bot.res.setHeader 'Content-Type', 'application/json'
   bot.res.send JSON.stringify({response_type: "in_channel"})
 
-  regex = new RegExp(QUERY_REGEX)
-  if match = message.text.match(regex)
+  if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
     runCLI(spawnedBot, message)
+  else if match = message.text.match(new RegExp(FIND_REGEX))
+    message.match = match
+    find(spawnedBot, message)
   else
     spawnedBot.reply(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
   runCLI(bot, message)
+
+controller.hears [FIND_REGEX], ['direct_mention'], (bot, message) ->
+  find(bot, message)
 
 runCLI = (bot, message) ->
   [txt, type, ignore, lookerName, query] = message.match
@@ -92,6 +99,21 @@ runCLI = (bot, message) ->
 
   context = new ReplyContext(looker, bot, message)
   runner = new CLIQueryRunner(context, query, type)
+  runner.start()
+
+find = (bot, message) ->
+  [__, type, query] = message.match
+
+  firstWord = query.split(" ")[0]
+  foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
+  if foundLooker
+    words = query.split(" ")
+    words.shift()
+    query = words.join(" ")
+  looker = foundLooker || lookers[0]
+
+  context = new ReplyContext(looker, bot, message)
+  runner = new LookFinder(context, type, query)
   runner.start()
 
 checkMessage = (bot, message) ->
