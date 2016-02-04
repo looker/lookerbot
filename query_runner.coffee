@@ -2,7 +2,7 @@ _ = require("underscore")
 
 module.exports = class QueryRunner
 
-  constructor: (@looker, @query, @bot, @message, @visualization) ->
+  constructor: (@replyContext, @query, @visualization) ->
 
   reply: (obj, cb) ->
 
@@ -10,17 +10,17 @@ module.exports = class QueryRunner
       # Hacky stealth update of message to preserve chat order
 
       if typeof(obj) == 'string'
-        obj = {text: obj, channel: @message.channel}
+        obj = {text: obj, channel: @replyContext.replyTo.channel}
 
-      params = {ts: @loadingMessage.ts, channel: @message.channel}
+      params = {ts: @loadingMessage.ts, channel: @replyContext.replyTo.channel}
 
       update = _.extend(params, obj)
       update.attachments = if update.attachments then JSON.stringify(update.attachments) else null
       update.text = update.text || " "
 
-      @bot.api.chat.update(update)
+      @replyContext.bot.api.chat.update(update)
     else
-      @bot.reply(@message, obj, cb)
+      @replyContext.bot.reply(@replyContext.replyTo, obj, cb)
 
   startLoading: (cb) ->
 
@@ -51,11 +51,11 @@ module.exports = class QueryRunner
 
     params =
       text: sass
-      channel: @message.channel
+      channel: @replyContext.replyTo.channel
       as_user: true
       attachments: [] # Override some Botkit stuff
 
-    @bot.say(params, (err, res) =>
+    @replyContext.bot.say(params, (err, res) =>
       @loadingMessage = res
       cb()
     )
@@ -119,13 +119,13 @@ module.exports = class QueryRunner
         @reply(":warning: #{response.message}")
       else
         @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
-    @looker.client.post("queries", queryDef, (query) =>
+    @replyContext.looker.client.post("queries", queryDef, (query) =>
       if @visualization == "data"
-        @looker.client.get("queries/#{query.id}/run/unified", (result) =>
+        @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
           @postResult(query, result)
         , error)
       else
-        @looker.client.get("queries/#{query.id}/run/png", (result) =>
+        @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
           @postImage(query, result)
         , error, {encoding: null})
     , error)
@@ -140,7 +140,7 @@ module.exports = class QueryRunner
       )
     error = (error) =>
       @reply(":warning: #{error}")
-    @looker.storeBlob(imageData, success, error)
+    @replyContext.looker.storeBlob(imageData, success, error)
 
   postResult: (query, result) ->
     if result.data.length == 0
