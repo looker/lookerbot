@@ -78,19 +78,19 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
   showShareUrl: -> true
 
-  postImage: (query, imageData) ->
+  postImage: (query, imageData, options = {}) ->
     success = (url) =>
       @reply(
         attachments: [
-          image_url: url
+          _.extend(options, {image_url: url})
         ]
-        text: query.share_url
+        text: if @showShareUrl() then query.share_url else ""
       )
     error = (error) =>
       @reply(":warning: #{error}")
     @replyContext.looker.storeBlob(imageData, success, error)
 
-  postResult: (query, result) ->
+  postResult: (query, result, options = {}) ->
     if result.data.length == 0
       if result.errors?.length
         txt = result.errors.map((e) -> "#{e.message}```#{e.message_details}```").join("\n")
@@ -98,39 +98,44 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       else
         @reply("#{query.share_url}\nNo results.")
     else if result.fields.dimensions.length == 0
-      @reply(
-        attachments: [
+      attachment = _.extend(options, {
+        fields: [
           fields: result.fields.measures.map((m) ->
             {title: m.label, value: result.data[0][m.name].rendered, short: true}
           )
         ]
-        text: query.share_url
+      })
+      @reply(
+        attachments: [attachment]
+        text: if @showShareUrl() then query.share_url else ""
       )
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 0
-      @reply(
-        attachments: [
-          fields: [
-            title: result.fields.dimensions[0].label
-            value: result.data.map((d) ->
-              d[result.fields.dimensions[0].name].rendered
-            ).join("\n")
-          ]
+      attachment = _.extend(options, {
+        fields: [
+          title: result.fields.dimensions[0].label
+          value: result.data.map((d) ->
+            d[result.fields.dimensions[0].name].rendered
+          ).join("\n")
         ]
-        text: query.share_url
+      })
+      @reply(
+        attachments: [attachment]
+        text: if @showShareUrl() then query.share_url else ""
       )
     else if result.fields.dimensions.length == 1 && result.fields.measures.length == 1
       dim = result.fields.dimensions[0]
       mes = result.fields.measures[0]
-      @reply(
-        attachments: [
-          fields: [
-            title: "#{dim.label} – #{mes.label}"
-            value: result.data.map((d) ->
-              "#{d[dim.name].rendered} – #{d[mes.name].rendered}"
-            ).join("\n")
-          ]
+      attachment = _.extend(options, {
+        fields: [
+          title: "#{dim.label} – #{mes.label}"
+          value: result.data.map((d) ->
+            "#{d[dim.name].rendered} – #{d[mes.name].rendered}"
+          ).join("\n")
         ]
-        text: query.share_url
+      })
+      @reply(
+        attachments: [attachment]
+        text: if @showShareUrl() then query.share_url else ""
       )
     else
       @reply(query.share_url)
@@ -142,6 +147,39 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       @reply(":warning: #{response.message}")
     else
       @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
+
+module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
+
+  constructor: (@replyContext, @lookId) ->
+    super @replyContext
+
+  showShareUrl: -> false
+
+  work: ->
+    @replyContext.looker.client.get("looks/#{@lookId}", (look) =>
+      message =
+        attachments: [
+          fallback: look.title
+          title: look.title
+          text: look.description
+          title_link: "#{@replyContext.looker.url}#{look.short_url}"
+          image_url: if look.public then "#{look.image_embed_url}?width=606" else null
+        ]
+
+      @reply(message)
+
+      if !look.public
+        type = look.query.vis_config?.type || "table"
+        if type == "table"
+          @replyContext.looker.client.get("queries/#{look.query.id}/run/unified", (result) =>
+            @postResult(look.query, result, message.attachments[0])
+          , @replyError)
+        else
+          @replyContext.looker.client.get("queries/#{look.query.id}/run/png", (result) =>
+            @postImage(look.query, result, message.attachments[0])
+          , @replyError, {encoding: null})
+
+    , @replyError)
 
 module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
 

@@ -1,7 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{CLIQueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
@@ -77,23 +77,11 @@ checkMessage = (bot, message) ->
 
       # Starts with Looker base URL?
       if url.lastIndexOf(looker.url, 0) == 0
-        annotatePublicLook(bot, url, message, looker)
+        annotateLook(bot, url, message, looker)
 
-annotatePublicLook = (bot, url, sourceMessage, looker) ->
+annotateLook = (bot, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
-    console.log "Expanding URL #{url}"
-
-    looker.client.get "looks/#{matches[1]}", (look) ->
-
-      message =
-        attachments: [
-          fallback: look.title
-          title: look.title
-          text: look.description
-          title_link: "#{looker.url}#{look.short_url}"
-          image_url: if look.public then "#{look.image_embed_url}?width=606" else null
-        ]
-        icon_url: "https://s3-us-west-2.amazonaws.com/slack-files2/avatars/2015-10-13/12436816609_c9dab244c5db8f0d218a_88.jpg"
-
-      bot.reply(sourceMessage, message)
-
+    console.log "Expanding Look URL #{url}"
+    context = new ReplyContext(looker, bot, sourceMessage)
+    runner = new LookQueryRunner(context, matches[1])
+    runner.start()
