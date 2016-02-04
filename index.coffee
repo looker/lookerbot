@@ -58,13 +58,27 @@ spawned.api.team.info {}, (err, response) ->
     console.log "Saved the team information..."
   )
 
-controller.on 'slash_command', (bot, message) ->
-  console.log message
-
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
-controller.hears ['(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'], ['direct_mention'], (bot, message) ->
+QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
+
+controller.on 'slash_command', (bot, message) ->
+
+  # Return 200 immediately
+  bot.res.send()
+
+  regex = new RegExp(QUERY_REGEX)
+  if match = regex.match(message.text)
+    message.match = match
+    runCLI(bot, message)
+  else
+    bot.reply("Unknown command! Sorry...")
+
+controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
+  runCLI(bot, message)
+
+runCLI = (bot, message) ->
   [txt, type, ignore, lookerName, query] = message.match
 
   looker = if lookerName
@@ -77,6 +91,7 @@ controller.hears ['(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'], 
   context = new ReplyContext(looker, bot, message)
   runner = new CLIQueryRunner(context, query, type)
   runner.start()
+
 
 checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"

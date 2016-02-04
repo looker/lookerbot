@@ -144,9 +144,9 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       @reply(query.share_url)
 
   replyError: (response) ->
-    if response.error
+    if response?.error
       @reply(":warning: #{response.error}")
-    else if response.message
+    else if response?.message
       @reply(":warning: #{response.message}")
     else
       @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
