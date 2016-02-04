@@ -79,7 +79,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
   constructor: (@replyContext, @querySlug) ->
     super @replyContext
 
-  showShareUrl: -> true
+  showShareUrl: -> false
 
   postImage: (query, imageData, options = {}) ->
     success = (url) =>
@@ -196,6 +196,8 @@ module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
 
   constructor: (@replyContext, @textQuery, @visualization) ->
     super @replyContext
+
+  showShareUrl: -> true
 
   work: ->
 
