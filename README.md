@@ -2,7 +2,7 @@
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-A bot for [Slack](http://slack.com) that integrates with [Looker](http://slack.com) to make sharing data in your organization easier!
+A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.com) to make sharing data in your organization easier!
 
 ### Configuration
 
