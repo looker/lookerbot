@@ -86,11 +86,9 @@ controller.on 'slash_command', (bot, message) ->
     spawnedBot.reply(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
-  return
   runCLI(bot, message)
 
 controller.hears [FIND_REGEX], ['direct_mention'], (bot, message) ->
-  return
   find(bot, message)
 
 controller.hears [GET_REGEX], ['direct_mention'], (bot, message) ->
@@ -141,7 +139,6 @@ get = (bot, message) ->
   runner.start()
 
 checkMessage = (bot, message) ->
-  return
   return if !message.text || message.subtype == "bot_message"
 
   # URL Expansion
