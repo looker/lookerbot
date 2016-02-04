@@ -1,7 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{QueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
@@ -64,7 +64,7 @@ controller.hears ['(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'], 
   type = "data" if type == "q" || type == "query"
 
   context = new ReplyContext(looker, bot, message)
-  runner = new QueryRunner(context, query, type)
+  runner = new CLIQueryRunner(context, query, type)
   runner.start()
 
 checkMessage = (bot, message) ->

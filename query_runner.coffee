@@ -76,70 +76,7 @@ module.exports.FancyReplier = class FancyReplier
 
 module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
-  constructor: (@replyContext, @query, @visualization) ->
-    super @replyContext
-
-  work: ->
-
-    [txt, limit, path, ignore, fields] = @query.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/)
-
-    limit = +(limit.trim()) if limit
-
-    pathParts = path.split("/").filter((p) -> p)
-
-    if pathParts.length != 2
-      @reply("You've got to specify the model and explore!")
-      return
-
-    fullyQualified = fields.split(",").map((f) -> f.trim()).map((f) ->
-      if f.indexOf(".") == -1
-        "#{pathParts[1]}.#{f}"
-      else
-        f
-    )
-
-    fields = []
-    filters = {}
-    sorts = []
-
-    for field in fullyQualified
-      matches = field.match(/([A-Za-z._]+)(\[(.+)\])? ?(asc|desc)?/i)
-      [__, field, __, filter, sort] = matches
-      if filter
-        filters[field] = _.unescape filter
-      if sort
-        sorts.push "#{field} #{sort}"
-      fields.push field
-
-    queryDef =
-      model: pathParts[0]
-      view: pathParts[1]
-      fields: fields
-      filters: filters
-      sorts: sorts
-      limit: limit
-
-    unless @visualization == "data"
-      queryDef.vis_config =
-        type: "looker_#{@visualization}"
-
-    error = (response) =>
-      if response.error
-        @reply(":warning: #{response.error}")
-      else if response.message
-        @reply(":warning: #{response.message}")
-      else
-        @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
-    @replyContext.looker.client.post("queries", queryDef, (query) =>
-      if @visualization == "data"
-        @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
-          @postResult(query, result)
-        , error)
-      else
-        @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
-          @postImage(query, result)
-        , error, {encoding: null})
-    , error)
+  showShareUrl: -> true
 
   postImage: (query, imageData) ->
     success = (url) =>
@@ -197,3 +134,71 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       )
     else
       @reply(query.share_url)
+
+  replyError: (response) ->
+    if response.error
+      @reply(":warning: #{response.error}")
+    else if response.message
+      @reply(":warning: #{response.message}")
+    else
+      @reply("Something unexpected went wrong: #{JSON.stringify(response)}")
+
+module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
+
+  constructor: (@replyContext, @textQuery, @visualization) ->
+    super @replyContext
+
+  work: ->
+
+    [txt, limit, path, ignore, fields] = @textQuery.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/)
+
+    limit = +(limit.trim()) if limit
+
+    pathParts = path.split("/").filter((p) -> p)
+
+    if pathParts.length != 2
+      @reply("You've got to specify the model and explore!")
+      return
+
+    fullyQualified = fields.split(",").map((f) -> f.trim()).map((f) ->
+      if f.indexOf(".") == -1
+        "#{pathParts[1]}.#{f}"
+      else
+        f
+    )
+
+    fields = []
+    filters = {}
+    sorts = []
+
+    for field in fullyQualified
+      matches = field.match(/([A-Za-z._]+)(\[(.+)\])? ?(asc|desc)?/i)
+      [__, field, __, filter, sort] = matches
+      if filter
+        filters[field] = _.unescape filter
+      if sort
+        sorts.push "#{field} #{sort}"
+      fields.push field
+
+    queryDef =
+      model: pathParts[0]
+      view: pathParts[1]
+      fields: fields
+      filters: filters
+      sorts: sorts
+      limit: limit
+
+    unless @visualization == "data"
+      queryDef.vis_config =
+        type: "looker_#{@visualization}"
+
+    @replyContext.looker.client.post("queries", queryDef, (query) =>
+      if @visualization == "data"
+        @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
+          @postResult(query, result)
+        , @replyError)
+      else
+        @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
+          @postImage(query, result)
+        , @replyError, {encoding: null})
+    , @replyError)
