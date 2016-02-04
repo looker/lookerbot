@@ -75,7 +75,7 @@ controller.on 'slash_command', (bot, message) ->
     message.match = match
     runCLI(spawnedBot, message)
   else
-    bot.replyPrivate(message, "Usage: `#{CLI_HELP}`")
+    spawnedBot.replyPrivate(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
   runCLI(bot, message)
