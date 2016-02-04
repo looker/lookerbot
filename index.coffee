@@ -75,7 +75,7 @@ controller.on 'slash_command', (bot, message) ->
     message.match = match
     runCLI(spawnedBot, message)
   else
-    spawnedBot.replyPrivate(message, "Usage: `#{CLI_HELP}`")
+    spawnedBot.reply(message, "Usage: `#{CLI_HELP}`")
 
 controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
   runCLI(bot, message)
@@ -93,7 +93,6 @@ runCLI = (bot, message) ->
   context = new ReplyContext(looker, bot, message)
   runner = new CLIQueryRunner(context, query, type)
   runner.start()
-
 
 checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"
