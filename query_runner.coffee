@@ -204,6 +204,11 @@ module.exports.DashboardQueryRunner = class DashboardQueryRunner extends QueryRu
   showShareUrl: -> true
 
   work: ->
+
+    if @dashboard.elements.length > 1
+      @reply("Dashboards with more than one element aren't currently supported for Slack commands.")
+      return
+
     for element in @dashboard.elements
       @replyContext.looker.client.get("looks/#{element.look_id}", (look) =>
         queryDef = look.query
