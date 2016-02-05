@@ -104,12 +104,9 @@ controller.on "direct_mention", (bot, message) ->
 
 processCommand = (bot, message) ->
 
-  if bot.res
-    # Return 200 immediately for slash commands
-    bot.res.setHeader 'Content-Type', 'application/json'
-    bot.res.send JSON.stringify({response_type: "in_channel"})
-
+  sent = false
   replyPrivateIfPossible = (newMessage) ->
+    sent = true
     if bot.res
       bot.replyPrivate(message, newMessage)
     else
@@ -151,6 +148,12 @@ processCommand = (bot, message) ->
       else
         replyPrivateIfPossible("_Your command wasn't recognized. No custom commands are configured._")
       refreshCommands()
+
+
+  if bot.res && !sent
+    # Return 200 immediately for slash commands
+    bot.res.setHeader 'Content-Type', 'application/json'
+    bot.res.send JSON.stringify({response_type: "in_channel"})
 
 runCLI = (bot, message) ->
   [txt, type, ignore, lookerName, query] = message.match
