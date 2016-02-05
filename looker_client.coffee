@@ -49,7 +49,7 @@ module.exports = class LookerAPIClient
       errorCallback
     )
 
-  fetchAccessToken: (cb) ->
+  fetchAccessToken: ->
 
     options =
       method: "POST"
@@ -69,5 +69,5 @@ module.exports = class LookerAPIClient
       else
         @token = null
         console.warn("Failed fetchAccessToken for Looker #{@options.baseUrl}: #{body}")
-      cb?()
+      @options.afterConnect?()
     )

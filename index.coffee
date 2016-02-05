@@ -13,11 +13,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 customCommands = {}
 
 lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
-  looker.client = new LookerClient(
-    baseUrl: looker.apiBaseUrl
-    clientId: looker.clientId
-    clientSecret: looker.clientSecret
-  )
   looker.storeBlob = (blob, success, error) ->
     path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
     key = "#{path.join("/")}.png"
@@ -38,6 +33,7 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
         success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
+    console.log "Refreshing custom commands for #{looker.url}..."
     looker.client.get("spaces/#{looker.customCommandSpaceId}", (space) ->
       for partialDashboard in space.dashboards
         looker.client.get("dashboards/#{partialDashboard.id}", (dashboard) ->
@@ -56,6 +52,12 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
 
         console.log)
     console.log)
+  looker.client = new LookerClient(
+    baseUrl: looker.apiBaseUrl
+    clientId: looker.clientId
+    clientSecret: looker.clientSecret
+    afterConnect: looker.refreshCommands
+  )
   looker
 )
 
@@ -66,9 +68,7 @@ refreshCommands = ->
 # Update access tokens every half hour
 setInterval(->
   for looker in lookers
-    looker.client.fetchAccessToken(->
-      looker.refreshCommands()
-    )
+    looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
 
 controller = Botkit.slackbot(
@@ -152,12 +152,10 @@ processCommand = (bot, message) ->
           help += " — _#{command.description}_"
         help += "\n"
 
-      # help = help.split("<").join("&lt;").split(">").join("&gt;").split("&").join("&amp;")
-
       spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
       ).join(" or ")
-      help += "\n To add your own shortcuts, add a dashboard to #{spaces}."
+      help += "\n_To add your own shortcuts, add a dashboard to #{spaces}._"
 
       replyPrivateIfPossible({text: help, parse: "none", attachments: []})
 
