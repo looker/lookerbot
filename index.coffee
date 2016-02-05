@@ -126,7 +126,7 @@ processCommand = (bot, message) ->
       query = message.text[matchedCommand.name.length..].trim()
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
-      context = new ReplyContext(matchedCommand.looker, bot, message)
+      context = new ReplyContext(matchedCommand.looker, spawnedBot, message)
       filters = {}
       for filter in matchedCommand.dashboard.filters
         filters[filter.name] = query
@@ -141,9 +141,9 @@ processCommand = (bot, message) ->
           help += " — _#{command.description}_"
         help += "\n"
       if _.values(customCommands).length > 0
-        bot.reply(message, help)
+        spawnedBot.reply(message, help)
       else
-        bot.reply(message, "No custom commands are configured.")
+        spawnedBot.reply(message, "No custom commands are configured.")
       refreshCommands()
 
 runCLI = (bot, message) ->
