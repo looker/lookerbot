@@ -137,16 +137,23 @@ processCommand = (bot, message) ->
       runner.start()
 
     else
-      help = "_Here's what you can ask me to look up:_\n"
+      help = """
+      _I've got some built-in commands:_\n
+      • *find* <look search term> — _Shows the top five Looks matching the search._
+      • *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n\n
+      """
+
+      if _.values(customCommands).length > 0
+        help += "_And there are some fancy quick shortcuts people have set up:_\n\n"
+
       for command in _.sortBy(_.values(customCommands), "name")
         help += "• *#{command.name}* #{command.helptext}"
         if command.description
           help += " — _#{command.description}_"
         help += "\n"
-      if _.values(customCommands).length > 0
-        replyPrivateIfPossible(help)
-      else
-        replyPrivateIfPossible("_Your command wasn't recognized. No custom commands are configured._")
+
+      replyPrivateIfPossible(help)
+
       refreshCommands()
 
 
