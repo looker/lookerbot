@@ -4,6 +4,51 @@ levenshteinFS = require('fuzzysearch-js/js/modules/LevenshteinFS')
 
 module.exports = {}
 
+sassyMessages = [
+
+  # English
+  ["us", "Just a second"]
+  ["us", "Thinking"]
+  ["ca", "On it"]
+  ["us", "Working on it"]
+  ["gb", "Queueing"]
+  ["gb", "Having a think"]
+  ["ca", "One moment please"]
+  ["in", "Give me a minute"]
+  ["pk", "Hold on"]
+  ["ng", "Looking into it"]
+  ["ph", "One sec"]
+  ["ph", "Working it out"]
+  ["us", "Hold please"]
+  ["eg", "Wait a moment"]
+  ["eg", "Hmm"]
+
+  # Cooler Languages
+  ["es", "Un momento, por favor"]
+  ["mx", "Por favor espera"]
+  ["de", "Bitte warten Sie einen Augenblick"]
+  ["jp", "お待ちください"]
+  ["ca", "Un moment s'il vous plait"]
+  ["cn", "稍等一會兒"]
+  ["nl", "Even geduld aub"]
+  ["so", "Ka shaqeeya waxaa ku"]
+  ["th", "กรุณารอสักครู่"]
+  ["ru", "один момент, пожалуйста"]
+  ["fi", "Hetkinen"]
+  ["ro", "De lucru pe ea"]
+  ["is", "Eitt andartak"]
+  ["az", "Bir dəqiqə zəhmət olmasa"]
+  ["ie", "Fán le do thoil"]
+  ["ne", "कृपया पर्खनुहोस्"]
+  ["in", "कृपया एक क्षण के लिए"]
+
+].map(([country, message] = pair) ->
+  # TODO: figure out why Slack unfurls the Google Translate link even when I set unfurl_links: false
+  # translate = "http://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
+  # "<#{translate}|:flag-#{country}:> _#{message}..._"
+  ":flag-#{country}: _#{message}..._"
+)
+
 module.exports.FancyReplier = class FancyReplier
 
   constructor: (@replyContext) ->
@@ -27,46 +72,6 @@ module.exports.FancyReplier = class FancyReplier
       @replyContext.bot.reply(@replyContext.replyTo, obj, cb)
 
   startLoading: (cb) ->
-
-    sassyMessages = [
-
-      # English
-      ":flag-us: _Just a second..._"
-      ":flag-us: _Thinking..._"
-      ":flag-ca: _On it..._"
-      ":flag-us: _Working on it..._"
-      ":flag-gb: _Queueing..._"
-      ":flag-gb: _Having a think..._"
-      ":flag-ca: _One moment please..._"
-      ":flag-in: _Give me a minute..._"
-      ":flag-pk: _Hold on..._"
-      ":flag-ng: _Looking into it..._"
-      ":flag-ph: _One sec..._"
-      ":flag-ph: _Working it out..._"
-      ":flag-us: _Hold please..._"
-      ":flag-eg: _Wait a moment..._"
-      ":flag-eg: _Hmm..._"
-
-      # Cooler Languages
-      ":flag-es: _Un momento, por favor..._"
-      ":flag-mx: _Por favor espera..._"
-      ":flag-de: _Bitte warten Sie einen Augenblick..._"
-      ":flag-jp: _お待ちください..._"
-      ":flag-ca: _Un moment s'il vous plait..._"
-      ":flag-cn: _稍等一會兒..._"
-      ":flag-nl: _Even geduld aub..._"
-      ":flag-so: _Ka shaqeeya waxaa ku..._"
-      ":flag-th: _กรุณารอสักครู่..._"
-      ":flag-ru: _один момент, пожалуйста..._"
-      ":flag-fi: _Hetkinen..._"
-      ":flag-ro: _De lucru pe ea..._"
-      ":flag-is: _Eitt andartak..._"
-      ":flag-az: _Bir dəqiqə zəhmət olmasa..._"
-      ":flag-ie: _Fán le do thoil..._"
-      ":flag-ne: _कृपया पर्खनुहोस्..._"
-      ":flag-in: _कृपया एक क्षण के लिए..._"
-
-    ]
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
