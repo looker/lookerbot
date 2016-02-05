@@ -154,8 +154,7 @@ processCommand = (bot, message) ->
 
       replyPrivateIfPossible(help)
 
-      refreshCommands()
-
+    refreshCommands()
 
   if bot.res && !sent
     # Return 200 immediately for slash commands
