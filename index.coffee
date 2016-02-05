@@ -152,13 +152,14 @@ processCommand = (bot, message) ->
           help += " — _#{command.description}_"
         help += "\n"
 
-      if _.values(customCommands).length > 0
-        spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
-          "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
-        ).join(" or ")
-        help += "\n To add your own custom command, add a dashboard to #{spaces}."
+      # help = help.split("<").join("&lt;").split(">").join("&gt;").split("&").join("&amp;")
 
-      replyPrivateIfPossible(help)
+      spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
+        "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
+      ).join(" or ")
+      help += "\n To add your own shortcuts, add a dashboard to #{spaces}."
+
+      replyPrivateIfPossible({text: help, parse: "none", attachments: []})
 
     refreshCommands()
 
