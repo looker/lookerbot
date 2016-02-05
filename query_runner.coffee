@@ -153,6 +153,11 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       else
         @reply("#{query.share_url}\nNo results.")
 
+    else if query.vis_config?.type == "single_value"
+      field = measure_like[0] || dimension_like[0]
+      share = if @showShareUrl() then "\n#{query.share_url}" else ""
+      text = "*#{result.data[0][field.name].rendered}*#{share}"
+      @reply(text)
     else if result.data.length == 1
       attachment = _.extend({}, options, {
         fields: renderableFields.map((m) ->
