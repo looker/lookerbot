@@ -141,6 +141,8 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     measure_like = measures.concat(calcs.filter((c) -> c.is_measure))
     dimension_like = dimensions.concat(calcs.filter((c) -> !c.is_measure))
 
+    renderableFields = dimension_like.concat(measure_like)
+
     if result.pivots
       @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
 
@@ -151,9 +153,9 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       else
         @reply("#{query.share_url}\nNo results.")
 
-    else if dimension_like.length == 0 && measure_like.length > 0
+    else if result.data.length == 1
       attachment = _.extend({}, options, {
-        fields: measure_like.map((m) ->
+        fields: renderableFields.map((m) ->
           {title: m.label, value: result.data[0][m.name].rendered, short: true}
         )
       })
@@ -162,26 +164,12 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         text: if @showShareUrl() then query.share_url else ""
       )
 
-    else if dimension_like.length == 1 && measure_like.length == 0
-      attachment = _.extend({}, options, {
-        fields: [
-          title: dimension_like[0].label
-          value: result.data.map((d) ->
-            d[dimension_like[0].name].rendered
-          ).join("\n")
-        ]
-      })
-      @reply(
-        attachments: [attachment]
-        text: if @showShareUrl() then query.share_url else ""
-      )
     else
-      fields = dimension_like.concat(measure_like)
       attachment = _.extend({}, options, {
         fields: [
-          title: fields.map((f) -> f.label).join(" – ")
+          title: renderableFields.map((f) -> f.label).join(" – ")
           value: result.data.map((d) ->
-            fields.map((f) -> d[f.name].rendered).join(" – ")
+            renderableFields.map((f) -> d[f.name].rendered).join(" – ")
           ).join("\n")
         ]
       })
