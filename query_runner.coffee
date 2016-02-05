@@ -73,6 +73,7 @@ module.exports.FancyReplier = class FancyReplier
       @work()
 
   replyError: (response) ->
+    console.error(response)
     if response?.error
       @reply(":warning: #{response.error}")
     else if response?.message
