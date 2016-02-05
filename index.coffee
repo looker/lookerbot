@@ -109,6 +109,12 @@ processCommand = (bot, message) ->
     bot.res.setHeader 'Content-Type', 'application/json'
     bot.res.send JSON.stringify({response_type: "in_channel"})
 
+  replyPrivateIfPossible = (newMessage) ->
+    if bot.res
+      bot.replyPrivate(message, newMessage)
+    else
+      spawnedBot.reply(message, newMessage)
+
   if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
     runCLI(spawnedBot, message)
@@ -141,9 +147,9 @@ processCommand = (bot, message) ->
           help += " — _#{command.description}_"
         help += "\n"
       if _.values(customCommands).length > 0
-        spawnedBot.reply(message, help)
+        replyPrivateIfPossible(help)
       else
-        spawnedBot.reply(message, "No custom commands are configured.")
+        replyPrivateIfPossible("_Your command wasn't recognized. No custom commands are configured._")
       refreshCommands()
 
 runCLI = (bot, message) ->
