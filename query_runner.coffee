@@ -29,26 +29,43 @@ module.exports.FancyReplier = class FancyReplier
   startLoading: (cb) ->
 
     sassyMessages = [
-      ":flag-us: Just a second..."
-      ":flag-gb: Working on it..."
-      ":flag-ca: One moment please..."
-      ":flag-in: Give me a minute..."
-      ":flag-pk: Hold on..."
-      ":flag-ng: Looking into it..."
-      ":flag-ph: One sec..."
-      ":flag-us: Hold please..."
-      ":flag-eg: Wait a moment..."
-      ":flag-es: Un momento, por favor..."
-      ":flag-mx: Por favor espera..."
-      ":flag-de: Bitte warten Sie einen Augenblick..."
-      ":flag-jp: お待ちください..."
-      ":flag-ca: Un moment s'il vous plait..."
-      ":flag-cn: 稍等一會兒..."
-      ":flag-nl: Even geduld aub..."
-      ":flag-so: Ka shaqeeya waxaa ku..."
-      ":flag-th: กรุณารอสักครู่..."
-      ":flag-ru: один момент, пожалуйста..."
-      ":flag-fi: Hetkinen..."
+
+      # English
+      ":flag-us: _Just a second..._"
+      ":flag-us: _Thinking..._"
+      ":flag-ca: _On it..._"
+      ":flag-us: _Working on it..._"
+      ":flag-gb: _Queueing..._"
+      ":flag-gb: _Having a think..._"
+      ":flag-ca: _One moment please..._"
+      ":flag-in: _Give me a minute..._"
+      ":flag-pk: _Hold on..._"
+      ":flag-ng: _Looking into it..._"
+      ":flag-ph: _One sec..._"
+      ":flag-ph: _Working it out..._"
+      ":flag-us: _Hold please..._"
+      ":flag-eg: _Wait a moment..._"
+      ":flag-eg: _Hmm..._"
+
+      # Cooler Languages
+      ":flag-es: _Un momento, por favor..._"
+      ":flag-mx: _Por favor espera..._"
+      ":flag-de: _Bitte warten Sie einen Augenblick..._"
+      ":flag-jp: _お待ちください..._"
+      ":flag-ca: _Un moment s'il vous plait..._"
+      ":flag-cn: _稍等一會兒..._"
+      ":flag-nl: _Even geduld aub..._"
+      ":flag-so: _Ka shaqeeya waxaa ku..._"
+      ":flag-th: _กรุณารอสักครู่..._"
+      ":flag-ru: _один момент, пожалуйста..._"
+      ":flag-fi: _Hetkinen..._"
+      ":flag-ro: _De lucru pe ea..._"
+      ":flag-is: _Eitt andartak..._"
+      ":flag-az: _Bir dəqiqə zəhmət olmasa..._"
+      ":flag-ie: _Fán le do thoil..._"
+      ":flag-ne: _कृपया पर्खनुहोस्..._"
+      ":flag-in: _कृपया एक क्षण के लिए..._"
+
     ]
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
