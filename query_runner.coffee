@@ -128,15 +128,32 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     @replyContext.looker.storeBlob(imageData, success, error)
 
   postResult: (query, result, options = {}) ->
-    if result.data.length == 0
+
+    # Handle hidden fields
+    hiddenFields = query.vis_config?.hidden_fields || []
+    if hiddenFields?.length > 0
+      for k, v of result.fields
+        result.fields[k] = v.filter((field) -> hiddenFields.indexOf(field.name) == -1)
+
+    calcs = result.fields.table_calculations || []
+    dimensions = result.fields.dimensions || []
+    measures = result.fields.measures || []
+    measure_like = measures.concat(calcs.filter((c) -> c.is_measure))
+    dimension_like = dimensions.concat(calcs.filter((c) -> !c.is_measure))
+
+    if result.pivots
+      @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
+
+    else if result.data.length == 0
       if result.errors?.length
         txt = result.errors.map((e) -> "#{e.message}```#{e.message_details}```").join("\n")
         @reply(":warning: #{query.share_url}\n#{txt}")
       else
         @reply("#{query.share_url}\nNo results.")
-    else if result.fields.dimensions.length == 0
+
+    else if dimension_like.length == 0 && measure_like.length > 0
       attachment = _.extend({}, options, {
-        fields: result.fields.measures.map((m) ->
+        fields: measure_like.map((m) ->
           {title: m.label, value: result.data[0][m.name].rendered, short: true}
         )
       })
@@ -144,27 +161,13 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         attachments: [attachment]
         text: if @showShareUrl() then query.share_url else ""
       )
-    else if result.fields.dimensions.length == 1 && result.fields.measures.length == 0
+
+    else if dimension_like.length == 1 && measure_like.length == 0
       attachment = _.extend({}, options, {
         fields: [
-          title: result.fields.dimensions[0].label
+          title: dimension_like[0].label
           value: result.data.map((d) ->
-            d[result.fields.dimensions[0].name].rendered
-          ).join("\n")
-        ]
-      })
-      @reply(
-        attachments: [attachment]
-        text: if @showShareUrl() then query.share_url else ""
-      )
-    else if (result.fields.dimensions.length == 1 && result.fields.measures.length == 1) || (result.fields.dimensions.length == 2 && result.fields.measures.length == 0)
-      dim = result.fields.dimensions[0]
-      mes = result.fields.measures[0] || result.fields.dimensions[1]
-      attachment = _.extend({}, options, {
-        fields: [
-          title: "#{dim.label} – #{mes.label}"
-          value: result.data.map((d) ->
-            "#{d[dim.name].rendered} – #{d[mes.name].rendered}"
+            d[dimension_like[0].name].rendered
           ).join("\n")
         ]
       })
@@ -173,7 +176,19 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         text: if @showShareUrl() then query.share_url else ""
       )
     else
-      @reply("#{query.share_url}\n_Result table too large to display in Slack._")
+      fields = dimension_like.concat(measure_like)
+      attachment = _.extend({}, options, {
+        fields: [
+          title: fields.map((f) -> f.label).join(" – ")
+          value: result.data.map((d) ->
+            fields.map((f) -> d[f.name].rendered).join(" – ")
+          ).join("\n")
+        ]
+      })
+      @reply(
+        attachments: [attachment]
+        text: if @showShareUrl() then query.share_url else ""
+      )
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
