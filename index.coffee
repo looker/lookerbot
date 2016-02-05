@@ -122,7 +122,7 @@ processCommand = (bot, message) ->
     message.match = match
     get(spawnedBot, message)
   else
-    shortCommands = _.sortBy(_.values(customCommands), (c) -> c.name.length)
+    shortCommands = _.sortBy(_.values(customCommands), (c) -> -c.name.length)
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf("#{c.name} ") == 0)?[0]
     if matchedCommand
 
