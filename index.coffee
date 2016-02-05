@@ -78,11 +78,11 @@ controller = Botkit.slackbot(
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
-spawnedBot = controller.spawn({
+defaultBot = controller.spawn({
   token: process.env.SLACK_API_KEY,
 }).startRTM()
 
-spawnedBot.api.team.info {}, (err, response) ->
+defaultBot.api.team.info {}, (err, response) ->
   controller.saveTeam(response.team, ->
     console.log "Saved the team information..."
   )
@@ -104,23 +104,17 @@ controller.on "direct_mention", (bot, message) ->
 
 processCommand = (bot, message) ->
 
-  sent = false
-  replyPrivateIfPossible = (newMessage) ->
-    sent = true
-    if bot.res
-      bot.replyPrivate(message, newMessage)
-    else
-      spawnedBot.reply(message, newMessage)
+  context = new ReplyContext(defaultBot, bot, message)
 
   if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
-    runCLI(spawnedBot, message)
+    runCLI(context, message)
   else if match = message.text.match(new RegExp(FIND_REGEX))
     message.match = match
-    find(spawnedBot, message)
+    find(context, message)
   else if match = message.text.match(new RegExp(GET_REGEX))
     message.match = match
-    get(spawnedBot, message)
+    get(context, message)
   else
     shortCommands = _.sortBy(_.values(customCommands), (c) -> -c.name.length)
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf("#{c.name} ") == 0)?[0]
@@ -129,7 +123,8 @@ processCommand = (bot, message) ->
       query = message.text[matchedCommand.name.length..].trim()
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
-      context = new ReplyContext(matchedCommand.looker, spawnedBot, message)
+      context.looker = matchedCommand.looker
+
       filters = {}
       for filter in matchedCommand.dashboard.filters
         filters[filter.name] = query
@@ -157,16 +152,16 @@ processCommand = (bot, message) ->
       ).join(" or ")
       help += "\n_To add your own shortcuts, add a dashboard to #{spaces}._"
 
-      replyPrivateIfPossible({text: help, parse: "none", attachments: []})
+      context.replyPrivate({text: help, parse: "none", attachments: []})
 
     refreshCommands()
 
-  if bot.res && !sent
+  if context.isSlashCommand() && !context.hasRepliedToSlashCommand
     # Return 200 immediately for slash commands
     bot.res.setHeader 'Content-Type', 'application/json'
     bot.res.send JSON.stringify({response_type: "in_channel"})
 
-runCLI = (bot, message) ->
+runCLI = (context, message) ->
   [txt, type, ignore, lookerName, query] = message.match
 
   looker = if lookerName
@@ -176,11 +171,10 @@ runCLI = (bot, message) ->
 
   type = "data" if type == "q" || type == "query"
 
-  context = new ReplyContext(looker, bot, message)
   runner = new CLIQueryRunner(context, query, type)
   runner.start()
 
-find = (bot, message) ->
+find = (context, message) ->
   [__, type, query] = message.match
 
   firstWord = query.split(" ")[0]
@@ -191,11 +185,10 @@ find = (bot, message) ->
     query = words.join(" ")
   looker = foundLooker || lookers[0]
 
-  context = new ReplyContext(looker, bot, message)
   runner = new LookFinder(context, type, query)
   runner.start()
 
-get = (bot, message) ->
+get = (context, message) ->
   [__, query, filterValue] = message.match
 
   firstWord = query.split(" ")[0]
@@ -206,7 +199,6 @@ get = (bot, message) ->
     query = words.join(" ")
   looker = foundLooker || lookers[0]
 
-  context = new ReplyContext(looker, bot, message)
   runner = new LookParameterizer(context, query.trim(), filterValue.trim())
   runner.start()
 
@@ -220,19 +212,19 @@ checkMessage = (bot, message) ->
 
       # Starts with Looker base URL?
       if url.lastIndexOf(looker.url, 0) == 0
-        annotateLook(bot, url, message, looker)
-        annotateShareUrl(bot, url, message, looker)
+        context = new ReplyContext(defaultBot, bot, sourceMessage)
+        context.looker = looker
+        annotateLook(context, url, message, looker)
+        annotateShareUrl(context, url, message, looker)
 
-annotateLook = (bot, url, sourceMessage, looker) ->
+annotateLook = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
     console.log "Expanding Look URL #{url}"
-    context = new ReplyContext(looker, bot, sourceMessage)
     runner = new LookQueryRunner(context, matches[1])
     runner.start()
 
-annotateShareUrl = (bot, url, sourceMessage, looker) ->
+annotateShareUrl = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/x\/([A-Za-z0-9]+)$/)
     console.log "Expanding Share URL #{url}"
-    context = new ReplyContext(looker, bot, sourceMessage)
     runner = new QueryRunner(context, matches[1])
     runner.start()

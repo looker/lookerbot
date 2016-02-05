@@ -54,35 +54,35 @@ module.exports.FancyReplier = class FancyReplier
   constructor: (@replyContext) ->
 
   reply: (obj, cb) ->
-
     if @loadingMessage
       # Hacky stealth update of message to preserve chat order
 
       if typeof(obj) == 'string'
-        obj = {text: obj, channel: @replyContext.replyTo.channel}
+        obj = {text: obj, channel: @replyContext.sourceMessage.channel}
 
-      params = {ts: @loadingMessage.ts, channel: @replyContext.replyTo.channel}
+      params = {ts: @loadingMessage.ts, channel: @replyContext.sourceMessage.channel}
 
       update = _.extend(params, obj)
       update.attachments = if update.attachments then JSON.stringify(update.attachments) else null
       update.text = update.text || " "
 
-      @replyContext.bot.api.chat.update(update)
+      @replyContext.defaultBot.api.chat.update(update)
     else
-      @replyContext.bot.reply(@replyContext.replyTo, obj, cb)
+      @replyContext.replyPublic(obj, cb)
 
   startLoading: (cb) ->
+
+    return unless @replyContext.canEditReply()
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
     params =
       text: sass
-      channel: @replyContext.replyTo.channel
       as_user: true
       attachments: [] # Override some Botkit stuff
 
-    @replyContext.bot.say(params, (err, res) =>
-      @loadingMessage = res
+    @replyContext.say(params, (sentMessage) =>
+      @loadingMessage = sentMessage
       cb()
     )
 
