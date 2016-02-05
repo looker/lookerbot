@@ -143,6 +143,13 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
     renderableFields = dimension_like.concat(measure_like)
 
+    renderField = (f, row) =>
+      d = row[f.name]
+      if d.drilldown_uri && (f.is_measure || f.measure)
+        "<#{@replyContext.looker.url}#{d.drilldown_uri}|#{d.rendered}>"
+      else
+        d.rendered
+
     if result.pivots
       @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
 
@@ -156,12 +163,13 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     else if query.vis_config?.type == "single_value"
       field = measure_like[0] || dimension_like[0]
       share = if @showShareUrl() then "\n#{query.share_url}" else ""
-      text = "*#{result.data[0][field.name].rendered}*#{share}"
+      text = "*#{renderField(field, result.data[0])}*#{share}"
       @reply(text)
+
     else if result.data.length == 1
       attachment = _.extend({}, options, {
         fields: renderableFields.map((m) ->
-          {title: m.label, value: result.data[0][m.name].rendered, short: true}
+          {title: m.label, value: renderField(m, result.data[0]), short: true}
         )
       })
       @reply(
@@ -174,7 +182,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         fields: [
           title: renderableFields.map((f) -> f.label).join(" – ")
           value: result.data.map((d) ->
-            renderableFields.map((f) -> d[f.name].rendered).join(" – ")
+            renderableFields.map((f) -> renderField(f, d)).join(" – ")
           ).join("\n")
         ]
       })
