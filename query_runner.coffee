@@ -185,7 +185,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
-    if type == "table" || type == "single_record" || type == "single_value"
+    if type == "table" || type == "looker_single_record" || type == "single_value"
       @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
         @postResult(query, result, options)
       (r) => @replyError(r))
