@@ -147,7 +147,7 @@ processCommand = (bot, message) ->
         help += "_And there are some fancy quick shortcuts people have set up:_\n\n"
 
       for command in _.sortBy(_.values(customCommands), "name")
-        help += "• *#{command.name}* #{command.helptext}"
+        help += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
         if command.description
           help += " — _#{command.description}_"
         help += "\n"
