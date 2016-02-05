@@ -1,13 +1,16 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 LookerClient = require('./looker_client')
-{CLIQueryRunner, LookFinder, LookParameterizer, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
+{CLIQueryRunner, LookFinder, LookParameterizer, DashboardQueryRunner, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
 ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
+_ = require('underscore')
 
 # Local dev only
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+
+customCommands = {}
 
 lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
   looker.client = new LookerClient(
@@ -33,13 +36,39 @@ lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
         error(err)
       else
         success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
+  looker.refreshCommands = ->
+    return unless looker.customCommandSpaceId
+    looker.client.get("spaces/#{looker.customCommandSpaceId}", (space) ->
+      for partialDashboard in space.dashboards
+        looker.client.get("dashboards/#{partialDashboard.id}", (dashboard) ->
+
+          command =
+            name: dashboard.title.toLowerCase().trim()
+            description: dashboard.description
+            dashboard: dashboard
+            looker: looker
+
+          command.helptext = (dashboard.filters || "").map((f) ->
+            "<#{f.title.toLowerCase()}>"
+          ).join(", ")
+
+          customCommands[command.name] = command
+
+        console.log)
+    console.log)
   looker
 )
+
+refreshCommands = ->
+  for looker in lookers
+    looker.refreshCommands()
 
 # Update access tokens every half hour
 setInterval(->
   for looker in lookers
-    looker.client.fetchAccessToken()
+    looker.client.fetchAccessToken(->
+      looker.refreshCommands()
+    )
 , 30 * 60 * 1000)
 
 controller = Botkit.slackbot(
@@ -67,11 +96,18 @@ GET_REGEX = 'get (.+)=(.+)'
 
 CLI_HELP = "pie model/view/field,another_field[filter_value],more_field desc"
 
-controller.on 'slash_command', (bot, message) ->
+controller.on "slash_command", (bot, message) ->
+  processCommand(bot, message)
 
-  # Return 200 immediately
-  bot.res.setHeader 'Content-Type', 'application/json'
-  bot.res.send JSON.stringify({response_type: "in_channel"})
+controller.on "direct_mention", (bot, message) ->
+  processCommand(bot, message)
+
+processCommand = (bot, message) ->
+
+  if bot.res
+    # Return 200 immediately for slash commands
+    bot.res.setHeader 'Content-Type', 'application/json'
+    bot.res.send JSON.stringify({response_type: "in_channel"})
 
   if match = message.text.match(new RegExp(QUERY_REGEX))
     message.match = match
@@ -83,16 +119,32 @@ controller.on 'slash_command', (bot, message) ->
     message.match = match
     get(spawnedBot, message)
   else
-    spawnedBot.reply(message, "Usage: `#{CLI_HELP}`")
+    shortCommands = _.sortBy(_.values(customCommands), (c) -> c.name.length)
+    matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf("#{c.name} ") == 0)?[0]
+    if matchedCommand
 
-controller.hears [QUERY_REGEX], ['direct_mention'], (bot, message) ->
-  runCLI(bot, message)
+      query = message.text[matchedCommand.name.length..].trim()
+      message.text.toLowerCase().indexOf(matchedCommand.name)
 
-controller.hears [FIND_REGEX], ['direct_mention'], (bot, message) ->
-  find(bot, message)
+      context = new ReplyContext(matchedCommand.looker, bot, message)
+      filters = {}
+      for filter in matchedCommand.dashboard.filters
+        filters[filter.name] = query
+      runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
+      runner.start()
 
-controller.hears [GET_REGEX], ['direct_mention'], (bot, message) ->
-  get(bot, message)
+    else
+      help = "_Here's what you can ask me to look up:_\n"
+      for command in _.sortBy(_.values(customCommands), "name")
+        help += "• *#{command.name}* #{command.helptext}"
+        if command.description
+          help += " — _#{command.description}_"
+        help += "\n"
+      if _.values(customCommands).length > 0
+        bot.reply(message, help)
+      else
+        bot.reply(message, "No custom commands are configured.")
+      refreshCommands()
 
 runCLI = (bot, message) ->
   [txt, type, ignore, lookerName, query] = message.match

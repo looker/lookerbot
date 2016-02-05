@@ -169,7 +169,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       (r) => @replyError(r)
       {encoding: null})
 
-module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
+module.exports.LookQueryRunner = class LookQueryRunner extends QueryRunner
 
   constructor: (@replyContext, @lookId) ->
     super @replyContext, null
@@ -193,6 +193,31 @@ module.exports.LookQueryRunner = class CLIQueryRunner extends QueryRunner
         @runQuery(look.query, message.attachments[0])
 
     (r) => @replyError(r))
+
+
+module.exports.DashboardQueryRunner = class DashboardQueryRunner extends QueryRunner
+
+  constructor: (@replyContext, @dashboard, @filters = {}) ->
+    super @replyContext, null
+
+  showShareUrl: -> true
+
+  work: ->
+    for element in @dashboard.elements
+      @replyContext.looker.client.get("looks/#{element.look_id}", (look) =>
+        queryDef = look.query
+
+        for dashFilterName, fieldName of element.listen
+          if @filters[dashFilterName]
+            queryDef.filters[fieldName] = @filters[dashFilterName]
+
+        queryDef.filter_config = null
+
+        @replyContext.looker.client.post("queries", queryDef, (query) =>
+          @runQuery(query)
+        , (r) => @replyError(r))
+
+      (r) => @replyError(r))
 
 module.exports.CLIQueryRunner = class CLIQueryRunner extends QueryRunner
 
