@@ -72,8 +72,6 @@ module.exports.FancyReplier = class FancyReplier
 
   startLoading: (cb) ->
 
-    return unless @replyContext.canEditReply()
-
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
     params =
