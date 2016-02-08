@@ -22,6 +22,12 @@ module.exports = class ReplyContext
 
   say: (message, cb) ->
     params = _.extend({}, {channel: @sourceMessage.channel}, message)
-    @messageBot.say(params, (err, res) =>
+    @_tokenizedBot().say(params, (err, res) =>
       cb(res)
     )
+
+  _tokenizedBot: ->
+    if @messageBot.config.token
+      @messageBot
+    else
+      @defaultBot
