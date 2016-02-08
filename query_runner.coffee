@@ -145,8 +145,10 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       d = row[f.name]
       if d.drilldown_uri && (f.is_measure || f.measure)
         "<#{@replyContext.looker.url}#{d.drilldown_uri}|#{d.rendered}>"
-      else
+      else if d? && d.value != null
         d.rendered
+      else
+        "∅"
 
     if result.pivots
       @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
