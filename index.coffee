@@ -102,6 +102,9 @@ controller.on "slash_command", (bot, message) ->
 controller.on "direct_mention", (bot, message) ->
   processCommand(bot, message)
 
+controller.on "direct_message", (bot, message) ->
+  processCommand(bot, message)
+
 processCommand = (bot, message) ->
 
   context = new ReplyContext(defaultBot, bot, message)
