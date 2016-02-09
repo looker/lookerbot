@@ -216,7 +216,7 @@ checkMessage = (bot, message) ->
 
       # Starts with Looker base URL?
       if url.lastIndexOf(looker.url, 0) == 0
-        context = new ReplyContext(defaultBot, bot, sourceMessage)
+        context = new ReplyContext(defaultBot, bot, message)
         context.looker = looker
         annotateLook(context, url, message, looker)
         annotateShareUrl(context, url, message, looker)
