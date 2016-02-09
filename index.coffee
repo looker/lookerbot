@@ -168,7 +168,7 @@ processCommand = (bot, message) ->
 runCLI = (context, message) ->
   [txt, type, ignore, lookerName, query] = message.match
 
-  looker = if lookerName
+  context.looker = if lookerName
     lookers.filter((l) -> l.url.indexOf(lookerName) != -1)[0] || lookers[0]
   else
     lookers[0]
