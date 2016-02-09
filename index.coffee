@@ -187,7 +187,7 @@ find = (context, message) ->
     words = query.split(" ")
     words.shift()
     query = words.join(" ")
-  looker = foundLooker || lookers[0]
+  context.looker = foundLooker || lookers[0]
 
   runner = new LookFinder(context, type, query)
   runner.start()
