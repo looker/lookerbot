@@ -94,8 +94,6 @@ QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
 GET_REGEX = 'get (.+)=(.+)'
 
-CLI_HELP = "pie model/view/field,another_field[filter_value],more_field desc"
-
 controller.on "slash_command", (bot, message) ->
   processCommand(bot, message)
 
