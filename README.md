@@ -4,6 +4,14 @@
 
 A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.com) to make sharing data in your organization easier!
 
+### Requirements
+
+- Looker
+- A server capable of running Node.js to deploy the bot application to
+- (optional) To display chart images:
+  - Looker 3.40 or later
+  - An Amazon S3 bucket and access keys
+
 ### Deployment
 
 Set an environment variable called `SLACK_API_KEY` to your Slack API key.
