@@ -92,11 +92,11 @@ If you choose to remove the image files from S3, the Slack messages that relied 
 
 ### Running Locally for Development
 
-1. Install Ruby and Node.js on your local machine.
-2. Install [foreman](https://github.com/ddollar/foreman) with `gem install foreman`
+1. Node.js on your local machine.
+2. Install [node-foreman](https://github.com/jeffjewiss/node-foreman) with `npm install -g foreman`
 3. Add your environment variables to a file called `.env` at the base of the repo.
 4. Install dependencies with `npm install`
-5. Run the bot with `foreman start`
+5. Run the bot with `nf start`
 
 ### Contributing
 
