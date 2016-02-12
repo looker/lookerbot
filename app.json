@@ -8,10 +8,27 @@
       "description": "A Slack API token (find it on https://api.slack.com/web)",
       "required": true
     },
-    "LOOKERS": {
-      "description": "A JSON array of JSON objects, each representing a Looker instance and its authentication information. 'url' should be the web url of the instance, 'apiBaseUrl' should be the API 3.0 endpoint, 'clientID' should be the API 3.0 client ID for the user you want the bot to run as, 'clientSecret' should be the secret for that API 3.0 key, and 'customCommandSpaceId' is an optional parameter, representing a Space that you would like the bot to use to define custom commands.",
-      "required": false,
-      "value": "[{\"url\": \"https://mycompany.looker.com\", \"apiBaseUrl\": \"https://mycompany.looker.com:19999/api/3.0\", \"clientId\": \"abc123\", \"clientSecret\": \"abc123\", \"customCommandSpaceId\": 1202}]"
+    "LOOKER_URL": {
+      "description": "The web url of your Looker instance.",
+      "required": true,
+      "value": "https://mycompany.looker.com"
+    },
+    "LOOKER_API_BASE_URL": {
+      "description": "The API 3.0 endpoint of your Looker instance.",
+      "required": true,
+      "value": "https://mycompany.looker.com:19999/api/3.0"
+    },
+    "LOOKER_API_3_CLIENT_ID": {
+      "description": "The API 3.0 client ID for the user you want the bot to run as.",
+      "required": true
+    },
+    "LOOKER_API_3_CLIENT_SECRET": {
+      "description": "The API 3.0 client secret for the user you want the bot to run as.",
+      "required": true
+    },
+    "LOOKER_CUSTOM_COMMAND_SPACE_ID": {
+      "description": "The ID of a Space that you would like the bot to use to define custom commands.",
+      "required": false
     },
     "SLACKBOT_S3_BUCKET": {
       "description": "If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.",

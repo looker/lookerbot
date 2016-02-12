@@ -29,21 +29,15 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `SLACK_API_KEY` (required) – Your Slack API key for the bot. You'll have gotten this when you created the bot user in the Slack settings.
 
-- `LOOKERS` (required) - A JSON array of JSON objects, each representing a Looker instance and its authentication information.
+- `LOOKER_URL` (required) – The web url of your Looker instance.
 
-  The JSON objects should have the following keys:
+- `LOOKER_API_BASE_URL` (required) – The API 3.0 endpoint of your Looker instance.
 
-  - `url` should be the web url of the instance
-  - `apiBaseUrl` should be the API 3.0 endpoint
-  - `clientID` should be the API 3.0 client ID for the user you want the bot to run as
-  - `clientSecret` should be the secret for that API 3.0 key
-  - `customCommandSpaceId` is an optional parameter, representing a Space that you would like the bot to use to define custom commands.
+- `LOOKER_API_3_CLIENT_ID` (required) – The API 3.0 client ID for the user you want the bot to run as.
 
-  Here's an example JSON that connects to one Looker instance:
+- `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as.
 
-  ```json
-  [{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
-  ```
+- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands.
 
 - `SLACKBOT_S3_BUCKET` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.
 
@@ -52,6 +46,26 @@ The bot is configured entirely via environment variables. You'll want to set up 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
+
+###### Connecting the bot to multiple Looker instances
+
+If you would like the bot to connect to multiple instances of Looker, then you can configure the bot with the `LOOKERS` environment variable. This variable should be JSON array of JSON objects, each representing a Looker instance and its authentication information.
+
+The JSON objects should have the following keys:
+
+- `url` should be the web url of the instance
+- `apiBaseUrl` should be the API 3.0 endpoint
+- `clientID` should be the API 3.0 client ID for the user you want the bot to run as
+- `clientSecret` should be the secret for that API 3.0 key
+- `customCommandSpaceId` is an optional parameter, representing a Space that you would like the bot to use to define custom commands.
+
+Here's an example JSON that connects to two Looker instances:
+
+```json
+[{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
+```
+
+The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3_CLIENT_SECRET`, and `LOOKER_CUSTOM_COMMAND_SPACE_ID` variables are ignored when `LOOKERS` is set.
 
 ##### Running the Server
 

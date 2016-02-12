@@ -12,7 +12,20 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
 customCommands = {}
 
-lookers = JSON.parse(process.env.LOOKERS).map((looker) ->
+lookerConfig = if process.env.LOOKERS
+  console.log("Using Looker information specified in LOOKERS environment variable.")
+  JSON.parse(process.env.LOOKERS)
+else
+  console.log("Using Looker information specified in individual environment variables.")
+  [{
+    url: process.env.LOOKER_URL
+    apiBaseUrl: process.env.LOOKER_API_BASE_URL
+    clientId: process.env.LOOKER_API_3_CLIENT_ID
+    clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET
+    customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID
+  }]
+
+lookers = lookerConfig.map((looker) ->
   looker.storeBlob = (blob, success, error) ->
     path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
     key = "#{path.join("/")}.png"
