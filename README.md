@@ -1,7 +1,5 @@
 # Looker Slackbot
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
-
 A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.com) to make sharing data in your organization easier!
 
 ### Requirements
@@ -14,14 +12,20 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ### Deployment
 
-##### Create a new bot in Slack
+#### Create a new bot in Slack
 
 1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
 2. Choose "Add Configuration"
 3. Create a username for your Slack bot. We use **@lookerbot** but it's up to you.
 4. Grab the API token from the settings page, you'll need this when you set up the bot server.
 
-##### Configure Bot Server
+#### Heroku Deployment
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
+
+The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot.
+
+#### Manual Deployment
 
 The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API.
 
@@ -47,7 +51,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
-###### Connecting the bot to multiple Looker instances
+##### Connecting the bot to multiple Looker instances
 
 If you would like the bot to connect to multiple instances of Looker, then you can configure the bot with the `LOOKERS` environment variable. This variable should be JSON array of JSON objects, each representing a Looker instance and its authentication information.
 
@@ -69,9 +73,7 @@ The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3
 
 ##### Running the Server
 
-If you've deployed the bot to Heroku, the included `Procfile` will handle running the server and configure the `PORT` environment variable for you. This is probably the easiest way to run the server.
-
-If you're running the server yourself, you'll need to do the following:
+To run the server:
 
 1. Ensure Node.js is installed
 2. `npm install` to install dependencies
@@ -79,7 +81,7 @@ If you're running the server yourself, you'll need to do the following:
 
 The included `Procfile` will also allow you to run the app using [foreman](https://github.com/ddollar/foreman) or [node-foreman](https://github.com/jeffjewiss/node-foreman). These libraries also provide easy ways of creating scripts for use with `upstart`, `supervisord`, and `systemd`.
 
-##### Configuring slash commands
+### Configuring Slash Commands
 
 Slash commands are not required to interact with the bot. You can DM the bot directly or mention the bot like:
 
