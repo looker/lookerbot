@@ -14,7 +14,6 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ### Deployment
 
-
 ##### Create a new bot in Slack
 
 1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
@@ -80,6 +79,16 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 2. Choose "Add Configuration"
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
 4. You can configure the options for the slash command however you like, but you'll need to set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+
+### Data Access
+
+We suggest creating a Looker user specifically for the Slack bot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Slack bot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
+
+Also, keep in mind that when the Looker bot answers questions in Slack _the resulting data moves into Slack and is now hosted there_. Be sure to carefully consider what data is allowed to leave Looker. Slack retains chat message history on their servers and pushes many types of notifications about messages out via other services.
+
+To allow visualizations to appear in Slack, if configured to do so, the bot uploads them as images to Amazon S3 with an extremely long randomly-generated URL. Anyone with this URL can access that image at any time, though it should be extremely difficult to guess.
+
+If you choose to remove the image files from S3, the Slack messages that relied on those images will be blank.
 
 ### Contributing
 
