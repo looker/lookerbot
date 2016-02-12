@@ -39,7 +39,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
   - `clientSecret` should be the secret for that API 3.0 key
   - `customCommandSpaceId` is an optional parameter, representing a Space that you would like the bot to use to define custom commands.
 
-  Here's an example JSON that connects to two Looker instances:
+  Here's an example JSON that connects to one Looker instance:
 
   ```json
   [{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
