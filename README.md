@@ -66,6 +66,21 @@ If you're running the server yourself, you'll need to do the following:
 
 The included `Procfile` will also allow you to run the app using [foreman](https://github.com/ddollar/foreman) or [node-foreman](https://github.com/jeffjewiss/node-foreman). These libraries also provide easy ways of creating scripts for use with `upstart`, `supervisord`, and `systemd`.
 
+##### Configuring slash commands
+
+Slash commands are not required to interact with the bot. You can DM the bot directly or mention the bot like:
+
+> @lookerbot help
+
+and use all the functionality.
+
+However, Slash commands are a bit friendlier to use and allow Slack to auto-complete so you'll probably want to set those up.
+
+1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Slash Commands"
+2. Choose "Add Configuration"
+3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
+4. You can configure the options for the slash command however you like, but you'll need to set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+
 ### Contributing
 
 Pull Requests are welcome – we'd love to have help expanding the bot's functionality.
