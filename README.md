@@ -14,9 +14,21 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ### Deployment
 
+
+##### Create a new bot in Slack
+
+- Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
+- Choose "Add Configuration"
+- Create a username for your Slack bot. We use **@lookerbot** but it's up to you.
+- The settings page for your bot will contain an API token, you'll need this when you set up the bot server.
+
+##### Configure Bot Server
+
+The bot is a simple Node.js application.
+
 A few environment variables are used to configure the bot:
 
-- `SLACK_API_KEY` (required) – Your Slack API key.
+- `SLACK_API_KEY` (required) – Your Slack API key for the bot. You'll have gotten this when you created the bot user in the Slack settings.
 
 - `LOOKERS` (required) - A JSON array of JSON objects, each representing a Looker instance and its authentication information.
 
