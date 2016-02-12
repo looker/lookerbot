@@ -8,15 +8,15 @@
   },
   "dependencies": {
     "botkit": "howdyai/botkit#cf717feae727223351cfe76d871afa64529a0833",
-    "coffee-script": ">0.0.0",
+    "coffee-script": "^1.10.0",
     "get-urls": "^5.0.0",
-    "underscore": ">0.0.0",
-    "aws-sdk": ">0.0.0",
+    "underscore": "^1.8.3",
+    "aws-sdk": "^2.2.30",
     "request": "^2.66.0",
     "fuzzysearch-js": "^0.2.0"
   },
   "engines": {
-    "node": "0.12.7"
+    "node": "^4.2.6"
   },
   "repository": {
     "type": "git",
