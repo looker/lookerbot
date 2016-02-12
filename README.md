@@ -6,11 +6,11 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ### Requirements
 
-- Looker
-- A server capable of running Node.js to deploy the bot application to
+- [Looker](http://looker.com)
+- A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
   - Looker 3.40 or later
-  - An Amazon S3 bucket and access keys
+  - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
 
 ### Deployment
 
@@ -92,7 +92,7 @@ If you choose to remove the image files from S3, the Slack messages that relied 
 
 ### Running Locally for Development
 
-1. Node.js on your local machine.
+1. Install [Node.js](https://nodejs.org/en/) on your local machine.
 2. Install [node-foreman](https://github.com/jeffjewiss/node-foreman) with `npm install -g foreman`
 3. Add your environment variables to a file called `.env` at the base of the repo.
 4. Install dependencies with `npm install`
