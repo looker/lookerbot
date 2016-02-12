@@ -90,14 +90,16 @@ To allow visualizations to appear in Slack, if configured to do so, the bot uplo
 
 If you choose to remove the image files from S3, the Slack messages that relied on those images will be blank.
 
-### Contributing
-
-Pull Requests are welcome – we'd love to have help expanding the bot's functionality.
-
-##### Running Locally for Development
+### Running Locally for Development
 
 1. Install Ruby and Node.js on your local machine.
 2. Install [foreman](https://github.com/ddollar/foreman) with `gem install foreman`
 3. Add your environment variables to a file called `.env` at the base of the repo.
 4. Install dependencies with `npm install`
 5. Run the bot with `foreman start`
+
+### Contributing
+
+Pull Requests are welcome – we'd love to have help expanding the bot's functionality.
+
+If you have any trouble with the bot, please open an issue so we can help you out!
