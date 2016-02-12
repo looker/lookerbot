@@ -17,16 +17,16 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ##### Create a new bot in Slack
 
-- Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
-- Choose "Add Configuration"
-- Create a username for your Slack bot. We use **@lookerbot** but it's up to you.
-- The settings page for your bot will contain an API token, you'll need this when you set up the bot server.
+1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
+2. Choose "Add Configuration"
+3. Create a username for your Slack bot. We use **@lookerbot** but it's up to you.
+4. Grab the API token from the settings page, you'll need this when you set up the bot server.
 
 ##### Configure Bot Server
 
-The bot is a simple Node.js application.
+The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API.
 
-A few environment variables are used to configure the bot:
+The bot is configured entirely via environment variables. You'll want to set up these variables:
 
 - `SLACK_API_KEY` (required) – Your Slack API key for the bot. You'll have gotten this when you created the bot user in the Slack settings.
 
@@ -52,9 +52,23 @@ A few environment variables are used to configure the bot:
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
+- `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
+
+##### Running the Server
+
+If you've deployed the bot to Heroku, the included `Procfile` will handle running the server and configure the `PORT` environment variable for you. This is probably the easiest way to run the server.
+
+If you're running the server yourself, you'll need to do the following:
+
+1. Ensure Node.js is installed
+2. `npm install` to install dependencies
+3. `npm start` to start the bot server. The server will run until you type `Crl+C` to stop it.
+
+The included `Procfile` will also allow you to run the app using [foreman](https://github.com/ddollar/foreman) or [node-foreman](https://github.com/jeffjewiss/node-foreman). These libraries also provide easy ways of creating scripts for use with `upstart`, `supervisord`, and `systemd`.
+
 ### Contributing
 
-Pull Requests are welcome!
+Pull Requests are welcome – we'd love to have help expanding the bot's functionality.
 
 ##### Running Locally for Development
 
