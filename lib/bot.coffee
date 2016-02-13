@@ -124,7 +124,7 @@ controller.on "direct_mention", (bot, message) ->
   processCommand(bot, message)
 
 controller.on "direct_message", (bot, message) ->
-  if message.text.indexOf("/looker") != 0
+  if message.text.indexOf("/") != 0
     processCommand(bot, message)
 
 processCommand = (bot, message) ->
