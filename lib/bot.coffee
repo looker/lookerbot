@@ -132,7 +132,7 @@ processCommand = (bot, message) ->
     get(context, message)
   else
     shortCommands = _.sortBy(_.values(customCommands), (c) -> -c.name.length)
-    matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf("#{c.name} ") == 0)?[0]
+    matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
       query = message.text[matchedCommand.name.length..].trim()
