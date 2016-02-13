@@ -47,7 +47,8 @@ lookers = lookerConfig.map((looker) ->
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
     console.log "Refreshing custom commands for #{looker.url}..."
-    looker.client.get("spaces/#{looker.customCommandSpaceId}", (space) ->
+
+    addCommandsForSpace = (space, category) ->
       for partialDashboard in space.dashboards
         looker.client.get("dashboards/#{partialDashboard.id}", (dashboard) ->
 
@@ -56,6 +57,7 @@ lookers = lookerConfig.map((looker) ->
             description: dashboard.description
             dashboard: dashboard
             looker: looker
+            category: category
 
           command.helptext = (dashboard.filters || "").map((f) ->
             "<#{f.title.toLowerCase()}>"
@@ -64,7 +66,15 @@ lookers = lookerConfig.map((looker) ->
           customCommands[command.name] = command
 
         console.log)
+
+    looker.client.get("spaces/#{looker.customCommandSpaceId}", (space) ->
+      addCommandsForSpace(space, "Shortcuts")
+      looker.client.get("spaces/#{looker.customCommandSpaceId}/children", (children) ->
+        for child in children
+          addCommandsForSpace(child, child.name)
+      console.log)
     console.log)
+
   looker.client = new LookerClient(
     baseUrl: looker.apiBaseUrl
     clientId: looker.clientId
@@ -148,24 +158,26 @@ processCommand = (bot, message) ->
 
     else
       help = """
-      _I've got some built-in commands:_\n
+      *Built-in Commands*\n
       • *find* <look search term> — _Shows the top five Looks matching the search._
       • *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n\n
       """
 
-      if _.values(customCommands).length > 0
-        help += "_And there are some fancy quick shortcuts people have set up:_\n\n"
+      groups = _.groupBy(customCommands, 'category')
 
-      for command in _.sortBy(_.values(customCommands), "name")
-        help += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
-        if command.description
-          help += " — _#{command.description}_"
+      for groupName, groupCommmands of groups
+        help += "\n *#{groupName}*\n"
+        for command in _.sortBy(_.values(groupCommmands), "name")
+          help += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
+          if command.description
+            help += " — _#{command.description}_"
+          help += "\n"
         help += "\n"
 
       spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
       ).join(" or ")
-      help += "\n_To add your own shortcuts, add a dashboard to #{spaces}._"
+      help += "\n_To add your own commands, add a dashboard to #{spaces}._"
 
       context.replyPrivate({text: help, parse: "none", attachments: []})
 
