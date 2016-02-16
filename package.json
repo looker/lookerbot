@@ -7,7 +7,7 @@
     "start": "coffee lib/bot.coffee"
   },
   "dependencies": {
-    "botkit": "howdyai/botkit#cf717feae727223351cfe76d871afa64529a0833",
+    "botkit": "wilg/botkit#46a33adee057d26decbc4591ff51f4d74e0c348c",
     "coffee-script": "^1.10.0",
     "get-urls": "^5.0.0",
     "underscore": "^1.8.3",

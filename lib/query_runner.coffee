@@ -43,10 +43,8 @@ sassyMessages = [
   ["in", "कृपया एक क्षण के लिए"]
 
 ].map(([country, message] = pair) ->
-  # TODO: figure out why Slack unfurls the Google Translate link even when I set unfurl_links: false
-  # translate = "http://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
-  # "<#{translate}|:flag-#{country}:> _#{message}..._"
-  ":flag-#{country}: _#{message}..._"
+  translate = "http://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
+  "<#{translate}|:flag-#{country}:> _#{message}..._"
 )
 
 module.exports.FancyReplier = class FancyReplier
@@ -78,6 +76,8 @@ module.exports.FancyReplier = class FancyReplier
       text: sass
       as_user: true
       attachments: [] # Override some Botkit stuff
+      unfurl_links: false
+      unfurl_media: false
 
     @replyContext.say(params, (sentMessage) =>
       @loadingMessage = sentMessage
