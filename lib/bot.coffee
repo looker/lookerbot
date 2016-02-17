@@ -106,6 +106,8 @@ defaultBot = controller.spawn({
 }).startRTM()
 
 defaultBot.api.team.info {}, (err, response) ->
+  if err
+    console.error(err)
   controller.saveTeam(response.team, ->
     console.log "Saved the team information..."
   )
