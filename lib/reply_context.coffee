@@ -9,7 +9,11 @@ module.exports = class ReplyContext
 
   replyPrivate: (message, cb) ->
     if @isSlashCommand()
-      @messageBot.replyPrivateDelayed(@sourceMessage, message, cb)
+      if @hasRepliedPrivately
+        @messageBot.replyPrivateDelayed(@sourceMessage, message, cb)
+      else
+        @hasRepliedPrivately = true
+        @messageBot.replyPrivate(@sourceMessage, message, cb)
     else
       @defaultBot.reply(@sourceMessage, message, cb)
 
