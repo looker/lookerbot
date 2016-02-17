@@ -12,24 +12,10 @@ module.exports = class ReplyContext
     if @isSlashCommand()
       @messageBot.replyPrivateDelayed(@sourceMessage, message, cb)
     else
-      @replyPublic(message, cb)
+      @defaultBot.reply(@sourceMessage, message, cb)
 
   replyPublic: (message, cb) ->
     if @isSlashCommand()
       @messageBot.replyPublicDelayed(@sourceMessage, message, cb)
     else
       @defaultBot.reply(@sourceMessage, message, cb)
-
-  canEditReply: ->
-    !@isSlashCommand()
-
-  say: (message, cb) ->
-    params = _.extend({}, {channel: @sourceMessage.channel}, message)
-    if @isSlashCommand()
-      @replyPublic(params, (err, res) =>
-        cb(res)
-      )
-    else
-      @defaultBot.say(params, (err, res) =>
-        cb(res)
-      )

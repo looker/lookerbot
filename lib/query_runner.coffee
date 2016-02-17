@@ -52,7 +52,8 @@ module.exports.FancyReplier = class FancyReplier
   constructor: (@replyContext) ->
 
   reply: (obj, cb) ->
-    if @loadingMessage && @replyContext.canEditReply()
+    if @loadingMessage
+
       # Hacky stealth update of message to preserve chat order
 
       if typeof(obj) == 'string'
@@ -65,6 +66,7 @@ module.exports.FancyReplier = class FancyReplier
       update.text = update.text || " "
 
       @replyContext.defaultBot.api.chat.update(update)
+
     else
       @replyContext.replyPublic(obj, cb)
 
@@ -82,8 +84,8 @@ module.exports.FancyReplier = class FancyReplier
       unfurl_links: false
       unfurl_media: false
 
-    @replyContext.say(params, (sentMessage) =>
-      @loadingMessage = sentMessage
+    @replyContext.replyPublic(params, (error, response) =>
+      @loadingMessage = response
       cb()
     )
 
