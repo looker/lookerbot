@@ -186,7 +186,7 @@ processCommand = (bot, message) ->
 
     refreshCommands()
 
-  if context.isSlashCommand() && !context.hasRepliedToSlashCommand
+  if context.isSlashCommand()
     # Return 200 immediately for slash commands
     bot.res.setHeader 'Content-Type', 'application/json'
     bot.res.send JSON.stringify({response_type: "in_channel"})
