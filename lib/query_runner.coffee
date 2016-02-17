@@ -52,7 +52,7 @@ module.exports.FancyReplier = class FancyReplier
   constructor: (@replyContext) ->
 
   reply: (obj, cb) ->
-    if @loadingMessage
+    if @loadingMessage && @replyContext.canEditReply()
       # Hacky stealth update of message to preserve chat order
 
       if typeof(obj) == 'string'
@@ -71,6 +71,9 @@ module.exports.FancyReplier = class FancyReplier
   startLoading: (cb) ->
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+
+    if process.env.DEV
+      sass = "[DEVELOPMENT] #{sass}"
 
     params =
       text: sass
