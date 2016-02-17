@@ -19,3 +19,6 @@ module.exports = class ReplyContext
       @messageBot.replyPublicDelayed(@sourceMessage, message, cb)
     else
       @defaultBot.reply(@sourceMessage, message, cb)
+
+  startTyping: ->
+    @messageBot.startTyping(@sourceMessage)
