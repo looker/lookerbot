@@ -49,6 +49,8 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
+
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
 ##### Connecting the bot to multiple Looker instances
@@ -95,6 +97,7 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 2. Choose "Add Configuration"
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
 4. You can configure the options for the slash command however you like, but you'll need to set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+5. You'll need to copy the token provided when you created the slash command and set the `SLACK_SLASH_COMMAND_TOKEN` variable with it for the bot to accept slash commands.
 
 ### Data Access
 
