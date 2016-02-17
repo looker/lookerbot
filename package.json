@@ -4,7 +4,7 @@
   "description": "Slackbot for Looker integration",
   "main": "index.js",
   "scripts": {
-    "start": "coffee lib/bot.coffee"
+    "start": "coffee lib/repro.coffee"
   },
   "dependencies": {
     "botkit": "wilg/botkit#46a33adee057d26decbc4591ff51f4d74e0c348c",
