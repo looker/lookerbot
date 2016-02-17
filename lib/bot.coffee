@@ -94,8 +94,9 @@ setInterval(->
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
 
+debugMode = process.env.DEBUG_MODE == "true"
 controller = Botkit.slackbot(
-  debug: process.env.DEBUG_MODE == "true"
+  debug: debugMode
 )
 
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
@@ -120,6 +121,8 @@ FIND_REGEX = 'find (dashboard|look )? ?(.+)'
 GET_REGEX = 'get (.+)=(.+)'
 
 controller.on "slash_command", (bot, message) ->
+  if debugMode
+    console.log message
   processCommand(bot, message)
 
 controller.on "direct_mention", (bot, message) ->
