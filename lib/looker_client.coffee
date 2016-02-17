@@ -17,6 +17,7 @@ module.exports = class LookerAPIClient
     requestConfig.url = "#{@options.baseUrl}/#{requestConfig.path}"
     headers =
       Authorization: "token #{@token}"
+      "User-Agent": "looker-slackbot"
     requestConfig.headers = _.extend(headers, requestConfig.headers || {})
     request(requestConfig, (error, response, body) =>
       if error
