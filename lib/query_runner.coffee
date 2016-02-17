@@ -72,6 +72,11 @@ module.exports.FancyReplier = class FancyReplier
 
   startLoading: (cb) ->
 
+    # Slash commands responses at the moment can't get the responding message
+    # so we won't be able to update or delete it.
+    if @replyContext.isSlashCommand()
+      return
+
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
     if process.env.DEV
