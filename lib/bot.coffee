@@ -177,7 +177,8 @@ processCommand = (bot, message) ->
       spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
       ).join(" or ")
-      help += "\n_To add your own commands, add a dashboard to #{spaces}._"
+      if spaces
+        help += "\n_To add your own commands, add a dashboard to #{spaces}._"
 
       context.replyPrivate({text: help, parse: "none", attachments: []})
 
