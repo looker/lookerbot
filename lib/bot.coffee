@@ -95,7 +95,7 @@ setInterval(->
 , 30 * 60 * 1000)
 
 controller = Botkit.slackbot(
-  debug: false
+  debug: process.env.DEBUG_MODE == "true"
 )
 
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
