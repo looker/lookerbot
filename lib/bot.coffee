@@ -94,9 +94,8 @@ setInterval(->
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
 
-debugMode = process.env.DEBUG_MODE == "true"
 controller = Botkit.slackbot(
-  debug: debugMode
+  debug: process.env.DEBUG_MODE == "true"
 )
 
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
@@ -121,9 +120,10 @@ FIND_REGEX = 'find (dashboard|look )? ?(.+)'
 GET_REGEX = 'get (.+)=(.+)'
 
 controller.on "slash_command", (bot, message) ->
-  if debugMode
-    console.log message
-  processCommand(bot, message)
+  if process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && process.env.SLACK_SLASH_COMMAND_TOKEN == message.token
+    processCommand(bot, message)
+  else
+    bot.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.")
 
 controller.on "direct_mention", (bot, message) ->
   processCommand(bot, message)

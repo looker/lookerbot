@@ -41,6 +41,10 @@
     "AWS_SECRET_ACCESS_KEY": {
       "description": "If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.",
       "required": false
+    },
+    "SLACK_SLASH_COMMAND_TOKEN": {
+      "description": "If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.",
+      "required": false
     }
   }
 }
