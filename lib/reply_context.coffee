@@ -15,10 +15,16 @@ module.exports = class ReplyContext
       @defaultBot.reply(@sourceMessage, message, cb)
 
   replyPublic: (message, cb) ->
+    @hasRepliedToSlashCommand = true
     if @isSlashCommand()
       @messageBot.replyPublicDelayed(@sourceMessage, message, cb)
     else
       @defaultBot.reply(@sourceMessage, message, cb)
 
   startTyping: ->
-    @messageBot.startTyping(@sourceMessage)
+    @hasRepliedToSlashCommand = true
+    if @isSlashCommand()
+      @messageBot.replyPublicDelayed(@sourceMessage, { type: 'typing' })
+    else
+      @defaultBot.startTyping(@sourceMessage)
+
