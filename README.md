@@ -4,7 +4,7 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 ### Requirements
 
-- [Looker](http://looker.com) 3.40.2 or later
+- [Looker](http://looker.com) 3.40.3 or later
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
   - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
