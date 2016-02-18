@@ -186,12 +186,10 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
     else
       attachment = _.extend({}, options, {
-        fields: [
-          title: renderableFields.map((f) -> f.label).join(" – ")
-          value: result.data.map((d) ->
-            renderableFields.map((f) -> renderField(f, d)).join(" – ")
-          ).join("\n")
-        ]
+        title: renderableFields.map((f) -> f.label).join(" – ")
+        text: result.data.map((d) ->
+          renderableFields.map((f) -> renderField(f, d)).join(" – ")
+        ).join("\n")
       })
       @reply(
         attachments: [attachment]
