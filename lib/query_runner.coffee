@@ -125,7 +125,12 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         share = if @showShareUrl() then query.share_url else ""
         @reply(
           attachments: [
-            _.extend({}, options, {image_url: url, title: share, title_link: share, color: "#64518A"})
+            _.extend({}, options, {
+              image_url: url
+              title: share
+              title_link: share
+              color: "#64518A"
+            })
           ]
           text: ""
         )
@@ -183,7 +188,9 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       @reply({attachments: [{text: text, color: "#64518A"}]})
 
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
-      attachment = _.extend({color: "#64518A"}, options, {
+      attachment = _.extend({}, options, {
+        color: "#64518A"
+        fallback: query.share_url
         fields: renderableFields.map((m) ->
           {title: renderFieldLabel(m), value: renderField(m, result.data[0]), short: true}
         )
@@ -192,13 +199,16 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment])
 
     else
-      attachment = _.extend({color: "#64518A"}, options, {
-        title: renderableFields.map((f) -> renderFieldLabel(f)).join(" – ")
-        text: result.data.map((d) ->
+      text = if @showShareUrl() then query.share_url else ""
+      text += "\n" if text
+      text += result.data.map((d) ->
           renderableFields.map((f) -> renderField(f, d)).join(" – ")
         ).join("\n")
+      attachment = _.extend({color: "#64518A"}, options, {
+        title: renderableFields.map((f) -> renderFieldLabel(f)).join(" – ")
+        text: text
+        fallback: query.share_url
       })
-      attachment.text = if @showShareUrl() then query.share_url else ""
       @reply(attachments: [attachment])
 
   work: ->
