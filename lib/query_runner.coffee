@@ -159,6 +159,12 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       else
         "∅"
 
+    renderFieldLabel = (field) ->
+      if query.vis_config?.show_view_names? && !query.vis_config.show_view_names
+        field.label_short || field.label
+      else
+        field.label
+
     if result.pivots
       @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
 
@@ -178,7 +184,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({color: "#64518A"}, options, {
         fields: renderableFields.map((m) ->
-          {title: m.label, value: renderField(m, result.data[0]), short: true}
+          {title: renderFieldLabel(m), value: renderField(m, result.data[0]), short: true}
         )
       })
       @reply(
@@ -188,7 +194,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
 
     else
       attachment = _.extend({color: "#64518A"}, options, {
-        title: renderableFields.map((f) -> f.label).join(" – ")
+        title: renderableFields.map((f) -> renderFieldLabel(f)).join(" – ")
         text: result.data.map((d) ->
           renderableFields.map((f) -> renderField(f, d)).join(" – ")
         ).join("\n")
