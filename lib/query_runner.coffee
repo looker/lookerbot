@@ -78,9 +78,8 @@ module.exports.FancyReplier = class FancyReplier
       sass = "[DEVELOPMENT] #{sass}"
 
     params =
-      text: sass
       as_user: true
-      attachments: [] # Override some Botkit stuff
+      attachments: [{text: sass, color: "#64518A", unfurl_links: false, unfurl_media: false}]
       unfurl_links: false
       unfurl_media: false
 
