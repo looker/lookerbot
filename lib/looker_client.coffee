@@ -31,7 +31,9 @@ module.exports = class LookerAPIClient
         try
           errorCallback?(JSON.parse(body))
         catch
-          errorCallback({error: body})
+          console.error("JSON parse failed:")
+          console.error(body)
+          errorCallback({error: "Couldn't parse Looker response. The server may be offline."})
     )
 
   get: (path, successCallback, errorCallback, options = {}) ->
