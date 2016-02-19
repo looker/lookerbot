@@ -120,17 +120,20 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
   showShareUrl: -> false
 
   postImage: (query, imageData, options = {}) ->
-    success = (url) =>
-      share = if @showShareUrl() then query.share_url else ""
-      @reply(
-        attachments: [
-          _.extend({}, options, {image_url: url, title: share, title_link: share})
-        ]
-        text: ""
-      )
-    error = (error) =>
-      @reply(":warning: #{error}")
-    @replyContext.looker.storeBlob(imageData, success, error)
+    if @replyContext.looker.storeBlob
+      success = (url) =>
+        share = if @showShareUrl() then query.share_url else ""
+        @reply(
+          attachments: [
+            _.extend({}, options, {image_url: url, title: share, title_link: share})
+          ]
+          text: ""
+        )
+      error = (error) =>
+        @reply(":warning: #{error}")
+      @replyContext.looker.storeBlob(imageData, success, error)
+    else
+      @reply(":warning: No storage is configured for visualization images in the bot configuration.")
 
   postResult: (query, result, options = {}) ->
 

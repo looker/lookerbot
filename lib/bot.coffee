@@ -29,24 +29,27 @@ else
   }]
 
 lookers = lookerConfig.map((looker) ->
-  looker.storeBlob = (blob, success, error) ->
-    path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-    key = "#{path.join("/")}.png"
-    unless blob.length
-      error("No image data returned.")
-      return
-    params =
-      Bucket: process.env.SLACKBOT_S3_BUCKET
-      Key: key
-      Body: blob
-      ACL: 'public-read'
-      ContentType: "image/png"
-    s3 = new AWS.S3()
-    s3.putObject params, (err, data) ->
-      if err
-        error(err)
-      else
-        success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
+
+  if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+    looker.storeBlob = (blob, success, error) ->
+      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
+      key = "#{path.join("/")}.png"
+      unless blob.length
+        error("No image data returned.")
+        return
+      params =
+        Bucket: process.env.SLACKBOT_S3_BUCKET
+        Key: key
+        Body: blob
+        ACL: 'public-read'
+        ContentType: "image/png"
+      s3 = new AWS.S3()
+      s3.putObject params, (err, data) ->
+        if err
+          error(err)
+        else
+          success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
+
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
     console.log "Refreshing custom commands for #{looker.url}..."
