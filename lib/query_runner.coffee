@@ -176,7 +176,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       text = "*#{renderField(field, result.data[0])}*#{share}"
       @reply({attachments: [{text: text, color: "#64518A"}])
 
-    else if result.data.length == 1
+    else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({color: "#64518A"}, options, {
         fields: renderableFields.map((m) ->
           {title: m.label, value: renderField(m, result.data[0]), short: true}
