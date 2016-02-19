@@ -11,6 +11,8 @@ if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
+enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
+
 customCommands = {}
 
 lookerConfig = if process.env.LOOKERS
@@ -137,7 +139,7 @@ processCommand = (bot, message) ->
 
   context = new ReplyContext(defaultBot, bot, message)
 
-  if match = message.text.match(new RegExp(QUERY_REGEX))
+  if match = message.text.match(new RegExp(QUERY_REGEX)) && enableQueryCli
     message.match = match
     runCLI(context, message)
   else if match = message.text.match(new RegExp(FIND_REGEX))
@@ -163,11 +165,7 @@ processCommand = (bot, message) ->
       runner.start()
 
     else
-      help = """
-      *Built-in Commands*\n
-      • *find* <look search term> — _Shows the top five Looks matching the search._
-      • *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n\n
-      """
+      help = ""
 
       groups = _.groupBy(customCommands, 'category')
 
@@ -179,6 +177,16 @@ processCommand = (bot, message) ->
             help += " — _#{command.description}_"
           help += "\n"
         help += "\n"
+
+      help += """
+      *Built-in Commands*\n
+      • *find* <look search term> — _Shows the top five Looks matching the search._
+      """
+
+      if enableQueryCli
+        help += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n"
+
+      help += "\n"
 
       spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
