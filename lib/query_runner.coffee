@@ -199,17 +199,14 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment])
 
     else
-      text = if @showShareUrl() then query.share_url else ""
-      text += "\n" if text
-      text += result.data.map((d) ->
-          renderableFields.map((f) -> renderField(f, d)).join(" – ")
-        ).join("\n")
       attachment = _.extend({color: "#64518A"}, options, {
         title: renderableFields.map((f) -> renderFieldLabel(f)).join(" – ")
-        text: text
+        text: result.data.map((d) ->
+          renderableFields.map((f) -> renderField(f, d)).join(" – ")
+        ).join("\n")
         fallback: query.share_url
       })
-      @reply(attachments: [attachment])
+      @reply(attachments: [attachment], text: if @showShareUrl() then query.share_url else "")
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
