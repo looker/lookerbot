@@ -7,8 +7,9 @@ AWS = require('aws-sdk')
 crypto = require('crypto')
 _ = require('underscore')
 
-# Local dev only
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+if process.env.DEV == "true"
+  # Allow communicating with Lookers running on localhost with self-signed certificates
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
 customCommands = {}
 
