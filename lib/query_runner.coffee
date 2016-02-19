@@ -125,7 +125,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
         share = if @showShareUrl() then query.share_url else ""
         @reply(
           attachments: [
-            _.extend({}, options, {image_url: url, title: share, title_link: share})
+            _.extend({}, options, {image_url: url, title: share, title_link: share, color: "#64518A"})
           ]
           text: ""
         )
@@ -174,10 +174,10 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       field = measure_like[0] || dimension_like[0]
       share = if @showShareUrl() then "\n#{query.share_url}" else ""
       text = "*#{renderField(field, result.data[0])}*#{share}"
-      @reply(text)
+      @reply({attachments: [{text: text, color: "#64518A"}])
 
     else if result.data.length == 1
-      attachment = _.extend({}, options, {
+      attachment = _.extend({color: "#64518A"}, options, {
         fields: renderableFields.map((m) ->
           {title: m.label, value: renderField(m, result.data[0]), short: true}
         )
@@ -188,7 +188,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       )
 
     else
-      attachment = _.extend({}, options, {
+      attachment = _.extend({color: "#64518A"}, options, {
         title: renderableFields.map((f) -> f.label).join(" – ")
         text: result.data.map((d) ->
           renderableFields.map((f) -> renderField(f, d)).join(" – ")
@@ -230,6 +230,7 @@ module.exports.LookQueryRunner = class LookQueryRunner extends QueryRunner
           fallback: look.title
           title: look.title
           text: look.description
+          color: "#64518A"
           title_link: "#{@replyContext.looker.url}#{look.short_url}"
           image_url: if look.public then "#{look.image_embed_url}?width=606" else null
         ]
