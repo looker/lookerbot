@@ -74,7 +74,7 @@ module.exports.FancyReplier = class FancyReplier
 
     sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
-    if process.env.DEV
+    if process.env.DEV == "true"
       sass = "[DEVELOPMENT] #{sass}"
 
     params =
