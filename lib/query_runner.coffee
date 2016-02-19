@@ -185,7 +185,7 @@ module.exports.QueryRunner = class QueryRunner extends FancyReplier
       field = measure_like[0] || dimension_like[0]
       share = if @showShareUrl() then "\n#{query.share_url}" else ""
       text = "*#{renderField(field, result.data[0])}*#{share}"
-      @reply({attachments: [{text: text, color: "#64518A"}]})
+      @reply({attachments: [{text: text, color: "#64518A", mrkdwn_in: ["text"]}]})
 
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({}, options, {
