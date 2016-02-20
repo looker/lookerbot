@@ -52,14 +52,23 @@ module.exports.FancyReplier = class FancyReplier
   constructor: (@replyContext) ->
 
   reply: (obj, cb) ->
-
-    # Delete the loading message if it's there
     if @loadingMessage
-      params = {ts: @loadingMessage.ts, channel: @replyContext.sourceMessage.channel}
-      @replyContext.defaultBot.api.chat.delete(params)
-      @loadingMessage = null
 
-    @replyContext.replyPublic(obj, cb)
+      # Hacky stealth update of message to preserve chat order
+
+      if typeof(obj) == 'string'
+        obj = {text: obj, channel: @replyContext.sourceMessage.channel}
+
+      params = {ts: @loadingMessage.ts, channel: @replyContext.sourceMessage.channel}
+
+      update = _.extend(params, obj)
+      update.attachments = if update.attachments then JSON.stringify(update.attachments) else null
+      update.text = update.text || " "
+
+      @replyContext.defaultBot.api.chat.update(update)
+
+    else
+      @replyContext.replyPublic(obj, cb)
 
   startLoading: (cb) ->
 
