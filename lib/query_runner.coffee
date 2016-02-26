@@ -90,10 +90,8 @@ module.exports.FancyReplier = class FancyReplier
     )
 
   start: ->
-    @replyContext.startTyping()
     if process.env.LOOKER_SLACKBOT_STEALTH_EDIT == "true"
       @startLoading(=>
-        @replyContext.startTyping()
         @work()
       )
     else
