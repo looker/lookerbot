@@ -7,7 +7,7 @@
     "start": "coffee lib/bot.coffee"
   },
   "dependencies": {
-    "botkit": "wilg/botkit#30d8269912d2e190f40d587c4d52d0c3d1408019",
+    "botkit": "wilg/botkit#2bcec8b995040a72bdb3263f4cabf028916df1df",
     "coffee-script": "^1.10.0",
     "get-urls": "^5.0.0",
     "underscore": "^1.8.3",
