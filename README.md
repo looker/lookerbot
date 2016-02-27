@@ -15,8 +15,9 @@ A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.
 
 1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
 2. Choose "Add Configuration"
-3. Create a username for your Slack bot. We use **@lookerbot** but it's up to you.
-4. Grab the API token from the settings page, you'll need this when you set up the bot server.
+3. Create a username for your Slack bot. We use **@looker** but it's up to you.
+4. Choose an icon for the Slack bot. [Here's the icon we use](looker-bot-icon-512.png).
+5. Grab the API token from the settings page, you'll need this when you set up the bot server.
 
 #### Heroku Deployment
 
@@ -95,8 +96,9 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Slash Commands"
 2. Choose "Add Configuration"
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
-4. You can configure the options for the slash command however you like, but you'll need to set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
-5. You'll need to copy the token provided when you created the slash command and set the `SLACK_SLASH_COMMAND_TOKEN` variable with it for the bot to accept slash commands.
+4. Choose an icon for the slash command responses. [Here's the icon we use](looker-bot-icon-512.png).
+5. Set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+6. You'll need to copy the token provided when you created the slash command and set the `SLACK_SLASH_COMMAND_TOKEN` variable with it for the bot to accept slash commands.
 
 ### Data Access
 
