@@ -1,11 +1,19 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
-LookerClient = require('./looker_client')
-{CLIQueryRunner, LookFinder, LookParameterizer, DashboardQueryRunner, QueryRunner, LookQueryRunner, FancyReplier} = require('./query_runner')
-ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
 _ = require('underscore')
+
+LookerClient = require('./looker_client')
+ReplyContext = require('./reply_context')
+
+CLIQueryRunner = require('./repliers/cli_query_runner')
+LookFinder = require('./repliers/look_finder')
+LookParameterizer = require('./repliers/look_parameterizer')
+DashboardQueryRunner = require('./repliers/dashboard_query_runner')
+QueryRunner = require('./repliers/query_runner')
+LookQueryRunner = require('./repliers/look_query_runner')
+
 versionChecker = require('./version_checker')
 
 if process.env.DEV == "true"
