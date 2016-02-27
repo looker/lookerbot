@@ -45,6 +45,8 @@ module.exports = class QueryRunner extends FancyReplier
 
     renderableFields = dimension_like.concat(measure_like)
 
+    shareUrl = "*<#{query.share_url}|View in Looker>*"
+
     renderField = (f, row) =>
       d = row[f.name]
       if d.drilldown_uri && (f.is_measure || f.measure)
@@ -61,30 +63,30 @@ module.exports = class QueryRunner extends FancyReplier
         field.label
 
     if result.pivots
-      @reply("#{query.share_url}\n _Can't currently display tables with pivots in Slack._")
+      @reply("#{shareUrl}\n _Can't currently display tables with pivots in Slack._")
 
     else if result.data.length == 0
       if result.errors?.length
         txt = result.errors.map((e) -> "#{e.message}```#{e.message_details}```").join("\n")
-        @reply(":warning: #{query.share_url}\n#{txt}")
+        @reply(":warning: #{shareUrl}\n#{txt}")
       else
-        @reply("#{query.share_url}\nNo results.")
+        @reply("#{shareUrl}\nNo results.")
 
     else if query.vis_config?.type == "single_value"
       field = measure_like[0] || dimension_like[0]
-      share = if @showShareUrl() then "\n#{query.share_url}" else ""
+      share = if @showShareUrl() then "\n#{shareUrl}" else ""
       text = "*#{renderField(field, result.data[0])}*#{share}"
       @reply({attachments: [{text: text, color: "#64518A", mrkdwn_in: ["text"]}]})
 
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({}, options, {
         color: "#64518A"
-        fallback: query.share_url
+        fallback: shareUrl
         fields: renderableFields.map((m) ->
           {title: renderFieldLabel(m), value: renderField(m, result.data[0]), short: true}
         )
       })
-      attachment.text = if @showShareUrl() then query.share_url else ""
+      attachment.text = if @showShareUrl() then shareUrl else ""
       @reply(attachments: [attachment])
 
     else
@@ -93,9 +95,9 @@ module.exports = class QueryRunner extends FancyReplier
         text: result.data.map((d) ->
           renderableFields.map((f) -> renderField(f, d)).join(" – ")
         ).join("\n")
-        fallback: query.share_url
+        fallback: shareUrl
       })
-      @reply(attachments: [attachment], text: if @showShareUrl() then query.share_url else "")
+      @reply(attachments: [attachment], text: if @showShareUrl() then shareUrl else "")
 
   work: ->
     @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
