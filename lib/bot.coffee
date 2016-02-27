@@ -185,40 +185,59 @@ processCommand = (bot, message, isDM = false) ->
       runner.start()
 
     else
-      help = ""
+      helpAttachments = []
 
       groups = _.groupBy(customCommands, 'category')
 
       for groupName, groupCommmands of groups
-        help += "\n *#{groupName}*\n"
+        groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
-          help += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
+          groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
           if command.description
-            help += " — _#{command.description}_"
-          help += "\n"
-        help += "\n"
+            groupText += " — _#{command.description}_"
+          groupText += "\n"
 
-      help += """
-      *Built-in Commands*\n
+        helpAttachments.push(
+          title: groupName
+          text: groupText
+          color: "#64518A"
+          mrkdwn_in: ["text"]
+        )
+
+      defaultText = """
       • *find* <look search term> — _Shows the top five Looks matching the search._
       """
 
       if enableQueryCli
-        help += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n"
+        defaultText += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n"
 
-      help += "\n"
+      helpAttachments.push(
+        title: "Built-in Commands"
+        text: defaultText
+        color: "#64518A"
+        mrkdwn_in: ["text"]
+      )
+
 
       spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
       ).join(" or ")
       if spaces
-        help += "\n_To add your own commands, add a dashboard to #{spaces}._"
+        helpAttachments.push(
+          text: "\n_To add your own commands, add a dashboard to #{spaces}._"
+          color: "#64518A"
+          mrkdwn_in: ["text"]
+        )
 
       if newVersion
-        help += "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+        helpAttachments.push(
+          text: "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+          color: "warning"
+          mrkdwn_in: ["text"]
+        )
 
       if !isDM || message.text.toLowerCase() == "help"
-        context.replyPrivate({text: help, parse: "none", attachments: []})
+        context.replyPrivate({attachments: helpAttachments})
 
     refreshCommands()
 
