@@ -6,6 +6,7 @@ ReplyContext = require('./reply_context')
 AWS = require('aws-sdk')
 crypto = require('crypto')
 _ = require('underscore')
+versionChecker = require('./version_checker')
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
@@ -94,11 +95,24 @@ refreshCommands = ->
   for looker in lookers
     looker.refreshCommands()
 
+newVersion = null
+checkVersion = ->
+  versionChecker((version) ->
+    newVersion = version
+  )
+
+checkVersion()
+
 # Update access tokens every half hour
 setInterval(->
   for looker in lookers
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
+
+# Check for new versions every day
+setInterval(->
+  checkVersion()
+, 24 * 60 * 60 * 1000)
 
 controller = Botkit.slackbot(
   debug: process.env.DEBUG_MODE == "true"
@@ -196,6 +210,9 @@ processCommand = (bot, message) ->
       ).join(" or ")
       if spaces
         help += "\n_To add your own commands, add a dashboard to #{spaces}._"
+
+      if newVersion
+        help += "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
 
       context.replyPrivate({text: help, parse: "none", attachments: []})
 
