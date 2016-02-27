@@ -9,7 +9,6 @@ ReplyContext = require('./reply_context')
 
 CLIQueryRunner = require('./repliers/cli_query_runner')
 LookFinder = require('./repliers/look_finder')
-LookParameterizer = require('./repliers/look_parameterizer')
 DashboardQueryRunner = require('./repliers/dashboard_query_runner')
 QueryRunner = require('./repliers/query_runner')
 LookQueryRunner = require('./repliers/look_query_runner')
@@ -145,7 +144,6 @@ controller.on 'ambient', (bot, message) ->
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
-GET_REGEX = 'get (.+)=(.+)'
 
 controller.on "slash_command", (bot, message) ->
   if process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && process.env.SLACK_SLASH_COMMAND_TOKEN == message.token
@@ -170,9 +168,6 @@ processCommand = (bot, message) ->
   else if match = message.text.match(new RegExp(FIND_REGEX))
     message.match = match
     find(context, message)
-  else if match = message.text.match(new RegExp(GET_REGEX))
-    message.match = match
-    get(context, message)
   else
     shortCommands = _.sortBy(_.values(customCommands), (c) -> -c.name.length)
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
@@ -256,20 +251,6 @@ find = (context, message) ->
   context.looker = foundLooker || lookers[0]
 
   runner = new LookFinder(context, type, query)
-  runner.start()
-
-get = (context, message) ->
-  [__, query, filterValue] = message.match
-
-  firstWord = query.split(" ")[0]
-  foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
-  if foundLooker
-    words = query.split(" ")
-    words.shift()
-    query = words.join(" ")
-  looker = foundLooker || lookers[0]
-
-  runner = new LookParameterizer(context, query.trim(), filterValue.trim())
   runner.start()
 
 checkMessage = (bot, message) ->
