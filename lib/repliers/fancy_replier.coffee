@@ -69,7 +69,7 @@ module.exports = class FancyReplier
   startLoading: (cb) ->
 
     sass = if @replyContext.isSlashCommand()
-      "..."
+      "…"
     else
       sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
