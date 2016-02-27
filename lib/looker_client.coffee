@@ -1,5 +1,6 @@
 request = require("request")
 _ = require("underscore")
+npmPackage = require('./../package.json')
 
 module.exports = class LookerAPIClient
 
@@ -17,7 +18,7 @@ module.exports = class LookerAPIClient
     requestConfig.url = "#{@options.baseUrl}/#{requestConfig.path}"
     headers =
       Authorization: "token #{@token}"
-      "User-Agent": "looker-slackbot"
+      "User-Agent": "looker-slackbot/#{npmPackage.version}"
     requestConfig.headers = _.extend(headers, requestConfig.headers || {})
     request(requestConfig, (error, response, body) =>
       if error
