@@ -45,7 +45,7 @@ module.exports = class QueryRunner extends FancyReplier
 
     renderableFields = dimension_like.concat(measure_like)
 
-    shareUrl = "*<#{query.share_url}|View in Looker>*"
+    shareUrl = "<#{query.share_url}>"
 
     renderField = (f, row) =>
       d = row[f.name]
