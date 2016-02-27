@@ -156,9 +156,9 @@ controller.on "direct_mention", (bot, message) ->
 
 controller.on "direct_message", (bot, message) ->
   if message.text.indexOf("/") != 0
-    processCommand(bot, message)
+    processCommand(bot, message, true)
 
-processCommand = (bot, message) ->
+processCommand = (bot, message, isDM = false) ->
 
   context = new ReplyContext(defaultBot, bot, message)
 
@@ -217,7 +217,8 @@ processCommand = (bot, message) ->
       if newVersion
         help += "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
 
-      context.replyPrivate({text: help, parse: "none", attachments: []})
+      if !isDM || message.text.toLowerCase() == "help"
+        context.replyPrivate({text: help, parse: "none", attachments: []})
 
     refreshCommands()
 
