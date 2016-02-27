@@ -68,7 +68,10 @@ module.exports = class FancyReplier
 
   startLoading: (cb) ->
 
-    sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+    sass = if @replyContext.isSlashCommand()
+      "..."
+    else
+      sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
     if process.env.DEV == "true"
       sass = "[DEVELOPMENT] #{sass}"
