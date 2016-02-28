@@ -225,7 +225,6 @@ processCommand = (bot, message, isDM = false) ->
       if spaces
         helpAttachments.push(
           text: "\n_To add your own commands, add a dashboard to #{spaces}._"
-          color: "#64518A"
           mrkdwn_in: ["text"]
         )
 
