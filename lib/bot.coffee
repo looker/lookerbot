@@ -73,6 +73,8 @@ lookers = lookerConfig.map((looker) ->
             looker: looker
             category: category
 
+          command.hidden = category.toLowerCase().indexOf("[hidden]") != -1 || command.name.indexOf("[hidden]") != -1
+
           command.helptext = (dashboard.filters || "").map((f) ->
             "<#{f.title.toLowerCase()}>"
           ).join(", ")
@@ -192,17 +194,19 @@ processCommand = (bot, message, isDM = false) ->
       for groupName, groupCommmands of groups
         groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
-          groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
-          if command.description
-            groupText += " — _#{command.description}_"
-          groupText += "\n"
+          unless command.hidden
+            groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
+            if command.description
+              groupText += " — _#{command.description}_"
+            groupText += "\n"
 
-        helpAttachments.push(
-          title: groupName
-          text: groupText
-          color: "#64518A"
-          mrkdwn_in: ["text"]
-        )
+        if groupText
+          helpAttachments.push(
+            title: groupName
+            text: groupText
+            color: "#64518A"
+            mrkdwn_in: ["text"]
+          )
 
       defaultText = """
       • *find* <look search term> — _Shows the top five Looks matching the search._
