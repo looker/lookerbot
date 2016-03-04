@@ -47,12 +47,15 @@ module.exports = class QueryRunner extends FancyReplier
 
     shareUrl = "<#{query.share_url}>"
 
+    renderString = (d) ->
+      d.rendered || d.value
+
     renderField = (f, row) =>
       d = row[f.name]
       if d.drilldown_uri && (f.is_measure || f.measure)
-        "<#{@replyContext.looker.url}#{d.drilldown_uri}|#{d.rendered}>"
+        "<#{@replyContext.looker.url}#{d.drilldown_uri}|#{renderString(d)}>"
       else if d? && d.value != null
-        d.rendered
+        renderString(d)
       else
         "∅"
 
