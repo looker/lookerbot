@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.2.30",
-    "botkit": "wilg/botkit#2bcec8b995040a72bdb3263f4cabf028916df1df",
+    "botkit": "howdyai/botkit#acc6ff2fb009d17a86a90bbb7daa7ab2652d3f54",
     "coffee-script": "^1.10.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^5.0.0",
