@@ -1,4 +1,4 @@
-# Looker Slackbot
+# Lookerbot for Slack
 
 A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.com) to make sharing data in your organization easier!
 
