@@ -19,6 +19,7 @@ module.exports = class DashboardQueryRunner extends QueryRunner
 
         for dashFilterName, fieldName of element.listen
           if @filters[dashFilterName]
+            queryDef.filters ||= {}
             queryDef.filters[fieldName] = @filters[dashFilterName]
 
         queryDef.filter_config = null
