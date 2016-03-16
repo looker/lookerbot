@@ -1,6 +1,8 @@
 # Lookerbot for Slack
 
-A bot for [Slack](http://slack.com) that integrates with [Looker](http://looker.com) to make sharing data in your organization easier!
+Lookerbot for [Slack](http://slack.com) integrates with [Looker](http://looker.com) to allow you to query all of your data directly from Slack. This enables everyone in your company to share data easily and answer data-driven questions instantly. Lookerbot expands Looker URLs in channels and allows you to create custom commands for running saved queries.
+
+For a free trial of Looker go to [looker.com/free-trial](http://looker.com/free-trial).
 
 ### Requirements
 
