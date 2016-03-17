@@ -2,11 +2,15 @@
 
 Lookerbot for [Slack](http://slack.com) integrates with [Looker](http://looker.com) to allow you to query all of your data directly from Slack. This enables everyone in your company to share data easily and answer data-driven questions instantly. Lookerbot expands Looker URLs in channels and allows you to create custom commands for running saved queries.
 
-For a free trial of Looker go to [looker.com/free-trial](http://looker.com/free-trial).
+> For a free trial of Looker go to [looker.com/free-trial](http://looker.com/free-trial).
+
+### Features
+
+Detailed information on how to interact with Lookerbot [can be found on Looker Discourse](https://discourse.looker.com/t/using-the-lookerbot/2302).
 
 ### Requirements
 
-- [Looker](http://looker.com) 3.40.3 or later
+- [Looker](http://looker.com) 3.40 or later
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
   - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
