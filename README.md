@@ -59,7 +59,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
-If you'd like to put these configurations on the filesystem, you can place them in a `.env` file at the root of the project and start the bot using node-forman [as described below](#running-locally-for-development).
+If you'd like to put these configurations on the filesystem, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
 
 ##### Connecting the bot to multiple Looker instances
 
