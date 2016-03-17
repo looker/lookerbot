@@ -78,15 +78,17 @@ module.exports = class QueryRunner extends FancyReplier
     else if query.vis_config?.type == "single_value"
       field = measure_like[0] || dimension_like[0]
       share = if @showShareUrl() then "\n#{shareUrl}" else ""
-      text = "*#{renderField(field, result.data[0])}*#{share}"
-      @reply({attachments: [{text: text, color: "#64518A", mrkdwn_in: ["text"]}]})
+      rendered = renderField(field, result.data[0])
+      text = "*#{rendered}*#{share}"
+      @reply({attachments: [{text: text, fallback: rendered, color: "#64518A", mrkdwn_in: ["text"]}],})
 
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({}, options, {
         color: "#64518A"
         fallback: shareUrl
         fields: renderableFields.map((m) ->
-          {title: renderFieldLabel(m), value: renderField(m, result.data[0]), short: true}
+          rendered = renderField(m, result.data[0])
+          {title: renderFieldLabel(m), value: rendered, fallback: rendered, short: true}
         )
       })
       attachment.text = if @showShareUrl() then shareUrl else ""
