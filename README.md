@@ -51,6 +51,8 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `SLACKBOT_S3_BUCKET` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.
 
+- `SLACKBOT_S3_BUCKET_REGION` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket region. Defaults to `us-east-1`.
+
 - `AWS_ACCESS_KEY_ID` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 access key that can write to the provided bucket.
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.

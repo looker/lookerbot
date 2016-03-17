@@ -56,7 +56,12 @@ lookers = lookerConfig.map((looker) ->
         if err
           error(err)
         else
-          success("https://#{params.Bucket}.s3.amazonaws.com/#{key}")
+          region = process.env.SLACKBOT_S3_BUCKET_REGION
+          domain = if region && region != "us-east-1"
+            "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}"
+          else
+            "s3"
+          success("https://#{params.Bucket}.#{domain}.amazonaws.com/#{key}")
 
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
