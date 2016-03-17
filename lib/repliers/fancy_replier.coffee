@@ -60,6 +60,7 @@ module.exports = class FancyReplier
       update = _.extend(params, obj)
       update.attachments = if update.attachments then JSON.stringify(update.attachments) else null
       update.text = update.text || " "
+      update.parse = "none"
 
       @replyContext.defaultBot.api.chat.update(update)
 
