@@ -105,18 +105,29 @@ module.exports = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment], text: if @showShareUrl() then shareUrl else "")
 
   work: ->
-    @replyContext.looker.client.get("queries/slug/#{@querySlug}", (query) =>
-      @runQuery(query)
-    (r) => @replyError(r))
+    @replyContext.looker.client.get(
+      "queries/slug/#{@querySlug}"
+      (query) => @runQuery(query)
+      (r) => @replyError(r)
+      {}
+      @replyContext
+    )
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
     if type == "table" || type == "looker_single_record" || type == "single_value"
-      @replyContext.looker.client.get("queries/#{query.id}/run/unified", (result) =>
-        @postResult(query, result, options)
-      (r) => @replyError(r))
+      @replyContext.looker.client.get(
+        "queries/#{query.id}/run/unified"
+        (result) => @postResult(query, result, options)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
     else
-      @replyContext.looker.client.get("queries/#{query.id}/run/png", (result) =>
-        @postImage(query, result, options)
-      (r) => @replyError(r)
-      {encoding: null})
+      @replyContext.looker.client.get(
+        "queries/#{query.id}/run/png"
+        (result) => @postImage(query, result, options)
+        (r) => @replyError(r)
+        {encoding: null}
+        @replyContext
+      )

@@ -14,19 +14,27 @@ module.exports = class DashboardQueryRunner extends QueryRunner
       return
 
     for element in @dashboard.elements
-      @replyContext.looker.client.get("looks/#{element.look_id}", (look) =>
-        queryDef = look.query
+      @replyContext.looker.client.get(
+        "looks/#{element.look_id}"
+        (look) =>
+          queryDef = look.query
 
-        for dashFilterName, fieldName of element.listen
-          if @filters[dashFilterName]
-            queryDef.filters ||= {}
-            queryDef.filters[fieldName] = @filters[dashFilterName]
+          for dashFilterName, fieldName of element.listen
+            if @filters[dashFilterName]
+              queryDef.filters ||= {}
+              queryDef.filters[fieldName] = @filters[dashFilterName]
 
-        queryDef.filter_config = null
+          queryDef.filter_config = null
 
-        @replyContext.looker.client.post("queries", queryDef, (query) =>
-          @runQuery(query)
-        , (r) => @replyError(r))
-
-      (r) => @replyError(r))
+          @replyContext.looker.client.post(
+            "queries"
+            queryDef
+            (query) => @runQuery(query)
+            (r) => @replyError(r)
+            @replyContext
+          )
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
 

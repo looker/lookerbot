@@ -8,12 +8,17 @@ module.exports = class LookFinder extends QueryRunner
     super @replyContext
 
   matchLooks: (query, cb) ->
-    @replyContext.looker.client.get("looks?fields=id,title,short_url,space(name,id)", (looks) =>
-      fuzzySearch = new FuzzySearch(looks, {termPath: "title"})
-      fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}))
-      results = fuzzySearch.search(query)
-      cb(results)
-    (r) => @replyError(r))
+    @replyContext.looker.client.get(
+      "looks?fields=id,title,short_url,space(name,id)"
+      (looks) =>
+        fuzzySearch = new FuzzySearch(looks, {termPath: "title"})
+        fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}))
+        results = fuzzySearch.search(query)
+        cb(results)
+      (r) => @replyError(r)
+      {}
+      @replyContext
+    )
 
   work: ->
     @matchLooks(@query, (results) =>

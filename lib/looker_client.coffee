@@ -1,6 +1,7 @@
 request = require("request")
 _ = require("underscore")
 npmPackage = require('./../package.json')
+crypto = require("crypto")
 
 module.exports = class LookerAPIClient
 
@@ -10,15 +11,28 @@ module.exports = class LookerAPIClient
   reachable: ->
     @token?
 
-  request: (requestConfig, successCallback, errorCallback) ->
+  request: (requestConfig, successCallback, errorCallback, replyContext) ->
+
     unless @reachable()
       errorCallback({error: "Looker #{@options.baseUrl} not reachable"})
       return
 
+    msg = replyContext?.sourceMessage
+    metadata = ""
+    if msg?.user
+      metadata += " user=#{@_sha(msg.user)}"
+    if msg?.team
+      metadata += " team=#{@_sha(msg.team)}"
+    if msg?.channel
+      metadata += " channel=#{@_sha(msg.channel)}"
+      metadata += " channel_type=#{msg.channel[0]}"
+    if replyContext
+      metadata += " slash=#{replyContext.isSlashCommand()}"
+
     requestConfig.url = "#{@options.baseUrl}/#{requestConfig.path}"
     headers =
       Authorization: "token #{@token}"
-      "User-Agent": "looker-slackbot/#{npmPackage.version}"
+      "User-Agent": "looker-slackbot/#{npmPackage.version}#{metadata}"
     requestConfig.headers = _.extend(headers, requestConfig.headers || {})
     request(requestConfig, (error, response, body) =>
       if error
@@ -37,10 +51,10 @@ module.exports = class LookerAPIClient
           errorCallback({error: "Couldn't parse Looker response. The server may be offline."})
     )
 
-  get: (path, successCallback, errorCallback, options = {}) ->
-    @request(_.extend({method: "GET", path: path}, options), successCallback, errorCallback)
+  get: (path, successCallback, errorCallback, options, replyContext) ->
+    @request(_.extend({method: "GET", path: path}, options || {}), successCallback, errorCallback, replyContext)
 
-  post: (path, body, successCallback, errorCallback) ->
+  post: (path, body, successCallback, errorCallback, replyContext) ->
     @request(
       {
         method: "POST"
@@ -50,7 +64,8 @@ module.exports = class LookerAPIClient
           "content-type": "application/json"
       },
       successCallback,
-      errorCallback
+      errorCallback,
+      replyContext
     )
 
   fetchAccessToken: ->
@@ -75,3 +90,8 @@ module.exports = class LookerAPIClient
         console.warn("Failed fetchAccessToken for Looker #{@options.baseUrl}: #{body}")
       @options.afterConnect?()
     )
+
+  _sha: (text) ->
+    shasum = crypto.createHash("sha1")
+    shasum.update(text)
+    shasum.digest("hex")
