@@ -10,10 +10,11 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 ### Requirements
 
-- [Looker](http://looker.com) 3.40 or later
+- [Looker](http://looker.com) 3.42 or later
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
   - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
+  - The **PDF Download & Scheduling and Scheduled Visualizations** Labs feature in Looker must be enabled
 
 ### Deployment
 
@@ -33,7 +34,7 @@ The quickest way to deploy the bot is to use Heroku's one-click deploy button, w
 
 #### Manual Deployment
 
-The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API.
+The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API. If you have a self-hosted instance of Looker, be sure to open up port 19999 (or your `core_port`) in order to accesss the Looker API.
 
 The bot is configured entirely via environment variables. You'll want to set up these variables:
 
@@ -41,11 +42,11 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_URL` (required) – The web url of your Looker instance.
 
-- `LOOKER_API_BASE_URL` (required) – The API 3.0 endpoint of your Looker instance.
+- `LOOKER_API_BASE_URL` (required) – The API 3.0 endpoint of your Looker instance. In most cases, this will be the web url followed by `:19999/api/3.0` (replace `19999` with your `core_port` if it is different).
 
-- `LOOKER_API_3_CLIENT_ID` (required) – The API 3.0 client ID for the user you want the bot to run as.
+- `LOOKER_API_3_CLIENT_ID` (required) – The API 3.0 client ID for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
 
-- `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as.
+- `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
 
 - `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands on Looker Discourse](https://discourse.looker.com/t/2302).
 
@@ -97,7 +98,7 @@ The included `Procfile` will also allow you to run the app using [foreman](https
 
 Slash commands are not required to interact with the bot. You can DM the bot directly or mention the bot like:
 
-> @lookerbot help
+> @looker help
 
 and use all the functionality.
 
@@ -112,7 +113,7 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 
 ### Data Access
 
-We suggest creating a Looker user specifically for the Slack bot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Slack bot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
+We suggest creating a Looker API user specifically for the Slack bot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Slack bot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
 
 Also, keep in mind that when the Looker bot answers questions in Slack _the resulting data moves into Slack and is now hosted there_. Be sure to carefully consider what data is allowed to leave Looker. Slack retains chat message history on their servers and pushes many types of notifications about messages out via other services.
 
