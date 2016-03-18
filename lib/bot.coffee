@@ -251,7 +251,9 @@ processCommand = (bot, message, isDM = false) ->
           mrkdwn_in: ["text"]
         )
 
-      if !isDM || message.text.toLowerCase() == "help"
+      if isDM && message.text.toLowerCase() != "help"
+        context.replyPrivate(":crying_cat_face: I couldn't understand that command. You can use `help` to see the list of possible commands.")
+      else
         context.replyPrivate({attachments: helpAttachments})
 
     refreshCommands()
