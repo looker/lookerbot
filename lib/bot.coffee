@@ -3,6 +3,7 @@ getUrls = require('get-urls')
 AWS = require('aws-sdk')
 crypto = require('crypto')
 _ = require('underscore')
+SlackUtils = require('./slack_utils')
 
 LookerClient = require('./looker_client')
 ReplyContext = require('./reply_context')
@@ -160,10 +161,12 @@ controller.on "slash_command", (bot, message) ->
     bot.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.")
 
 controller.on "direct_mention", (bot, message) ->
+  message.text = SlackUtils.stripMessageText(message.text)
   processCommand(bot, message)
 
 controller.on "direct_message", (bot, message) ->
   if message.text.indexOf("/") != 0
+    message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
 processCommand = (bot, message, isDM = false) ->

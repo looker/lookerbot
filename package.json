@@ -4,7 +4,8 @@
   "description": "Slackbot for Looker integration",
   "main": "index.js",
   "scripts": {
-    "start": "coffee lib/bot.coffee"
+    "start": "coffee lib/bot.coffee",
+    "test": "mocha --compilers coffee:coffee-script/register"
   },
   "dependencies": {
     "aws-sdk": "^2.2.30",
@@ -15,6 +16,9 @@
     "request": "^2.66.0",
     "semver": "^5.1.0",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "mocha": "^2.4.5"
   },
   "engines": {
     "node": "^4.2.6"
