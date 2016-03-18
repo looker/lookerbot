@@ -80,9 +80,10 @@ lookers = lookerConfig.map((looker) ->
 
           command.hidden = category.toLowerCase().indexOf("[hidden]") != -1 || command.name.indexOf("[hidden]") != -1
 
-          command.helptext = (dashboard.filters || "").map((f) ->
-            "<#{f.title.toLowerCase()}>"
-          ).join(", ")
+          command.helptext = ""
+
+          if dashboard.filters?.length > 0
+            command.helptext = "<#{dashboard.filters[0].title.toLowerCase()}>"
 
           customCommands[command.name] = command
 
