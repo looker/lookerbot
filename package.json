@@ -1,6 +1,6 @@
 {
   "name": "looker-slackbot",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Slackbot for Looker integration",
   "main": "index.js",
   "scripts": {
