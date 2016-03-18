@@ -127,7 +127,11 @@ module.exports = class QueryRunner extends FancyReplier
       @replyContext.looker.client.get(
         "queries/#{query.id}/run/png"
         (result) => @postImage(query, result, options)
-        (r) => @replyError(r)
+        (r) =>
+          if r?.error == "Received empty response from Looker."
+            @replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."})
+          else
+            @replyError(r)
         {encoding: null}
         @replyContext
       )

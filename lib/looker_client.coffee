@@ -44,7 +44,10 @@ module.exports = class LookerAPIClient
           successCallback?(body)
       else
         try
-          errorCallback?(JSON.parse(body))
+          if Buffer.isBuffer(body) && body.length == 0
+            errorCallback?({error: "Received empty response from Looker."})
+          else
+            errorCallback?(JSON.parse(body))
         catch
           console.error("JSON parse failed:")
           console.error(body)
