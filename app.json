@@ -1,8 +1,9 @@
 {
-  "name": "Looker Slackbot",
+  "name": "Lookerbot for Slack",
   "description": "A Slack bot for Looker, to make sharing data easier!",
   "repository": "https://github.com/looker/looker-slackbot",
   "keywords": ["looker", "bi", "analytics", "slack", "chat", "data"],
+  "logo": "https://cdn.rawgit.com/looker/looker-slackbot/master/looker-bot-icon-512.png",
   "env": {
     "SLACK_API_KEY": {
       "description": "A Slack API token (find it on https://api.slack.com/web)",
