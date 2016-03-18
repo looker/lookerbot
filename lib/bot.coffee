@@ -167,6 +167,9 @@ controller.on "direct_message", (bot, message) ->
 
 processCommand = (bot, message, isDM = false) ->
 
+  message.text = message.text.split('“').join('"')
+  message.text = message.text.split('”').join('"')
+
   context = new ReplyContext(defaultBot, bot, message)
 
   if match = message.text.match(new RegExp(QUERY_REGEX)) && enableQueryCli
