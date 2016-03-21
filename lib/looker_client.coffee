@@ -14,7 +14,7 @@ module.exports = class LookerAPIClient
   request: (requestConfig, successCallback, errorCallback, replyContext) ->
 
     unless @reachable()
-      errorCallback({error: "Looker #{@options.baseUrl} not reachable"})
+      errorCallback({error: "Looker #{@options.baseUrl} not reachable.\n#{@tokenError || ""}"})
       return
 
     msg = replyContext?.sourceMessage
@@ -81,8 +81,10 @@ module.exports = class LookerAPIClient
         client_secret: @options.clientSecret
 
     request(options, (error, response, body) =>
+      @tokenError = null
       if error
         console.warn("Couldn't fetchAccessToken for Looker #{@options.baseUrl}: #{error}")
+        @tokenError = error
         @token = null
       else if response.statusCode == 200
         json = JSON.parse(body)
