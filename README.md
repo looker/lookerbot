@@ -64,6 +64,14 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 If you'd like to put these configurations on the filesystem, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
 
+##### Self-signed or invalid certificates
+
+If your Looker instance uses a self-signed certificate, Lookerbot will refuse to connect to it by default.
+
+Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will override this behavior instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thouroughly evaluated the security implications of this action for your infrastructure before setting this variable.
+
+This should only impact on-premise deployments of Looker. Do not set this environment variable if Looker hosts your instance.
+
 ##### Connecting the bot to multiple Looker instances
 
 If you would like the bot to connect to multiple instances of Looker, then you can configure the bot with the `LOOKERS` environment variable. This variable should be JSON array of JSON objects, each representing a Looker instance and its authentication information.
