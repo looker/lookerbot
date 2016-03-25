@@ -30,7 +30,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
 
-The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot.
+The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot. See the 'Manual Deployment' section below for more information on the environment variables needed. Once you have deployed via Heroku, skip to the 'Configuring Slash Commands' section of this document.
 
 #### Manual Deployment
 
