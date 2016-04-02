@@ -1,6 +1,7 @@
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
+AzureStorage = require('azure-storage')
 crypto = require('crypto')
 _ = require('underscore')
 SlackUtils = require('./slack_utils')
@@ -63,6 +64,24 @@ lookers = lookerConfig.map((looker) ->
           else
             "s3"
           success("https://#{domain}.amazonaws.com/#{params.Bucket}/#{key}")
+
+  if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+    looker.storeBlob = (blob, success, error) ->
+      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
+      key = "#{path.join("/")}.png"
+      unless blob.length
+        error("No image data returned.")
+        return
+      container = process.env.SLACKBOT_AZURE_CONTAINER
+      options =
+          ContentType: "image/png"
+      wasb = new AzureStorage.CreateBlobService()
+      wasb.createBlockBlobFromLocalFile container, key, blob, options, (err, result, response) ->
+        if err
+          error(err)
+        else
+          storageAccount = process.env.AZURE_STORAGE_ACCOUNT
+          success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
 
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
