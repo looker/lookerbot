@@ -13,7 +13,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 - [Looker](http://looker.com) 3.42 or later
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
-  - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys or [Microsoft Azure Storage](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) account and access key
+  - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys or a [Microsoft Azure Storage](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) account and access key
   - The **PDF Download & Scheduling and Scheduled Visualizations** Labs feature in Looker must be enabled
 
 ### Deployment
