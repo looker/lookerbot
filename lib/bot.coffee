@@ -75,8 +75,8 @@ lookers = lookerConfig.map((looker) ->
       container = process.env.SLACKBOT_AZURE_CONTAINER
       options =
           ContentType: "image/png"
-      wasb = new AzureStorage.CreateBlobService()
-      wasb.createBlockBlobFromLocalFile container, key, blob, options, (err, result, response) ->
+      wasb = new AzureStorage.createBlobService()
+      wasb.createBlockBlobFromText container, key, blob, options, (err, result, response) ->
         if err
           error(err)
         else
