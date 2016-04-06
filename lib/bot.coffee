@@ -40,37 +40,45 @@ else
 
 lookers = lookerConfig.map((looker) ->
 
+  # Amazon S3
   if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
       path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
       key = "#{path.join("/")}.png"
+
       unless blob.length
-        error("No image data returned.")
+        error("No image data returned.", "S3 Error")
         return
+
+      region = process.env.SLACKBOT_S3_BUCKET_REGION
+      domain = if region && region != "us-east-1"
+        "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}.amazonaws.com"
+      else
+        "s3.amazonaws.com"
+
       params =
         Bucket: process.env.SLACKBOT_S3_BUCKET
         Key: key
         Body: blob
         ACL: 'public-read'
         ContentType: "image/png"
-      s3 = new AWS.S3()
+
+      s3 = new AWS.S3(
+        endpoint: new AWS.Endpoint(domain)
+      )
       s3.putObject params, (err, data) ->
         if err
-          error(err)
+          error(err, "S3 Error")
         else
-          region = process.env.SLACKBOT_S3_BUCKET_REGION
-          domain = if region && region != "us-east-1"
-            "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}"
-          else
-            "s3"
-          success("https://#{domain}.amazonaws.com/#{params.Bucket}/#{key}")
+          success("https://#{domain}/#{params.Bucket}/#{key}")
 
+  # Azure
   if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
       path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
       key = "#{path.join("/")}.png"
       unless blob.length
-        error("No image data returned.")
+        error("No image data returned.", "Azure Error")
         return
       container = process.env.SLACKBOT_AZURE_CONTAINER
       options =
@@ -78,7 +86,7 @@ lookers = lookerConfig.map((looker) ->
       wasb = new AzureStorage.createBlobService()
       wasb.createBlockBlobFromText container, key, blob, options, (err, result, response) ->
         if err
-          error(err)
+          error(err, "Azure Error")
         else
           storageAccount = process.env.AZURE_STORAGE_ACCOUNT
           success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")

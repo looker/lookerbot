@@ -23,8 +23,8 @@ module.exports = class QueryRunner extends FancyReplier
           ]
           text: ""
         )
-      error = (error) =>
-        @reply(":warning: #{error}")
+      error = (error, context) =>
+        @reply(":warning: *#{context}* #{error}")
       @replyContext.looker.storeBlob(imageData, success, error)
     else
       @reply(":warning: No storage is configured for visualization images in the bot configuration.")
