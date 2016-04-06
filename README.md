@@ -14,10 +14,10 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
   - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart imgaes
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images, credentials for a supported storage service:
-  - [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
+  - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
     - [Documentation](http://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
-  - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/)
-      - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) account and access key
+  - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
+      - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) 
 
 ### Deployment
 
