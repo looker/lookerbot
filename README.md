@@ -13,7 +13,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 - [Looker](http://looker.com) 3.42 or later
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images:
-  - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys
+  - An [Amazon S3](https://aws.amazon.com/s3/) bucket and access keys or a [Microsoft Azure Storage](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) account and access key
   - The **PDF Download & Scheduling and Scheduled Visualizations** Labs feature in Looker must be enabled
 
 ### Deployment
@@ -57,6 +57,12 @@ The bot is configured entirely via environment variables. You'll want to set up 
 - `AWS_ACCESS_KEY_ID` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 access key that can write to the provided bucket.
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
+
+- `AZURE_STORAGE_ACCOUNT` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of your Azure Storage account.
+
+- `SLACKBOT_AZURE_CONTAINER` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of the container within your Azure Storage account that you wish to use.
+
+- `AZURE_STORAGE_ACCESS_KEY` (optional) - If using Microsoft Azure Storage to store visualization images posted by the Slack bot, provide an access key that can write to the provided Azure Storage account and container.
 
 - `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
 
