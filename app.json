@@ -31,6 +31,10 @@
       "description": "The ID of a Space that you would like the bot to use to define custom commands.",
       "required": false
     },
+    "SLACK_SLASH_COMMAND_TOKEN": {
+      "description": "If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.",
+      "required": false
+    },
     "SLACKBOT_S3_BUCKET": {
       "description": "If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.",
       "required": false
@@ -48,8 +52,16 @@
       "description": "If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.",
       "required": false
     },
-    "SLACK_SLASH_COMMAND_TOKEN": {
-      "description": "If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.",
+    "AZURE_STORAGE_ACCOUNT": {
+      "description": "If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of your Azure Storage account.",
+      "required": false
+    },
+    "SLACKBOT_AZURE_CONTAINER": {
+      "description": "If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of the container within your Azure Storage account that you wish to use.",
+      "required": false
+    },
+    "AZURE_STORAGE_ACCESS_KEY": {
+      "description": "If using Microsoft Azure Storage to store visualization images posted by the Slack bot, provide an access key that can write to the provided Azure Storage account and container.",
       "required": false
     }
   }
