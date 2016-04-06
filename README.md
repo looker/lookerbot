@@ -50,6 +50,13 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands on Looker Discourse](https://discourse.looker.com/t/2302).
 
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
+
+- `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
+
+
+###### (optional) Amazon S3 Image Storage
+
 - `SLACKBOT_S3_BUCKET` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.
 
 - `SLACKBOT_S3_BUCKET_REGION` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket region. Defaults to `us-east-1`.
@@ -58,15 +65,13 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
+###### (optional) Azure Image Storage
+
 - `AZURE_STORAGE_ACCOUNT` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of your Azure Storage account.
 
 - `SLACKBOT_AZURE_CONTAINER` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of the container within your Azure Storage account that you wish to use.
 
 - `AZURE_STORAGE_ACCESS_KEY` (optional) - If using Microsoft Azure Storage to store visualization images posted by the Slack bot, provide an access key that can write to the provided Azure Storage account and container.
-
-- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
-
-- `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
 If you'd like to put these configurations on the filesystem, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
 
