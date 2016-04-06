@@ -13,7 +13,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 ### Requirements
 
 - [Looker](http://looker.com) 3.42 or later
-  - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart imgaes
+  - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images, credentials for a supported storage service:
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
