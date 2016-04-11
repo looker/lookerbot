@@ -166,6 +166,7 @@ controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
 
 defaultBot = controller.spawn({
   token: process.env.SLACK_API_KEY,
+  retry: 10,
 }).startRTM()
 
 defaultBot.api.team.info {}, (err, response) ->
