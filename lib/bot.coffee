@@ -179,6 +179,9 @@ defaultBot.api.team.info {}, (err, response) ->
   else
     throw new Error("Could not connect to the Slack API.")
 
+controller.on 'rtm_reconnect_failed', ->
+  throw new Error("Failed to reconnect to the Slack RTM API.")
+
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 

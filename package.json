@@ -10,7 +10,7 @@
   "dependencies": {
     "aws-sdk": "^2.2.30",
     "azure-storage": "~0.10.0",
-    "botkit": "^0.0.8",
+    "botkit": "0.0.15",
     "coffee-script": "^1.10.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^5.0.0",
