@@ -172,9 +172,12 @@ defaultBot = controller.spawn({
 defaultBot.api.team.info {}, (err, response) ->
   if err
     console.error(err)
-  controller.saveTeam(response.team, ->
-    console.log "Saved the team information..."
-  )
+  if response
+    controller.saveTeam(response.team, ->
+      console.log "Saved the team information..."
+    )
+  else
+    throw new Error("Could not connect to the Slack API.")
 
 controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
