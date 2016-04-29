@@ -186,7 +186,7 @@ controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
-FIND_REGEX = 'find (dashboard|look )? ?(.+)'
+FIND_REGEX = 'find (dashboard|look|command)? ?(.+)'
 
 controller.on "slash_command", (bot, message) ->
   if process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && process.env.SLACK_SLASH_COMMAND_TOKEN == message.token
@@ -221,14 +221,14 @@ processCommand = (bot, message, isDM = false) ->
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
-      query = message.text[matchedCommand.name.length..].trim()
+      query = message.text[matchedCommand.name.length..].trim().split('|').map((t) -> t.trim())
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
       context.looker = matchedCommand.looker
 
       filters = {}
-      for filter in matchedCommand.dashboard.filters
-        filters[filter.name] = query
+      for filter, index in matchedCommand.dashboard.filters
+        filters[filter.name] = query[index]
       runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
       runner.start()
 
@@ -241,6 +241,7 @@ processCommand = (bot, message, isDM = false) ->
         groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
           unless command.hidden
+            console.log('command: ' + JSON.stringify(command, null, 2))
             groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
             if command.description
               groupText += " — _#{command.description}_"
@@ -255,7 +256,7 @@ processCommand = (bot, message, isDM = false) ->
           )
 
       defaultText = """
-      • *find* <look search term> — _Shows the top five Looks matching the search._
+      • *find* <(command|look|dashboard) search term|> — _Shows the top five commands/looks/dashboards matching the search._
       """
 
       if enableQueryCli
@@ -312,6 +313,8 @@ runCLI = (context, message) ->
 
 find = (context, message) ->
   [__, type, query] = message.match
+  if not type
+    type = 'command'
 
   firstWord = query.split(" ")[0]
   foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]

@@ -34,7 +34,7 @@ module.exports = class LookerAPIClient
       Authorization: "token #{@token}"
       "User-Agent": "looker-slackbot/#{npmPackage.version}#{metadata}"
     requestConfig.headers = _.extend(headers, requestConfig.headers || {})
-    console.log('requestConfig: ' + JSON.stringify(requestConfig));
+    console.log('requestConfig: ' + JSON.stringify(requestConfig, null, 2));
     request(requestConfig, (error, response, body) =>
       if error
         errorCallback?(error)

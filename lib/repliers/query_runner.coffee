@@ -32,6 +32,7 @@ module.exports = class QueryRunner extends FancyReplier
   postResult: (query, result, options = {}) ->
 
     # Handle hidden fields
+    console.log('result: ' + JSON.stringify(result, null, 2));
     hiddenFields = query.vis_config?.hidden_fields || []
     if hiddenFields?.length > 0
       for k, v of result.fields
