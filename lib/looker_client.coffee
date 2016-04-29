@@ -34,6 +34,7 @@ module.exports = class LookerAPIClient
       Authorization: "token #{@token}"
       "User-Agent": "looker-slackbot/#{npmPackage.version}#{metadata}"
     requestConfig.headers = _.extend(headers, requestConfig.headers || {})
+    console.log('requestConfig: ' + JSON.stringify(requestConfig));
     request(requestConfig, (error, response, body) =>
       if error
         errorCallback?(error)
@@ -80,7 +81,9 @@ module.exports = class LookerAPIClient
         client_id: @options.clientId
         client_secret: @options.clientSecret
 
+    console.log('request options: ' + JSON.stringify(options));
     request(options, (error, response, body) =>
+      console.log('error: ' + JSON.stringify(error) + '\tresponse: ' + JSON.stringify(response) + '\tbody: ' + JSON.stringify(body));
       @tokenError = null
       if error
         console.warn("Couldn't fetchAccessToken for Looker #{@options.baseUrl}: #{error}")
