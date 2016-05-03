@@ -17,6 +17,8 @@ LookQueryRunner = require('./repliers/look_query_runner')
 
 versionChecker = require('./version_checker')
 
+LOOKER_BOT_CHANNEL_ID = 'C14KGPH38' # hard coded to #looker-bot
+
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
@@ -203,10 +205,29 @@ controller.on "direct_message", (bot, message) ->
     message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
+logMessage = (bot, message) ->
+  sendLog = (username, commandType, question) =>
+    defaultBot.send({
+      text: "[Lookerbot Log][#{commandType}] Asked by: #{username} for question: #{question}"
+      channel: LOOKER_BOT_CHANNEL_ID
+    })
+  console.log('message: ' + JSON.stringify(message, null, 2))
+  if message.type == 'slash_command'
+    sendLog(message.user_name, 'Slash Command', message.text)
+  else if message.type == 'message'
+    bot.api.users.info({user: "U047EMSKV"}, (err, resp) ->
+      console.log("resp: #{JSON.stringify(resp, null, 2)}")
+      if message.event = 'direct_mention'
+        sendLog(resp.user.name, 'Direct Mention', message.text)
+      else # this is a direct message
+        sendLog(resp.user.name, 'Direct Message', message.text)
+    )
+
 processCommand = (bot, message, isDM = false) ->
 
   message.text = message.text.split('“').join('"')
   message.text = message.text.split('”').join('"')
+  logMessage(bot, message)
 
   context = new ReplyContext(defaultBot, bot, message)
 
@@ -233,6 +254,7 @@ processCommand = (bot, message, isDM = false) ->
       runner.start()
 
     else
+
       helpAttachments = []
 
       groups = _.groupBy(customCommands, 'category')
@@ -241,7 +263,7 @@ processCommand = (bot, message, isDM = false) ->
         groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
           unless command.hidden
-            console.log('command: ' + JSON.stringify(command, null, 2))
+            # console.log('command: ' + JSON.stringify(command, null, 2))
             groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
             if command.description
               groupText += " — _#{command.description}_"
@@ -257,6 +279,7 @@ processCommand = (bot, message, isDM = false) ->
 
       defaultText = """
       • *find* <(command|look|dashboard) search term|> — _Shows the top five commands/looks/dashboards matching the search._
+      • *help*  — _Shows this help screen._
       """
 
       if enableQueryCli
@@ -286,10 +309,13 @@ processCommand = (bot, message, isDM = false) ->
           mrkdwn_in: ["text"]
         )
 
-      if isDM && message.text.toLowerCase() != "help"
-        context.replyPrivate(":crying_cat_face: I couldn't understand that command. You can use `help` to see the list of possible commands.")
-      else
-        context.replyPrivate({attachments: helpAttachments})
+      if message.text.toLowerCase() != "help"
+        helpAttachments.push(
+          text: "*Sorry, we could not understand your command. The list of commands we understand are listed above. If you have feedback for additional commands, please let us know in #lookerbot-support.*"
+          mrkdwn_in: ["text"]
+        )
+
+      context.replyPrivate({attachments: helpAttachments})
 
     refreshCommands()
 
@@ -336,8 +362,8 @@ checkMessage = (bot, message) ->
     for looker in lookers
 
       # Starts with Looker base URL?
-      if url.lastIndexOf(looker.url, 0) == 0
         context = new ReplyContext(defaultBot, bot, message)
+      if url.lastIndexOf(looker.url, 0) == 0
         context.looker = looker
         annotateLook(context, url, message, looker)
         annotateShareUrl(context, url, message, looker)

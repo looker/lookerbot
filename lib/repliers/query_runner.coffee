@@ -32,7 +32,7 @@ module.exports = class QueryRunner extends FancyReplier
   postResult: (query, result, options = {}) ->
 
     # Handle hidden fields
-    console.log('result: ' + JSON.stringify(result, null, 2));
+    # console.log('result: ' + JSON.stringify(result, null, 2));
     hiddenFields = query.vis_config?.hidden_fields || []
     if hiddenFields?.length > 0
       for k, v of result.fields
@@ -116,7 +116,9 @@ module.exports = class QueryRunner extends FancyReplier
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
-    if type == "table" || type == "looker_single_record" || type == "single_value"
+    console.log("type: #{type}")
+    console.log("query: #{JSON.stringify(query, null, )}")
+    if type == "looker_single_record" || type == "single_value"
       @replyContext.looker.client.get(
         "queries/#{query.id}/run/unified"
         (result) => @postResult(query, result, options)
@@ -126,7 +128,7 @@ module.exports = class QueryRunner extends FancyReplier
       )
     else
       @replyContext.looker.client.get(
-        "queries/#{query.id}/run/png"
+        "queries/#{query.id}/run/png?image_width=900&image_height=560"
         (result) => @postImage(query, result, options)
         (r) =>
           if r?.error == "Received empty response from Looker."
