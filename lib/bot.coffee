@@ -48,7 +48,7 @@ lookers = lookerConfig.map((looker) ->
   if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
       path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-      key = "#{path.join("/")}.png"
+      key = "looker-bot-pictures/#{path.join("/")}.png"
 
       unless blob.length
         error("No image data returned.", "S3 Error")
