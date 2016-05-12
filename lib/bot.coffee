@@ -1,3 +1,5 @@
+Fuse = require('./fuse.min')
+
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
@@ -258,10 +260,14 @@ processCommand = (bot, message, isDM = false) ->
       helpAttachments = []
 
       groups = _.groupBy(customCommands, 'category')
+      commandNames = []
+      commandNameToHelpText = {}
 
       for groupName, groupCommmands of groups
         groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
+          commandNames.push(command.name)
+          commandNameToHelpText[command.name] = command.helptext
           unless command.hidden
             # console.log('command: ' + JSON.stringify(command, null, 2))
             groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
@@ -312,6 +318,15 @@ processCommand = (bot, message, isDM = false) ->
       if message.text.toLowerCase() != "help"
         helpAttachments.push(
           text: "*Sorry, we could not understand your command. The list of commands we understand are listed above. If you have feedback for additional commands, please let us know in #lookerbot-support.*"
+          mrkdwn_in: ["text"]
+        )
+        closestCommand = findClosestCommand(message.text, commandNames)
+        helpText = commandNameToHelpText[closestCommand]
+        triedText = "The command you tried is: *#{message.text}*."
+        if closestCommand
+          triedText += " Did you mean *#{closestCommand}* #{helpText}?"
+        helpAttachments.push(
+          text: triedText
           mrkdwn_in: ["text"]
         )
 
@@ -379,3 +394,24 @@ annotateShareUrl = (context, url, sourceMessage, looker) ->
     console.log "Expanding Share URL #{url}"
     runner = new QueryRunner(context, matches[1])
     runner.start()
+
+findClosestCommand = (userAttempt, commandNames) ->
+  # Convert [a,b] to [{id: a}, {id: b}]
+  commandNameMaps = []
+  for commandName in commandNames
+    commandNameMaps.push({id: commandName})
+  # See https://github.com/krisk/Fuse
+  options = {
+    keys: ['id'],
+    id: 'id',
+    include: ['score']
+  }
+  fuse = new Fuse(commandNameMaps, options)
+  # Also uses heuristic: try user's search without everything after last whitespace
+  # For example, if she searches find my id 12345, then trying find my id has a better
+  # chance of finding a good match.
+  userAttemptWithoutId = userAttempt.split(' ').slice(0, -1).join(' ')
+  results = fuse.search(userAttempt).concat(fuse.search(userAttemptWithoutId)).sort((a,b) -> a.score - b.score)
+  console.log("Results for \"#{userAttempt}\" and \"#{userAttemptWithoutId}: #{JSON.stringify(results)}")
+  if results.length > 0
+    return results[0].item
