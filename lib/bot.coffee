@@ -207,10 +207,12 @@ controller.on "direct_message", (bot, message) ->
     message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
-logMessage = (bot, message) ->
+logMessage = (message) ->
   sendLog = (username, commandType, question) =>
+    text = "[Lookerbot Log][#{commandType}] Asked by: #{username} for question: #{question}"
+    console.log(text)
     defaultBot.send({
-      text: "[Lookerbot Log][#{commandType}] Asked by: #{username} for question: #{question}"
+      text: text
       channel: LOOKER_BOT_CHANNEL_ID
     })
   console.log('message: ' + JSON.stringify(message, null, 2))
@@ -229,7 +231,7 @@ processCommand = (bot, message, isDM = false) ->
 
   message.text = message.text.split('“').join('"')
   message.text = message.text.split('”').join('"')
-  logMessage(bot, message)
+  logMessage(message)
 
   context = new ReplyContext(defaultBot, bot, message)
 
