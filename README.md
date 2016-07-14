@@ -115,7 +115,7 @@ To run the server:
 
 1. Ensure Node.js is installed
 2. `npm install` to install dependencies
-3. `npm start` to start the bot server. The server will run until you type `Crl+C` to stop it.
+3. `npm start` to start the bot server. The server will run until you type `Ctrl+C` to stop it.
 
 The included `Procfile` will also allow you to run the app using [foreman](https://github.com/ddollar/foreman) or [node-foreman](https://github.com/jeffjewiss/node-foreman). These libraries also provide easy ways of creating scripts for use with `upstart`, `supervisord`, and `systemd`.
 
