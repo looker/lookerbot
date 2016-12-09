@@ -9,11 +9,13 @@ module.exports = class DashboardQueryRunner extends QueryRunner
 
   work: ->
 
-    if @dashboard.elements.length > 1
+    elements = @dashboard.dashboard_elements || @dashboard.elements
+
+    if elements.length > 1
       @reply("Dashboards with more than one element aren't currently supported for Slack commands.")
       return
 
-    for element in @dashboard.elements
+    for element in elements
       @replyContext.looker.client.get(
         "looks/#{element.look_id}"
         (look) =>

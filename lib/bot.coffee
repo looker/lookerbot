@@ -110,8 +110,9 @@ lookers = lookerConfig.map((looker) ->
 
           command.helptext = ""
 
-          if dashboard.filters?.length > 0
-            command.helptext = "<#{dashboard.filters[0].title.toLowerCase()}>"
+          dashboard_filters = dashboard.dashboard_filters || dashboard.filters
+          if dashboard_filters?.length > 0
+            command.helptext = "<#{dashboard_filters[0].title.toLowerCase()}>"
 
           customCommands[command.name] = command
 
@@ -221,13 +222,15 @@ processCommand = (bot, message, isDM = false) ->
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
+      dashboard = matchedCommand.dashboard
       query = message.text[matchedCommand.name.length..].trim()
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
       context.looker = matchedCommand.looker
 
       filters = {}
-      for filter in matchedCommand.dashboard.filters
+      dashboard_filters = dashboard.dashboard_filters || dashboard.filters
+      for filter in dashboard_filters
         filters[filter.name] = query
       runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
       runner.start()
