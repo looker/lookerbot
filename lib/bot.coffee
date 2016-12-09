@@ -222,7 +222,7 @@ processCommand = (bot, message, isDM = false) ->
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
-      dashboard = matched_command.dashboard
+      dashboard = matchedCommand.dashboard
       query = message.text[matchedCommand.name.length..].trim()
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
