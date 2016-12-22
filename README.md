@@ -148,7 +148,14 @@ You can use the bot to send scheduled Looks to Slack.
 1. Click "Schedule" on a Look
 2. Set "Destination" to "Webhook"
 3. Leave "Format" set to "HTML Attachment". The format selection is ignored.
-4. Enter the webhook URL. The path to the slash command endpoint is `/slack/post_to_channel/channel_name`, so if your bot is hosted at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post_to_channel/data-science`.
+4. Enter the webhook URL.
+
+  - Post to public channels `/slack/post/channel/my-channel-name`
+  - Post to private groups `/slack/post/group/my-channel-name`
+  - To direct message a user `/slack/post/dm/myusername`
+
+  These URLs are prefixed with the URL your bot. So, if yoru bot is hosted at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
+
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
 ### Data Access
