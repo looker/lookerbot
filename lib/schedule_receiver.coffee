@@ -17,16 +17,18 @@ module.exports =
             lookId = matches[1]
             @getChannel(bot, req.params.channel_name, (channel) =>
               for looker in lookers
-                console.log looker.url
                 if req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) == 0
-                  context = new ReplyContext(bot, bot, {
-                    channel: channel.id
-                  })
-                  context.looker = looker
-                  context.scheduled = true
-                  runner = new ScheduledLookQueryRunner(context, lookId)
-                  runner.start()
-                  reply {success: true, reason: "Sending Look #{lookId} to channel #{channel.id}."}
+                  if req.headers['x-looker-webhook-token'] == looker.webhookToken
+                    context = new ReplyContext(bot, bot, {
+                      channel: channel.id
+                    })
+                    context.looker = looker
+                    context.scheduled = true
+                    runner = new ScheduledLookQueryRunner(context, lookId)
+                    runner.start()
+                    reply {success: true, reason: "Sending Look #{lookId} to channel #{channel.id}."}
+                  else
+                    reply {success: false, reason: "Invalid webhook token."}
             )
           else
             reply {success: false, reason: "Unknown scheduled plan URL."}

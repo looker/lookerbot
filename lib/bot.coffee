@@ -37,6 +37,7 @@ else
     clientId: process.env.LOOKER_API_3_CLIENT_ID
     clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET
     customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID
+    webhookToken: process.env.LOOKER_WEBHOOK_TOKEN
   }]
 
 lookers = lookerConfig.map((looker) ->
