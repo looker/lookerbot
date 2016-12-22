@@ -1,5 +1,5 @@
 ReplyContext = require('./reply_context')
-ScheduledLookQueryRunner = require('./repliers/scheduled_look_query_runner')
+LookQueryRunner = require('./repliers/look_query_runner')
 
 module.exports =
 
@@ -31,7 +31,7 @@ module.exports =
                   })
                   context.looker = looker
                   context.scheduled = true
-                  runner = new ScheduledLookQueryRunner(context, lookId)
+                  runner = new LookQueryRunner(context, lookId)
                   runner.start()
                   reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
                 else
