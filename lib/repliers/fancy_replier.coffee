@@ -69,13 +69,15 @@ module.exports = class FancyReplier
 
   startLoading: (cb) ->
 
+    # Scheduled messages don't have a loading indicator, why distract everything?
+    if @replyContext.scheduled
+      cb()
+      return
+
     sass = if @replyContext.isSlashCommand()
       "…"
     else
       sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
-
-    if @replyContext.scheduled
-      sass = ":alarm_clock: — #{sass}"
 
     if process.env.DEV == "true"
       sass = "[DEVELOPMENT] #{sass}"
