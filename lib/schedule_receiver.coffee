@@ -4,7 +4,7 @@ ScheduledLookQueryRunner = require('./repliers/scheduled_look_query_runner')
 module.exports =
 
   listen: (server, bot, lookers) ->
-    server.post("/slack/post_to_channel/:channel_name", (req, res) =>
+    server.post("/slack/post/:post_type/:channel_name", (req, res) =>
 
       reply = (json) ->
         res.setHeader 'Content-Type', 'application/json'
@@ -15,21 +15,28 @@ module.exports =
         if req.body.scheduled_plan.type == "Look"
           if matches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)$/)
             lookId = matches[1]
-            @getChannel(bot, req.params.channel_name, (channel) =>
-              for looker in lookers
-                if req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) == 0
-                  if req.headers['x-looker-webhook-token'] == looker.webhookToken
-                    context = new ReplyContext(bot, bot, {
-                      channel: channel.id
-                    })
-                    context.looker = looker
-                    context.scheduled = true
-                    runner = new ScheduledLookQueryRunner(context, lookId)
-                    runner.start()
-                    reply {success: true, reason: "Sending Look #{lookId} to channel #{channel.id}."}
-                  else
-                    reply {success: false, reason: "Invalid webhook token."}
-            )
+
+            channelName = req.params.channel_name
+            channelType = req.params.post_type
+            if channelType == "dm"
+              channelName = "@#{channelName}"
+            else if channelType == "channel"
+              channelName = "##{channelName}"
+
+            for looker in lookers
+              if req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) == 0
+                if req.headers['x-looker-webhook-token'] == looker.webhookToken
+                  context = new ReplyContext(bot, bot, {
+                    channel: channelName
+                  })
+                  context.looker = looker
+                  context.scheduled = true
+                  runner = new ScheduledLookQueryRunner(context, lookId)
+                  runner.start()
+                  reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
+                else
+                  reply {success: false, reason: "Invalid webhook token."}
+
           else
             reply {success: false, reason: "Unknown scheduled plan URL."}
         else
@@ -37,13 +44,3 @@ module.exports =
       else
         reply {success: false, reason: "No scheduled plan in payload."}
     )
-
-  getChannel: (bot, channelName, callback) ->
-    bot.api.channels.list {}, (err, response) ->
-      if err
-        console.error(err)
-      if response?.ok
-        channel = response.channels.filter((c) -> c.name == channelName)[0]
-        callback(channel)
-      else
-        throw new Error("Could not connect to the Slack API.")
