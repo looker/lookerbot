@@ -19,7 +19,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
     - [Documentation](http://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
   - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
-      - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/) 
+      - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/)
 
 ### Deployment
 
@@ -56,6 +56,8 @@ The bot is configured entirely via environment variables. You'll want to set up 
 - `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
 
 - `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands on Looker Discourse](https://discourse.looker.com/t/2302).
+
+- `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
 - `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
 
@@ -100,6 +102,7 @@ The JSON objects should have the following keys:
 - `clientID` should be the API 3.0 client ID for the user you want the bot to run as
 - `clientSecret` should be the secret for that API 3.0 key
 - `customCommandSpaceId` is an optional parameter, representing a Space that you would like the bot to use to define custom commands.
+- `webhookToken` is an optional parameter. It's the webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
 Here's an example JSON that connects to two Looker instances:
 
@@ -107,7 +110,7 @@ Here's an example JSON that connects to two Looker instances:
 [{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
 ```
 
-The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3_CLIENT_SECRET`, and `LOOKER_CUSTOM_COMMAND_SPACE_ID` variables are ignored when `LOOKERS` is set.
+The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3_CLIENT_SECRET`, `LOOKER_WEBHOOK_TOKEN`, and `LOOKER_CUSTOM_COMMAND_SPACE_ID` variables are ignored when `LOOKERS` is set.
 
 ##### Running the Server
 
@@ -137,6 +140,23 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 6. You'll need to copy the token provided when you created the slash command and set the `SLACK_SLASH_COMMAND_TOKEN` variable with it for the bot to accept slash commands.
 
 Directions for creating slash commands [can be found in Looker Discourse](https://discourse.looker.com/t/using-lookerbot-for-slack/2302)
+
+### Scheduling Data to Slack
+
+You can use the bot to send scheduled Looks to Slack.
+
+1. Click "Schedule" on a Look
+2. Set "Destination" to "Webhook"
+3. Leave "Format" set to "HTML Attachment". The format selection is ignored.
+4. Enter the webhook URL.
+
+  - Post to public channels `/slack/post/channel/my-channel-name`
+  - Post to private groups `/slack/post/group/my-channel-name`
+  - To direct message a user `/slack/post/dm/myusername`
+
+  These URLs are prefixed with the URL your bot. So, if yoru bot is hosted at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
+
+5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
 ### Data Access
 

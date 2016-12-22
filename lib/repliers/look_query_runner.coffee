@@ -5,23 +5,20 @@ module.exports = class LookQueryRunner extends QueryRunner
   constructor: (@replyContext, @lookId) ->
     super @replyContext, null
 
-  showShareUrl: -> false
+  showShareUrl: -> true
+
+  linkText: (shareUrl) ->
+    @loadedLook?.title || super(shareUrl)
+
+  linkUrl: (shareUrl) ->
+    if @loadedLook
+      "#{@replyContext.looker.url}#{@loadedLook.short_url}"
+    else
+      super(shareUrl)
 
   work: ->
     @replyContext.looker.client.get("looks/#{@lookId}", (look) =>
-      message =
-        attachments: [
-          fallback: look.title
-          title: look.title
-          text: look.description
-          color: "#64518A"
-          title_link: "#{@replyContext.looker.url}#{look.short_url}"
-          image_url: if look.public then "#{look.image_embed_url}?width=606" else null
-        ]
-
-      @reply(message)
-
-      if !look.public
-        @runQuery(look.query, message.attachments[0])
-
+      @querySlug = look.query.slug
+      @loadedLook = look
+      super
     (r) => @replyError(r))

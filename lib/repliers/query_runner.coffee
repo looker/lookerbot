@@ -8,16 +8,27 @@ module.exports = class QueryRunner extends FancyReplier
 
   showShareUrl: -> false
 
+  linkText: (shareUrl) ->
+    shareUrl
+
+  linkUrl: (shareUrl) ->
+    shareUrl
+
+  shareUrlContent: (shareUrl) ->
+    if @linkText(shareUrl) == @linkUrl(shareUrl)
+      "<#{@linkUrl(shareUrl)}>"
+    else
+      "<#{@linkUrl(shareUrl)}|#{@linkText(shareUrl)}>"
+
   postImage: (query, imageData, options = {}) ->
     if @replyContext.looker.storeBlob
       success = (url) =>
-        share = if @showShareUrl() then query.share_url else ""
         @reply(
           attachments: [
             _.extend({}, options, {
               image_url: url
-              title: share
-              title_link: share
+              title: if @showShareUrl() then @linkText(query.share_url) else ""
+              title_link: if @showShareUrl() then @linkUrl(query.share_url) else ""
               color: "#64518A"
             })
           ]
@@ -45,7 +56,7 @@ module.exports = class QueryRunner extends FancyReplier
 
     renderableFields = dimension_like.concat(measure_like)
 
-    shareUrl = "<#{query.share_url}>"
+    shareUrl = @shareUrlContent(query.share_url)
 
     renderString = (d) ->
       d.rendered || d.value
