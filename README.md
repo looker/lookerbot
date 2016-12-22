@@ -168,6 +168,12 @@ To allow visualizations to appear in Slack, if configured to do so, the bot uplo
 
 If you choose to remove the image files from S3, the Slack messages that relied on those images will be blank.
 
+### Tweaking Behavior
+
+There are a couple environment variables that can be used to tweak behavior:
+
+- `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to.
+
 ### Running Locally for Development
 
 1. Install [Node.js](https://nodejs.org/en/) on your local machine.
