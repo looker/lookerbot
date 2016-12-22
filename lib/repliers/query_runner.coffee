@@ -8,7 +8,7 @@ module.exports = class QueryRunner extends FancyReplier
 
   showShareUrl: -> false
 
-  @linkText: (shareUrl) ->
+  linkText: (shareUrl) ->
     shareUrl
 
   linkUrl: (shareUrl) ->
