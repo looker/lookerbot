@@ -16,6 +16,7 @@ QueryRunner = require('./repliers/query_runner')
 LookQueryRunner = require('./repliers/look_query_runner')
 
 versionChecker = require('./version_checker')
+ScheduleReceiver = require('./schedule_receiver')
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
@@ -162,9 +163,6 @@ controller = Botkit.slackbot(
   debug: process.env.DEBUG_MODE == "true"
 )
 
-controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
-  controller.createWebhookEndpoints(expressWebserver)
-
 defaultBot = controller.spawn({
   token: process.env.SLACK_API_KEY,
   retry: 10,
@@ -179,6 +177,10 @@ defaultBot.api.team.info {}, (err, response) ->
     )
   else
     throw new Error("Could not connect to the Slack API.")
+
+controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
+  controller.createWebhookEndpoints(expressWebserver)
+  ScheduleReceiver.listen(expressWebserver, defaultBot, lookers)
 
 controller.on 'rtm_reconnect_failed', ->
   throw new Error("Failed to reconnect to the Slack RTM API.")
