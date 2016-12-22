@@ -1,5 +1,5 @@
 ReplyContext = require('./reply_context')
-LookQueryRunner = require('./repliers/look_query_runner')
+ScheduledLookQueryRunner = require('./repliers/scheduled_look_query_runner')
 
 module.exports =
 
@@ -24,7 +24,7 @@ module.exports =
                   })
                   context.looker = looker
                   context.scheduled = true
-                  runner = new LookQueryRunner(context, lookId)
+                  runner = new ScheduledLookQueryRunner(context, lookId)
                   runner.start()
                   reply {success: true, reason: "Sending Look #{lookId} to channel #{channel.id}."}
             )
@@ -45,10 +45,3 @@ module.exports =
         callback(channel)
       else
         throw new Error("Could not connect to the Slack API.")
-
-  runLook: (bot, channelId, lookId) ->
-    context = new ReplyContext(bot, bot, {
-      channel: channelId
-    })
-    runner = new LookQueryRunner(context, lookId)
-    runner.start()
