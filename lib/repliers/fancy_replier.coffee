@@ -95,7 +95,7 @@ module.exports = class FancyReplier
     )
 
   start: ->
-    if process.env.LOOKER_SLACKBOT_STEALTH_EDIT == "true"
+    if process.env.LOOKER_SLACKBOT_LOADING_MESSAGES != "false"
       @startLoading(=>
         @work()
       )
