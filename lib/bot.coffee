@@ -330,7 +330,7 @@ find = (context, message) ->
 checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"
 
-  return if process.env.LOOKER_SLACKBOT_EXPAND_URLS == "false"
+  return unless process.env.LOOKER_SLACKBOT_EXPAND_URLS == "true"
 
   # URL Expansion
   for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
