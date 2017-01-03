@@ -225,6 +225,9 @@ processCommand = (bot, message, isDM = false) ->
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
+      console.log("Debug matchedCommand:")
+      console.log(matchedCommand)
+
       dashboard = matchedCommand.dashboard
       query = message.text[matchedCommand.name.length..].trim()
       message.text.toLowerCase().indexOf(matchedCommand.name)
@@ -233,6 +236,8 @@ processCommand = (bot, message, isDM = false) ->
 
       filters = {}
       dashboard_filters = dashboard.dashboard_filters || dashboard.filters
+      console.log("Debug filter list:")
+      console.log(dashboard_filters)
       for filter in dashboard_filters
         filters[filter.name] = query
       runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
@@ -241,10 +246,14 @@ processCommand = (bot, message, isDM = false) ->
     else
       helpAttachments = []
 
+      console.log("Debug command list:")
+      console.log(customCommands)
+
       groups = _.groupBy(customCommands, 'category')
 
       for groupName, groupCommmands of groups
         groupText = ""
+
         for command in _.sortBy(_.values(groupCommmands), "name")
           unless command.hidden
             groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
