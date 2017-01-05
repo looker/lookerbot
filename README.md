@@ -159,6 +159,60 @@ You can use the bot to send scheduled Looks to Slack.
 
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
+### Using Data Actions with Slack
+
+The bot server also implements endpoints to allow you to easily send [Data Actions](https://discourse.looker.com/t/data-actions/3573) to Slack.
+
+Here's an example of a few data actions you could implement in your LookML. (Replace `https://example.com` with your bot's hostname.)
+
+To make use of this, you'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel, just like with scheduling data.
+
+```coffeescript
+  dimension: value {
+    sql: CONCAT(${first_name}, ' ', ${last_name}) ;;
+
+    # Let user choose a Slack channel to send to
+    action: {
+      label: "Send to Slack Channel"
+      url: "https://example.com/data_actions"
+      form_url: "https://example.com/data_actions/form"
+      param: {
+        name: "message"
+        value: ":signal_strength: I sent a value from Slack: {{rendered_value}}"
+      }
+    }
+
+    # Send to a particular Slack channel with a preset message
+    action: {
+      label: "Ping Channel"
+      url: "https://example.com/data_actions"
+      param: {
+        name: "message"
+        value: ":signal_strength: I sent a value from Slack: {{rendered_value}}"
+      }
+      param: {
+        name: "channel"
+        value: "#alerts"
+      }
+    }
+
+    # Ask the user for a message to send to a particular channel
+    action: {
+      label: "Ask a Question"
+      url: "https://example.com/data_actions"
+      form_param: {
+        name: "message"
+        default: "Something seems wrong... (add details)"
+      }
+      param: {
+        name: "channel"
+        value: "#alerts"
+      }
+    }
+
+  }
+```
+
 ### Data Access
 
 We suggest creating a Looker API user specifically for the Slack bot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Slack bot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
