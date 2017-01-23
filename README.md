@@ -152,7 +152,9 @@ You can use the bot to send scheduled Looks to Slack.
 4. Enter the webhook URL.
 
   - Post to public channels `/slack/post/channel/my-channel-name`
+    - (Lookerbot will need to be invited to this channel to post in it.)
   - Post to private groups `/slack/post/group/my-channel-name`
+    - (Lookerbot will need to be invited to this group to post in it.)
   - To direct message a user `/slack/post/dm/myusername`
 
   These URLs are prefixed with the URL your bot. So, if yoru bot is hosted at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
