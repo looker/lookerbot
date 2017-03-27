@@ -13,15 +13,22 @@ class SlackActionListener extends Listener
 
     @server.post("/slack/action", (req, res) =>
 
-      console.log("Received slack action: #{JSON.stringify(req.body)}")
+      try
+        payload = JSON.parse(req.body.payload)
+      catch e
+        res.status 400
+        @reply res, {error: "Malformed action payload"}
+        return
 
       # Make this look like a botkit message
       message = {}
-      for key in req.body
-        message[key] = req.body[key]
+      for key of payload
+        message[key] = payload[key]
       message.user = message.user_id
       message.channel = message.channel_id
       message.type = "action"
+
+      console.log("Received slack action: #{JSON.stringify(message)}")
 
       if SlackUtils.checkToken(@bot, message)
 
@@ -29,7 +36,7 @@ class SlackActionListener extends Listener
 
           try
             payload = JSON.parse(action.value)
-          catch
+          catch e
             res.status 400
             @reply res, {error: "Malformed action value"}
             return
