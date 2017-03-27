@@ -69,7 +69,7 @@ class SlackActionListener extends Listener
           )
 
           # Return OK immediately
-          res.send
+          res.send ""
 
       else
         res.status 401
