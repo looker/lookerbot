@@ -17,6 +17,10 @@ class SlackEventListener extends Listener
       if SlackUtils.checkToken(null, payload)
         if payload.challenge
           res.send payload.challenge
+          console.log "Replied to challenge #{payload.challenge}"
+        else
+          console.log "Unknown event type #{JSON.stringify(payload)}"
+          @fail res
       else
         @fail res
 
