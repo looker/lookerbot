@@ -27,6 +27,7 @@ module.exports = class DashboardQueryRunner extends QueryRunner
               queryDef.filters[fieldName] = @filters[dashFilterName]
 
           queryDef.filter_config = null
+          queryDef.client_id = null
 
           @replyContext.looker.client.post(
             "queries"
