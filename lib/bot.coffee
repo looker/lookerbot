@@ -19,6 +19,7 @@ versionChecker = require('./version_checker')
 ScheduleListener = require('./listeners/schedule_listener')
 DataActionListener = require('./listeners/data_action_listener')
 SlackActionListener = require('./listeners/slack_action_listener')
+SlackEventListener = require('./listeners/slack_event_listener')
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
@@ -190,6 +191,7 @@ controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
     new ScheduleListener(expressWebserver, defaultBot, lookers)
     new DataActionListener(expressWebserver, defaultBot, lookers)
     new SlackActionListener(expressWebserver, defaultBot, lookers)
+    new SlackEventListener(expressWebserver, defaultBot, lookers)
   ]
 
   for listener in listeners

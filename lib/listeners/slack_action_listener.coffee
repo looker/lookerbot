@@ -1,6 +1,3 @@
-ReplyContext = require('../reply_context')
-LookQueryRunner = require('../repliers/look_query_runner')
-_ = require('underscore')
 Listener = require("./listener")
 SlackUtils = require('../slack_utils')
 
