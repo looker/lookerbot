@@ -59,12 +59,12 @@ module.exports = class QueryRunner extends FancyReplier
 
     shareUrl = @shareUrlContent(query.share_url)
 
-    addSlackButtons = (f, row, attachment) ->
+    addSlackButtons = (f, row, attachment) =>
       d = row[f.name]
       return unless d.links
       usableActions = d.links.filter((l) -> l.type == "action" && !l.form && !l.form_url)
       return unless usableActions.length > 0
-      attachment.actions = usableActions.map((link) ->
+      attachment.actions = usableActions.map((link) =>
         name: "data_action"
         text: link.label
         type: "button"
