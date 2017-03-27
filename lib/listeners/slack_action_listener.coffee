@@ -41,7 +41,7 @@ class SlackActionListener extends Listener
             @reply res, {error: "Malformed action value"}
             return
 
-          looker = @lookers.filter((l) -> l.url == payload.lookerUrl)
+          looker = @lookers.filter((l) -> l.url == payload.lookerUrl)[0]
           unless looker
             res.status 400
             @reply res, {error: "Unknown looker"}
