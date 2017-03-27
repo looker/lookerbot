@@ -16,7 +16,7 @@
     "get-urls": "^5.0.0",
     "request": "^2.66.0",
     "semver": "^5.1.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
