@@ -68,7 +68,8 @@ class SlackActionListener extends Listener
             error
           )
 
-          @reply res, {message: "Sending data action..."}
+          # Return OK immediately
+          res.send
 
       else
         res.status 401
