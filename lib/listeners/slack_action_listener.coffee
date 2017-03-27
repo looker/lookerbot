@@ -58,7 +58,7 @@ class SlackActionListener extends Listener
             reply =
               response_type: "ephemeral"
               replace_original: false
-              text: "Data action couldn't be sent. `#{error}`"
+              text: "Data action couldn't be sent. `#{error?.error}`"
             @bot.replyPrivateDelayed(message, reply)
 
           looker.client.post(
