@@ -12,36 +12,60 @@ class SlackActionListener extends Listener
   listen: ->
 
     @server.post("/slack/action", (req, res) =>
-      console.log(req.body)
 
-      # message = {}
+      console.log("Received slack action: #{JSON.stringify(req.body)}")
 
-      # for key in req.body
-      #   message[key] = req.body[key]
-      # message.user = message.user_id
-      # message.channel = message.channel_id
-      # message.type = 'action';
+      # Make this look like a botkit message
+      message = {}
+      for key in req.body
+        message[key] = req.body[key]
+      message.user = message.user_id
+      message.channel = message.channel_id
+      message.type = "action"
 
+      if SlackUtils.checkToken(@bot, message)
 
-      # actionBot = slack_botkit.spawn(team);
+        for action in message.actions
 
-      # bot.team_info = team;
-      # bot.res = res;
+          try
+            payload = JSON.parse(action.value)
+          catch
+            res.status 400
+            @reply res, {error: "Malformed action value"}
+            return
 
-      # slack_botkit.receiveMessage(bot, message);
+          looker = @lookers.filter((l) -> l.url == payload.lookerUrl)
+          unless looker
+            res.status 400
+            @reply res, {error: "Unknown looker"}
+            return
 
-      # slack_botkit.findTeamById(message.team_id, function(err, team) {
-      #     // FIX THIS
-      #     // this won't work for single team bots because the team info
-      #     // might not be in a db
-      #     if (err || !team) {
-      #         slack_botkit.log.error('Received slash command, but could not load team');
-      #     } else {
+          success = (actionResult) =>
+            reply =
+              response_type: "ephemeral"
+              replace_original: false
+              text: "Action succeeded! `#{actionResult}`"
+            @bot.replyPrivateDelayed(message, reply)
 
-      #     }
-      # });
+          error = (error) =>
+            reply =
+              response_type: "ephemeral"
+              replace_original: false
+              text: "Data action couldn't be sent. `#{error}`"
+            @bot.replyPrivateDelayed(message, reply)
 
-      # return unless SlackUtils.checkToken(@bot, message)
+          looker.client.post(
+            "data_actions"
+            {action: payload.action}
+            success
+            error
+          )
+
+          @reply res, {message: "Sending data action..."}
+
+      else
+        res.status 401
+        @reply res, {error: "Slack token incorrect."}
 
     )
 

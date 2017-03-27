@@ -68,7 +68,7 @@ module.exports = class QueryRunner extends FancyReplier
         name: "data_action"
         text: link.label
         type: "button"
-        value: JSON.stringify(link)
+        value: JSON.stringify({lookerUrl: @replyContext.looker.url, action: link})
       )
       attachment.callback_id = uuid()
 

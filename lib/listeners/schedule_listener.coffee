@@ -34,14 +34,14 @@ class ScheduleListener extends Listener
                   context.scheduled = true
                   runner = new LookQueryRunner(context, lookId)
                   runner.start()
-                  @reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
+                  @reply res, {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
 
           else
-            @reply {success: false, reason: "Unknown scheduled plan URL."}
+            @reply res, {success: false, reason: "Unknown scheduled plan URL."}
         else
-          @reply {success: false, reason: "Scheduled plan type #{req.body.scheduled_plan.type} not supported."}
+          @reply res, {success: false, reason: "Scheduled plan type #{req.body.scheduled_plan.type} not supported."}
       else
-        @reply {success: false, reason: "No scheduled plan in payload."}
+        @reply res, {success: false, reason: "No scheduled plan in payload."}
     )
 
 module.exports = ScheduleListener
