@@ -5,6 +5,9 @@ AzureStorage = require('azure-storage')
 crypto = require('crypto')
 _ = require('underscore')
 SlackUtils = require('./slack_utils')
+request = require('request')
+tmp = require('tmp')
+fs = require('fs')
 
 LookerClient = require('./looker_client')
 ReplyContext = require('./reply_context')
@@ -76,7 +79,7 @@ lookers = lookerConfig.map((looker) ->
           success("https://#{domain}/#{params.Bucket}/#{key}")
 
   # Azure
-  if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+  else if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
       path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
       key = "#{path.join("/")}.png"
@@ -93,6 +96,66 @@ lookers = lookerConfig.map((looker) ->
         else
           storageAccount = process.env.AZURE_STORAGE_ACCOUNT
           success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
+
+  else
+    looker.storeBlob = (blob, success, error, channel) ->
+
+      unless blob.length
+        error("No image data returned.", "Image Rendering Error")
+        return
+
+      # For some reason the blob can't be sent directly to formData
+      # even thought that package purports to support that.
+      tmp.file((err, path, fd, cleanupCallback)  ->
+
+        if err
+          error(err, "Could not create tempfile.")
+          return
+
+        fs.writeFileSync(path, blob)
+
+        params =
+          url: 'https://slack.com/api/files.upload'
+          formData:
+            token: defaultBot.config.token
+            title: "looker-slackbot upload"
+            filename: "looker-slackbot.png"
+            file: fs.createReadStream(path)
+            channels: channel
+
+        request.post params, (err, response) ->
+
+          cleanupCallback()
+
+          if err
+            error(err, "Could not upload file to Slack.")
+          else
+            body = JSON.parse(response.body)
+            console.log(body)
+            if body.ok
+              privateUrl = body.file.url_private
+
+              # We post a dummy message to the channel and delete it so that it can be used
+              # in an attachment (otherwise it's private to the bot user)
+              dummyMessage = {channel: channel, text: privateUrl}
+              defaultBot.api.chat.postMessage dummyMessage, (pmErr, pmResponse) ->
+                if pmErr
+                  error(pmErr, "Could not post dummy message to Slack channel for uploading.")
+                else
+                  deleteParams = {ts: pmResponse.ts, channel: channel}
+                  defaultBot.api.chat.delete deleteParams, (deleteErr, deleteResponse) ->
+                    if pmErr
+                      error(pmErr, "Could not delete dummy message to Slack channel.")
+                    else
+                      setTimeout(->
+                        success(privateUrl)
+
+                      )
+
+            else
+              error(body.error, "Could not upload file to Slack.")
+
+      )
 
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId

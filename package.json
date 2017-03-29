@@ -8,6 +8,7 @@
     "test": "mocha --compilers coffee:coffee-script/register"
   },
   "dependencies": {
+    "@google-cloud/storage": "^0.8.0",
     "aws-sdk": "^2.2.30",
     "azure-storage": "~0.10.0",
     "botkit": "0.0.15",
@@ -16,6 +17,7 @@
     "get-urls": "^5.0.0",
     "request": "^2.66.0",
     "semver": "^5.1.0",
+    "tmp": "0.0.31",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
