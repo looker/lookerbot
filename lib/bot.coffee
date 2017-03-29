@@ -2,6 +2,9 @@ Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
 AzureStorage = require('azure-storage')
+gcs = require('@google-cloud/storage')
+
+streamBuffers = require('stream-buffers')
 crypto = require('crypto')
 _ = require('underscore')
 SlackUtils = require('./slack_utils')
@@ -41,18 +44,16 @@ else
     webhookToken: process.env.LOOKER_WEBHOOK_TOKEN
   }]
 
+randomPNGPath = ->
+  path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
+  "#{path.join("/")}.png"
+
 lookers = lookerConfig.map((looker) ->
 
   # Amazon S3
   if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
-      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-      key = "#{path.join("/")}.png"
-
-      unless blob.length
-        error("No image data returned.", "S3 Error")
-        return
-
+      key = randomPNGPath()
       region = process.env.SLACKBOT_S3_BUCKET_REGION
       domain = if region && region != "us-east-1"
         "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}.amazonaws.com"
@@ -76,13 +77,9 @@ lookers = lookerConfig.map((looker) ->
           success("https://#{domain}/#{params.Bucket}/#{key}")
 
   # Azure
-  if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+  else if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
     looker.storeBlob = (blob, success, error) ->
-      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-      key = "#{path.join("/")}.png"
-      unless blob.length
-        error("No image data returned.", "Azure Error")
-        return
+      key = randomPNGPath()
       container = process.env.SLACKBOT_AZURE_CONTAINER
       options =
           ContentType: "image/png"
@@ -93,6 +90,31 @@ lookers = lookerConfig.map((looker) ->
         else
           storageAccount = process.env.AZURE_STORAGE_ACCOUNT
           success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
+
+  else if process.env.GOOGLE_CLOUD_BUCKET
+    looker.storeBlob = (blob, success, error) ->
+
+      blobStream = new streamBuffers.ReadableStreamBuffer()
+      blobStream.put(blob)
+      blobStream.stop()
+
+      storage = gcs(
+        projectId: process.env.GOOGLE_CLOUD_PROJECT
+        credentials: if process.env.GOOGLE_CLOUD_CREDENTIALS_JSON then JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) else undefined
+      )
+
+      bucketName = process.env.GOOGLE_CLOUD_BUCKET
+      bucket = storage.bucket(bucketName)
+      key = randomPNGPath()
+      file = bucket.file(key)
+
+      blobStream.pipe(file.createWriteStream(
+        public: true
+      )).on("error", (err) ->
+        error("```\n#{JSON.stringify(err)}\n```", "Google Cloud Storage Error")
+      ).on("finish", ->
+        success("https://storage.googleapis.com/#{bucketName}/#{key}")
+      )
 
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId

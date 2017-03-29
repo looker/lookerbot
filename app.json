@@ -63,6 +63,18 @@
     "AZURE_STORAGE_ACCESS_KEY": {
       "description": "If using Microsoft Azure Storage to store visualization images posted by the Slack bot, provide an access key that can write to the provided Azure Storage account and container.",
       "required": false
+    },
+    "GOOGLE_CLOUD_BUCKET": {
+      "description": "If you want to use Google Cloud to store visualization images posted by Lookerbot, provide the name of your bucket.",
+      "required": false
+    },
+    "GOOGLE_CLOUD_PROJECT": {
+      "description": "If you want to use Google Cloud to store visualization images posted by Lookerbot, provide the name of your project.",
+      "required": false
+    },
+    "GOOGLE_CLOUD_CREDENTIALS_JSON": {
+      "description": "If using Google Cloud to store visualization images posted by Lookerbot, provide the content of the credentials JSON file you got from the Google Cloud website.",
+      "required": false
     }
   }
 }
