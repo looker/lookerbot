@@ -21,6 +21,8 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
     - The acccess keys need the `s3:PutObjectAcl` permission.
   - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
       - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/)
+  - [Google Cloud Storage](https://cloud.google.com/storage/) account and credentials
+      - [Documentation](https://cloud.google.com/storage/docs/)
 
 ### Deployment
 
@@ -28,8 +30,8 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
 2. Choose "Add Configuration"
-3. Create a username for your Slack bot. We use **@looker** but it's up to you.
-4. Choose an icon for the Slack bot. [Here's the icon we use](looker-bot-icon-512.png).
+3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
+4. Choose an icon for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
 5. Grab the API token from the settings page, you'll need this when you set up the bot server.
 
 #### Heroku Deployment
@@ -60,29 +62,43 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
-- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with the Slack bot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with Lookerbot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
-###### (optional) Amazon S3 Image Storage
+If you'd like to put these configuration variables on the filesystem instead, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
 
-- `SLACKBOT_S3_BUCKET` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket name.
+##### (optional) Storage Services for Visualization Images
 
-- `SLACKBOT_S3_BUCKET_REGION` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 bucket region. Defaults to `us-east-1`.
+###### Amazon S3
 
-- `AWS_ACCESS_KEY_ID` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 access key that can write to the provided bucket.
+- `SLACKBOT_S3_BUCKET` (optional) – If you want to use Lookerbot to post visualization images, provide an Amazon S3 bucket name.
 
-- `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use the Slack bot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
+- `SLACKBOT_S3_BUCKET_REGION` (optional) – If you want to use Lookerbot to post visualization images, provide an Amazon S3 bucket region. Defaults to `us-east-1`.
 
-###### (optional) Azure Image Storage
+- `AWS_ACCESS_KEY_ID` (optional) – If you want to use Lookerbot to post visualization images, provide an Amazon S3 access key that can write to the provided bucket.
 
-- `AZURE_STORAGE_ACCOUNT` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of your Azure Storage account.
+- `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use Lookerbot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
-- `SLACKBOT_AZURE_CONTAINER` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by the Slack bot, provide the name of the container within your Azure Storage account that you wish to use.
+###### Microsoft Azure
 
-- `AZURE_STORAGE_ACCESS_KEY` (optional) - If using Microsoft Azure Storage to store visualization images posted by the Slack bot, provide an access key that can write to the provided Azure Storage account and container.
+- `AZURE_STORAGE_ACCOUNT` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by Lookerbot, provide the name of your Azure Storage account.
 
-If you'd like to put these configurations on the filesystem, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
+- `SLACKBOT_AZURE_CONTAINER` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by Lookerbot, provide the name of the container within your Azure Storage account that you wish to use.
+
+- `AZURE_STORAGE_ACCESS_KEY` (optional) - If using Microsoft Azure Storage to store visualization images posted by Lookerbot, provide an access key that can write to the provided Azure Storage account and container.
+
+###### Google Cloud Storage
+
+- `GOOGLE_CLOUD_BUCKET` (optional) - If you want to use Google Cloud to store visualization images posted by Lookerbot, provide the name of your bucket.
+
+If Lookerbot is running on Google Compute Engine, [no further information should be needed if the approprate API scopes are set up](https://github.com/GoogleCloudPlatform/google-cloud-node#on-google-cloud-platform).
+
+Otherwise, you can provide credentials directly:
+
+- `GOOGLE_CLOUD_PROJECT` (optional) - If you want to use Google Cloud to store visualization images posted by Lookerbot, provide the name of your project.
+
+- `GOOGLE_CLOUD_CREDENTIALS_JSON` (optional) - If using Google Cloud to store visualization images posted by Lookerbot, provide the content of the credentials JSON file you got from the Google Cloud website.
 
 ##### Self-signed or invalid certificates
 
@@ -217,7 +233,7 @@ dimension: value {
 
 ### Data Access
 
-We suggest creating a Looker API user specifically for the Slack bot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Slack bot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
+We suggest creating a Looker API user specifically for Lookerbot, and using that user's API credentials. It's worth remembering that _everyone who can talk to your Lookerbot has the permissions of this user_. If there's data you don't want people to access via Slack, ensure that user cannot access it using Looker's permissioning mechanisms.
 
 Also, keep in mind that when the Looker bot answers questions in Slack _the resulting data moves into Slack and is now hosted there_. Be sure to carefully consider what data is allowed to leave Looker. Slack retains chat message history on their servers and pushes many types of notifications about messages out via other services.
 
