@@ -23,6 +23,7 @@ module.exports = class QueryRunner extends FancyReplier
 
   postImage: (query, imageData, options = {}) ->
     if @replyContext.looker.storeBlob
+
       success = (url) =>
         @reply(
           attachments: [
@@ -35,9 +36,16 @@ module.exports = class QueryRunner extends FancyReplier
           ]
           text: ""
         )
+
       error = (error, context) =>
         @reply(":warning: *#{context}* #{error}")
-      @replyContext.looker.storeBlob(imageData, success, error, @replyContext.sourceMessage.channel)
+
+
+      if imageData.length
+        @replyContext.looker.storeBlob(imageData, success, error)
+      else
+        error("No image data returned for query.", "Looker Render Error")
+
     else
       @reply(":warning: No storage is configured for visualization images in the bot configuration.")
 
