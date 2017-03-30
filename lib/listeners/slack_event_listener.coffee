@@ -22,6 +22,7 @@ class SlackEventListener extends Listener
           console.log "Unknown event type #{JSON.stringify(payload)}"
           @fail res
       else
+        console.log "Payload had invalid format #{JSON.stringify(payload)}"
         @fail res
 
     )
