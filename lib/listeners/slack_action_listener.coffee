@@ -45,17 +45,26 @@ class SlackActionListener extends Listener
             return
 
           success = (actionResult) =>
+            if actionResult.success
+              text = ":white_check_mark: Done!"
+            else if actionResult.validation_errors
+              text = actionResult.validation_errors.errors.map((e) ->
+                ":x: #{e.message}"
+              ).join("\n")
+            else
+              text = ":x: Couldn't perform action."
+
             reply =
               response_type: "ephemeral"
               replace_original: false
-              text: "Action succeeded! `#{actionResult}`"
+              text: text
             @bot.replyPrivateDelayed(message, reply)
 
           error = (error) =>
             reply =
               response_type: "ephemeral"
               replace_original: false
-              text: "Data action couldn't be sent. `#{JSON.stringify(error)}`"
+              text: ":warning: Couldn't perform action due to an error: `#{JSON.stringify(error)}`"
             @bot.replyPrivateDelayed(message, reply)
 
           looker.client.post(
