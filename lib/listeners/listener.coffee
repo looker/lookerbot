@@ -8,7 +8,7 @@ class Listener
       return false
     return true
 
-  validateTokenForLooker: (requre, looker) ->
+  validateTokenForLooker: (req, looker) ->
     value = req.headers['x-looker-webhook-token'] == looker.webhookToken
     unless value
       @reply(res, {looker: {success: false}, reason: "Invalid webhook token."})
