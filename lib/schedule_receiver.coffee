@@ -13,7 +13,7 @@ module.exports =
 
       if req.body.scheduled_plan
         if req.body.scheduled_plan.type == "Look"
-          if matches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)$/)
+          if matches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/)
             lookId = matches[1]
 
             channelName = req.params.channel_name
