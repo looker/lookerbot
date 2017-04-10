@@ -1,5 +1,6 @@
 ReplyContext = require('./reply_context')
 LookQueryRunner = require('./repliers/look_query_runner')
+QueryRunner = require('./repliers/query_runner')
 
 module.exports =
 
