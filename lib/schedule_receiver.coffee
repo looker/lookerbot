@@ -13,8 +13,11 @@ module.exports =
 
       if req.body.scheduled_plan
         if req.body.scheduled_plan.type == "Look"
-          if matches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/)
-            lookId = matches[1]
+
+          qid = req.body.scheduled_plan.query_id
+          lookId = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/)?[1]
+
+          if qid || lookId
 
             channelName = req.params.channel_name
             channelType = req.params.post_type
@@ -31,14 +34,20 @@ module.exports =
                   })
                   context.looker = looker
                   context.scheduled = true
-                  runner = new LookQueryRunner(context, lookId)
-                  runner.start()
-                  reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
+
+                  if qid
+                    runner = new QueryRunner(context, {id: qid})
+                    runner.start()
+                    reply {success: true, reason: "Sending Query #{qid} to channel #{channelName}."}
+                  else
+                    runner = new LookQueryRunner(context, lookId)
+                    runner.start()
+                    reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
                 else
                   reply {success: false, reason: "Invalid webhook token."}
 
           else
-            reply {success: false, reason: "Unknown scheduled plan URL."}
+            reply {success: false, reason: "Scheduled plan does not have a query_id or a parsable Look URL."}
         else
           reply {success: false, reason: "Scheduled plan type #{req.body.scheduled_plan.type} not supported."}
       else

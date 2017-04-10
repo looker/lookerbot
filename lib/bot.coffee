@@ -380,5 +380,5 @@ annotateLook = (context, url, sourceMessage, looker) ->
 annotateShareUrl = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/x\/([A-Za-z0-9]+)$/)
     console.log "Expanding Share URL #{url}"
-    runner = new QueryRunner(context, matches[1])
+    runner = new QueryRunner(context, {slug: matches[1]})
     runner.start()

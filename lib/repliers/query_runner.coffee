@@ -3,7 +3,11 @@ FancyReplier = require('./fancy_replier')
 
 module.exports = class QueryRunner extends FancyReplier
 
-  constructor: (@replyContext, @querySlug) ->
+  constructor: (@replyContext, queryParam) ->
+    @querySlug = queryParam.slug
+    @queryId = queryParam.id
+    unless @querySlug || @queryId
+      throw "Must set slug or id when creating QueryRunner"
     super @replyContext
 
   showShareUrl: -> false
@@ -124,13 +128,22 @@ module.exports = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment], text: if @showShareUrl() then shareUrl else "")
 
   work: ->
-    @replyContext.looker.client.get(
-      "queries/slug/#{@querySlug}"
-      (query) => @runQuery(query)
-      (r) => @replyError(r)
-      {}
-      @replyContext
-    )
+    if @querySlug
+      @replyContext.looker.client.get(
+        "queries/slug/#{@querySlug}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
+    else
+      @replyContext.looker.client.get(
+        "queries/#{@queryId}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
