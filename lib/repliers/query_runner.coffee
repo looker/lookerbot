@@ -4,10 +4,8 @@ FancyReplier = require('./fancy_replier')
 module.exports = class QueryRunner extends FancyReplier
 
   constructor: (@replyContext, queryParam) ->
-    @querySlug = queryParam.slug
-    @queryId = queryParam.id
-    unless @querySlug || @queryId
-      throw "Must set slug or id when creating QueryRunner"
+    @querySlug = queryParam?.slug
+    @queryId = queryParam?.id
     super @replyContext
 
   showShareUrl: -> false
@@ -136,7 +134,7 @@ module.exports = class QueryRunner extends FancyReplier
         {}
         @replyContext
       )
-    else
+    else if @queryId
       @replyContext.looker.client.get(
         "queries/#{@queryId}"
         (query) => @runQuery(query)
@@ -144,6 +142,8 @@ module.exports = class QueryRunner extends FancyReplier
         {}
         @replyContext
       )
+    else
+      throw "Must set slug or id when creating QueryRunner, or override work"
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
