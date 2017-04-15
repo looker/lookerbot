@@ -51,7 +51,7 @@ randomPNGPath = ->
 lookers = lookerConfig.map((looker) ->
 
   # Amazon S3
-  if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+  if process.env.SLACKBOT_S3_BUCKET
     looker.storeBlob = (blob, success, error) ->
       key = randomPNGPath()
       region = process.env.SLACKBOT_S3_BUCKET_REGION
@@ -77,7 +77,7 @@ lookers = lookerConfig.map((looker) ->
           success("https://#{domain}/#{params.Bucket}/#{key}")
 
   # Azure
-  else if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+  else if process.env.SLACKBOT_AZURE_CONTAINER
     looker.storeBlob = (blob, success, error) ->
       key = randomPNGPath()
       container = process.env.SLACKBOT_AZURE_CONTAINER
