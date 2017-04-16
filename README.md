@@ -1,10 +1,10 @@
 # Lookerbot for Slack
 
-Lookerbot for [Slack](http://slack.com) integrates with [Looker](http://looker.com) to allow you to query all of your data directly from Slack. This enables everyone in your company to share data easily and answer data-driven questions instantly. Lookerbot expands Looker URLs in channels and allows you to create custom commands for running saved queries.
+Lookerbot for [Slack](https://slack.com) integrates with [Looker](https://looker.com) to allow you to query all of your data directly from Slack. This enables everyone in your company to share data easily and answer data-driven questions instantly. Lookerbot expands Looker URLs in channels and allows you to create custom commands for running saved queries.
 
 [![](doc/readme-video-thumb.png)](https://vimeo.com/159130949)
 
-> For a free trial of Looker go to [looker.com/free-trial](http://looker.com/free-trial).
+> For a free trial of Looker go to [looker.com/free-trial](https://looker.com/free-trial).
 
 ### Features
 
@@ -12,13 +12,13 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 ### Requirements
 
-- [Looker](http://looker.com) 3.42 or later
+- [Looker](https://looker.com) 3.42 or later
   - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
 - A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
 - (optional) To display chart images, credentials for a supported storage service:
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
-    - [Documentation](http://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
-    - The acccess keys need the `s3:PutObjectAcl` permission.
+    - [Documentation](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
+    - The access keys need the `s3:PutObjectAcl` permission.
   - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
       - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/)
   - [Google Cloud Storage](https://cloud.google.com/storage/) account and credentials

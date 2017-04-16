@@ -39,7 +39,7 @@ sassyMessages = [
   ["in", "कृपया एक क्षण के लिए"]
 
 ].map(([country, message] = pair) ->
-  translate = "http://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
+  translate = "https://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
   "<#{translate}|:flag-#{country}:> _#{message}..._"
 )
 
