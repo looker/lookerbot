@@ -17,6 +17,33 @@ module.exports =
 
   listen: (server, bot, lookers) ->
 
+    server.post("/", (req, res) =>
+
+      return unless validateToken(res, req, lookers)
+
+      label = if process.env.DEV == "true"
+        sass = "[DEVELOPMENT] Lookerbot"
+      else
+        "Lookerbot"
+
+      baseUrl = req.protocol + '://' + req.get('host')
+
+      out = {
+        label: label
+        destinations: [{
+          name: "lookerbot"
+          label: "Slack"
+          description: "Send data to Slack."
+          url: "#{baseUrl}/data_actions"
+          form_url: "#{baseUrl}/data_actions/form"
+          supported_action_types: ["query"]
+        }]
+      }
+
+      res.json out
+
+    )
+
     server.post("/data_actions/form", (req, res) =>
 
       return unless validateToken(res, req, lookers)
@@ -60,6 +87,7 @@ module.exports =
 
       unless typeof(channel) == "string"
         reply res, {looker: {success: false, message: "Channel must be a string."}}
+        return
 
       context = new ReplyContext(bot, bot, {
         channel: channel
@@ -71,6 +99,7 @@ module.exports =
         reply res, {looker: {success: true}}
       else
         reply res, {looker: {success: false, message: "Message must be a string."}}
+        return
 
     )
 
