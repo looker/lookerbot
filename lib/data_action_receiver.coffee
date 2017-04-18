@@ -33,8 +33,8 @@ module.exports =
         destinations: [{
           name: "lookerbot"
           label: "Slack"
-          description: "Send data to Slack."
-          url: "#{baseUrl}/data_actions"
+          description: "Send data to Slack as the bot user configured for Lookerbot."
+          url: "#{baseUrl}/slack/post_from_query_action"
           form_url: "#{baseUrl}/data_actions/form"
           supported_action_types: ["query"]
         }]

@@ -5,12 +5,20 @@ QueryRunner = require('./repliers/query_runner')
 module.exports =
 
   listen: (server, bot, lookers) ->
-    server.post("/slack/post/:post_type/:channel_name", (req, res) =>
+
+    handleRequest = (req, res) =>
 
       reply = (json) ->
         res.setHeader 'Content-Type', 'application/json'
         res.send JSON.stringify(json)
         console.log("Replied to scheduled plan webhook.", json)
+
+      channelName = req.params.channel_name || req.form_params?.channel
+      channelType = req.params.post_type
+
+      unless channelName
+        reply {success: false, reason: "Channel not specified."}
+        return
 
       if req.body.scheduled_plan
         if req.body.scheduled_plan.type == "Look"
@@ -20,8 +28,6 @@ module.exports =
 
           if qid || lookId
 
-            channelName = req.params.channel_name
-            channelType = req.params.post_type
             if channelType == "dm"
               channelName = "@#{channelName}"
             else if channelType == "channel"
@@ -53,4 +59,7 @@ module.exports =
           reply {success: false, reason: "Scheduled plan type #{req.body.scheduled_plan.type} not supported."}
       else
         reply {success: false, reason: "No scheduled plan in payload."}
-    )
+
+    server.post("/slack/post/:post_type/:channel_name", handleRequest)
+    server.post("/slack/post_from_query_action", handleRequest)
+
