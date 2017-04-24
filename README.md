@@ -28,23 +28,25 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Create a new bot in Slack
 
-1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Bots"
-2. Choose "Add Configuration"
+1. Go to http://yourdomain.slack.com/apps and choose "Bots".
+2. Choose "Add Configuration".
 3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
 4. Choose an icon for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
-5. Grab the API token from the settings page, you'll need this when you set up the bot server.
+5. Grab the API token from the settings page; you'll need this when you set up the bot server.
 
 #### Heroku Deployment
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
 
-The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot. This will also allow you to configure all of the required variables.
+The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot. This will prompt you to give the app a unique name, add the Slack API key and configure all of the required variables (see "Environment Variables" below).
 
-Once deployed, the bot should be ready to go! You can also optionally [configure slash commands](#configuring-slash-commands).
+Once the environment variables have been set and the server has been deployed, the bot should be ready to go! You can also optionally [configure slash commands](#configuring-slash-commands).
 
 #### Manual Deployment
 
 The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API. If you have a self-hosted instance of Looker, be sure to open up port 19999 (or your `core_port`) in order to accesss the Looker API.
+
+#### Environment Variables
 
 The bot is configured entirely via environment variables. You'll want to set up these variables:
 
@@ -67,6 +69,14 @@ The bot is configured entirely via environment variables. You'll want to set up 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
 If you'd like to put these configuration variables on the filesystem instead, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
+
+### Tweaking Behavior
+
+There are a couple environment variables that can be used to tweak behavior:
+
+- `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to.
+
+- `LOOKER_SLACKBOT_LOADING_MESSAGES` – Set this to `false` to disable posting loading messages.
 
 ##### (optional) Storage Services for Visualization Images
 
@@ -149,14 +159,13 @@ and use all the functionality.
 
 However, Slash commands are a bit friendlier to use and allow Slack to auto-complete so you'll probably want to set those up.
 
-1. Under "Customize Slack" > "Configure" > "Custom Integrations" select "Slash Commands"
-2. Choose "Add Configuration"
+1. Go to http://yourdomain.slack.com/apps and choose "Slash Commands".
+2. Choose "Add Configuration".
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
 4. Choose an icon for the slash command responses. [Here's the icon we use](looker-bot-icon-512.png).
-5. Set the URL to wherever you have your bot server hosted. The path to the slash command endpoint is `/slack/receive`, so if your bot is hosted at `https://example.com`, the URL would be `https://example.com/slack/receive`.
-6. You'll need to copy the token provided when you created the slash command and set the `SLACK_SLASH_COMMAND_TOKEN` variable with it for the bot to accept slash commands.
-
-Directions for creating slash commands [can be found in Looker Discourse](https://discourse.looker.com/t/using-lookerbot-for-slack/2302)
+5. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you set / generated) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+6. Set the method to POST.
+6. You'll need to copy the token that was generated when you created the slash command and use it to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
 
 ### Scheduling Data to Slack
 
@@ -164,8 +173,8 @@ You can use the bot to send scheduled Looks to Slack.
 
 1. Click "Schedule" on a Look
 2. Set "Destination" to "Webhook"
-3. Leave "Format" set to "HTML Attachment". The format selection is ignored.
-4. Enter the webhook URL.
+3. Leave "Format" set to default. The format selection is ignored.
+4. Enter the webhook URL of the server you set up.
 
   - Post to public channels `/slack/post/channel/my-channel-name`
     - (Lookerbot will need to be invited to this channel to post in it.)
@@ -173,7 +182,7 @@ You can use the bot to send scheduled Looks to Slack.
     - (Lookerbot will need to be invited to this group to post in it.)
   - To direct message a user `/slack/post/dm/myusername`
 
-  These URLs are prefixed with the URL your bot. So, if yoru bot is hosted at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
+  These URLs are prefixed with the URL of your server. (If you used the Heroku deployment, this will be the unique app name you specified/ generated). So, if your server is at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
 
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
@@ -240,14 +249,6 @@ Also, keep in mind that when the Looker bot answers questions in Slack _the resu
 To allow visualizations to appear in Slack, if configured to do so, the bot uploads them as images to Amazon S3 with an extremely long randomly-generated URL. Anyone with this URL can access that image at any time, though it should be extremely difficult to guess.
 
 If you choose to remove the image files from S3, the Slack messages that relied on those images will be blank.
-
-### Tweaking Behavior
-
-There are a couple environment variables that can be used to tweak behavior:
-
-- `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to.
-
-- `LOOKER_SLACKBOT_LOADING_MESSAGES` – Set this to `false` to disable posting loading messages.
 
 ### Running Locally for Development
 
