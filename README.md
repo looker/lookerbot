@@ -28,7 +28,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Create a new bot in Slack
 
-1. Go to https://api.slack.com/apps and create a new app. We call it **looker** but it's up to you.
+1. Go to https://api.slack.com/apps and create a new app. We call it **Looker** but it's up to you.
 2. Choose "Bot Users" and click "Add a bot user".
 3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
 4. Under settings, choose "Install App", then "Install App to Team" and authenticate.
