@@ -165,7 +165,7 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 1. Go to https://api.slack.com/apps and find your app.
 2. Choose "Slash Commands" and click "Create New Command".
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
-4. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you set / generated) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+4. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
 5. Under settings, choose "Install App" again, then "Reinstall App" and authenticate.
 6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
 
@@ -184,7 +184,7 @@ You can use the bot to send scheduled Looks to Slack.
     - (Lookerbot will need to be invited to this group to post in it.)
   - To direct message a user `/slack/post/dm/myusername`
 
-  These URLs are prefixed with the URL of your server. (If you used the Heroku deployment, this will be the unique app name you set / generated). So, if your server is at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
+  These URLs are prefixed with the URL of your server. (If you used the Heroku deployment, this will be the unique app name you chose). So, if your server is at `https://example.com` and you want to post to a channel called `data-science`, the URL would be `https://example.com/slack/post/channel/data-science`.
 
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
