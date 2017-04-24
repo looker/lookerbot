@@ -28,11 +28,13 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Create a new bot in Slack
 
-1. Go to http://yourdomain.slack.com/apps and choose "Bots".
-2. Choose "Add Configuration".
+1. Go to https://api.slack.com/apps and create a new app. We use **looker** but it's up to you.
+2. Choose "Bot Users" and click "Add a bot user".
 3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
-4. Choose an icon for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
-5. Grab the API token from the settings page; you'll need this when you set up the bot server.
+4. Under settings, choose "Install App", then "Install App to Team" and authenticate.
+5. Copy the Bot User OAuth Access Token (you'll need this later)
+6. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
+7. Note - make sure NOT to "distribute" the app.
 
 #### Heroku Deployment
 
@@ -50,7 +52,7 @@ The bot is a simple Node.js application. The application needs to be able to rea
 
 The bot is configured entirely via environment variables. You'll want to set up these variables:
 
-- `SLACK_API_KEY` (required) – Your Slack API key for the bot. You'll have gotten this when you created the bot user in the Slack settings.
+- `SLACK_API_KEY` (required) – Your Slack API key for the bot. You'll have gotten this when you created the bot user in the Slack settings. If you used the app to create a bot, you will use the Bot User OAuth Access Token in this field.
 
 - `LOOKER_URL` (required) – The web url of your Looker instance.
 
@@ -64,7 +66,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
-- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with Lookerbot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands.
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with Lookerbot, provide the verification token from the slash command setup page so that the bot can verify the integrity of incoming slash commands. If you used an app to set up the slash command, you can get the verification token in "Basic Information" in the app.
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
@@ -159,13 +161,13 @@ and use all the functionality.
 
 However, Slash commands are a bit friendlier to use and allow Slack to auto-complete so you'll probably want to set those up.
 
-1. Go to http://yourdomain.slack.com/apps and choose "Slash Commands".
-2. Choose "Add Configuration".
+1. Go to https://api.slack.com/apps and find your app.
+2. Choose "Slash Commands" and click "Create New Command".
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
-4. Choose an icon for the slash command responses. [Here's the icon we use](looker-bot-icon-512.png).
-5. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you set / generated) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
-6. Set the method to POST.
-6. You'll need to copy the token that was generated when you created the slash command and use it to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
+4. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you set / generated) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
+5. Under settings, choose "Install App" again, then "Reinstall App" and authenticate.
+6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
+7. Note - make sure NOT to "distribute" the app.
 
 ### Scheduling Data to Slack
 
