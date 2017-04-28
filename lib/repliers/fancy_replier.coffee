@@ -31,7 +31,7 @@ sassyMessages = [
   ["th", "กรุณารอสักครู่"]
   ["ru", "один момент, пожалуйста"]
   ["fi", "Hetkinen"]
-  ["ro", "De lucru pe ea"]
+  ["ro", "Lucrez la asta"]
   ["is", "Eitt andartak"]
   ["az", "Bir dəqiqə zəhmət olmasa"]
   ["ie", "Fán le do thoil"]
