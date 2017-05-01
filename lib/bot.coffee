@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
