@@ -314,7 +314,7 @@ processCommand = (bot, message, isDM = false) ->
 
       if newVersion
         helpAttachments.push(
-          text: "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+          text: "\n\n:scream: *<#{newVersion.html_url}|Lookerbot is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
           color: "warning"
           mrkdwn_in: ["text"]
         )
