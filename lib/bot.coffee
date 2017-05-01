@@ -23,6 +23,7 @@ LookQueryRunner = require('./repliers/look_query_runner')
 versionChecker = require('./version_checker')
 ScheduleReceiver = require('./schedule_receiver')
 DataActionReceiver = require('./data_action_receiver')
+HealthCheckReceiver = require('./health_check_receiver')
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
@@ -208,6 +209,7 @@ controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
   ScheduleReceiver.listen(expressWebserver, defaultBot, lookers)
   DataActionReceiver.listen(expressWebserver, defaultBot, lookers)
+  HealthCheckReceiver.listen(expressWebserver, defaultBot, lookers)
 
 controller.on 'rtm_reconnect_failed', ->
   throw new Error("Failed to reconnect to the Slack RTM API.")
