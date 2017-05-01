@@ -71,7 +71,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
-If you'd like to put these configuration variables on the filesystem instead, you can place them in a `.env` file at the root of the project and start the bot using node-foreman [as described below](#running-locally-for-development).
+If you'd like to put these configuration variables on the filesystem instead, you can place them in a `.env` file at the root of the project as well. Environment variables will take precedence over `.env` settings if both are present.
 
 ### Tweaking Behavior
 
