@@ -42,14 +42,15 @@ module.exports =
                   context.looker = looker
                   context.scheduled = true
 
-                  if qid
+                  if lookId
+                    runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url})
+                    runner.start()
+                    reply {success: true, reason: "Sending Look #{lookId} with query #{qid} to channel #{channelName}."}
+                  else
                     runner = new QueryRunner(context, {id: qid})
                     runner.start()
                     reply {success: true, reason: "Sending Query #{qid} to channel #{channelName}."}
-                  else
-                    runner = new LookQueryRunner(context, lookId)
-                    runner.start()
-                    reply {success: true, reason: "Sending Look #{lookId} to channel #{channelName}."}
+
                 else
                   reply {success: false, reason: "Invalid webhook token."}
 
