@@ -4,8 +4,8 @@
   "description": "Slackbot for Looker integration",
   "main": "index.js",
   "scripts": {
-    "start": "coffee lib/bot.coffee",
-    "test": "mocha --compilers coffee:coffee-script/register"
+    "start": "node_modules/coffee-script/bin/coffee lib/bot.coffee",
+    "test": "node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register"
   },
   "dependencies": {
     "@google-cloud/storage": "^0.8.0",
