@@ -1,8 +1,8 @@
-FROM node:4.4
+FROM node:6.10.3
 
 ADD . /app
 WORKDIR /app
 
-RUN npm install
+RUN yarn install
 
-ENTRYPOINT ["npm", "start"]
+ENTRYPOINT ["yarn", "start"]
