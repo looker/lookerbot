@@ -14,7 +14,9 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 - [Looker](https://looker.com) 3.42 or later
   - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
-- A server capable of running [Node.js](https://nodejs.org/en/) to deploy the bot application to
+- A web server capable of running [Node.js](https://nodejs.org/) applications to deploy the bot application to
+  - [Node.js](https://nodejs.org/) 6.10.3 is required
+  - [Yarn](https://yarnpkg.com/) is required
 - (optional) To display chart images, credentials for a supported storage service:
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
     - [Documentation](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
@@ -147,8 +149,8 @@ The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3
 To run the server:
 
 1. Ensure Node.js is installed
-2. `npm install` to install dependencies
-3. `npm start` to start the bot server. The server will run until you type `Ctrl+C` to stop it.
+2. `yarn install` to install dependencies
+3. `yarn start` to start the bot server. The server will run until you type `Ctrl+C` to stop it.
 
 The included `Procfile` will also allow you to run the app using [foreman](https://github.com/ddollar/foreman) or [node-foreman](https://github.com/jeffjewiss/node-foreman). These libraries also provide easy ways of creating scripts for use with `upstart`, `supervisord`, and `systemd`.
 
@@ -255,10 +257,10 @@ If you choose to remove the image files from S3, the Slack messages that relied 
 ### Running Locally for Development
 
 1. Install [Node.js](https://nodejs.org/en/) on your local machine.
-2. Install [node-foreman](https://github.com/jeffjewiss/node-foreman) with `npm install -g foreman`
+2. Install [Yarn](https://yarnpkg.com/) on your local machine.
 3. Add your environment variables to a file called `.env` at the base of the repo.
-4. Install dependencies with `npm install`
-5. Run the bot with `nf start`
+4. Install dependencies with `yarn install`
+5. Run the bot with `yarn start`
 
 ### Contributing
 
