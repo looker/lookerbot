@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
@@ -24,6 +25,8 @@ versionChecker = require('./version_checker')
 ScheduleReceiver = require('./schedule_receiver')
 DataActionReceiver = require('./data_action_receiver')
 HealthCheckReceiver = require('./health_check_receiver')
+
+LOOKER_BOT_CHANNEL_ID = 'C14KGPH38' # hard coded to #looker-bot
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
@@ -57,6 +60,7 @@ lookers = lookerConfig.map((looker) ->
   if process.env.SLACKBOT_S3_BUCKET
     looker.storeBlob = (blob, success, error) ->
       key = randomPNGPath()
+
       region = process.env.SLACKBOT_S3_BUCKET_REGION
       domain = if region && region != "us-east-1"
         "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}.amazonaws.com"
@@ -218,7 +222,7 @@ controller.on 'ambient', (bot, message) ->
   checkMessage(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
-FIND_REGEX = 'find (dashboard|look )? ?(.+)'
+FIND_REGEX = 'find (dashboard|look|command)? ?(.+)'
 
 controller.on "slash_command", (bot, message) ->
   if process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && process.env.SLACK_SLASH_COMMAND_TOKEN == message.token
@@ -235,10 +239,31 @@ controller.on "direct_message", (bot, message) ->
     message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
+logMessage = (message) ->
+  sendLog = (username, commandType, question) =>
+    text = "[Lookerbot Log][#{commandType}] Asked by: #{username} for question: #{question}"
+    console.log(text)
+    defaultBot.send({
+      text: text
+      channel: LOOKER_BOT_CHANNEL_ID
+    })
+  console.log('message: ' + JSON.stringify(message, null, 2))
+  if message.type == 'slash_command'
+    sendLog(message.user_name, 'Slash Command', message.text)
+  else if message.type == 'message'
+    bot.api.users.info({user: "U047EMSKV"}, (err, resp) ->
+      console.log("resp: #{JSON.stringify(resp, null, 2)}")
+      if message.event = 'direct_mention'
+        sendLog(resp.user.name, 'Direct Mention', message.text)
+      else # this is a direct message
+        sendLog(resp.user.name, 'Direct Message', message.text)
+    )
+
 processCommand = (bot, message, isDM = false) ->
 
   message.text = message.text.split('“').join('"')
   message.text = message.text.split('”').join('"')
+  logMessage(message)
 
   context = new ReplyContext(defaultBot, bot, message)
 
@@ -255,26 +280,35 @@ processCommand = (bot, message, isDM = false) ->
 
       dashboard = matchedCommand.dashboard
       query = message.text[matchedCommand.name.length..].trim()
+
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
       context.looker = matchedCommand.looker
 
       filters = {}
+
       dashboard_filters = dashboard.dashboard_filters || dashboard.filters
       for filter in dashboard_filters
         filters[filter.name] = query
+
       runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
       runner.start()
 
     else
+
       helpAttachments = []
 
       groups = _.groupBy(customCommands, 'category')
+      commandNames = []
+      commandNameToHelpText = {}
 
       for groupName, groupCommmands of groups
         groupText = ""
         for command in _.sortBy(_.values(groupCommmands), "name")
+          commandNames.push(command.name)
+          commandNameToHelpText[command.name] = command.helptext
           unless command.hidden
+            # console.log('command: ' + JSON.stringify(command, null, 2))
             groupText += "• *<#{command.looker.url}/dashboards/#{command.dashboard.id}|#{command.name}>* #{command.helptext}"
             if command.description
               groupText += " — _#{command.description}_"
@@ -289,7 +323,8 @@ processCommand = (bot, message, isDM = false) ->
           )
 
       defaultText = """
-      • *find* <look search term> — _Shows the top five Looks matching the search._
+      • *find* <(command|look|dashboard) search term|> — _Shows the top five commands/looks/dashboards matching the search._
+      • *help*  — _Shows this help screen._
       """
 
       if enableQueryCli
@@ -319,10 +354,22 @@ processCommand = (bot, message, isDM = false) ->
           mrkdwn_in: ["text"]
         )
 
-      if isDM && message.text.toLowerCase() != "help"
-        context.replyPrivate(":crying_cat_face: I couldn't understand that command. You can use `help` to see the list of possible commands.")
-      else
-        context.replyPrivate({attachments: helpAttachments})
+      if message.text.toLowerCase() != "help"
+        helpAttachments.push(
+          text: "*Sorry, we could not understand your command. The list of commands we understand are listed above. If you have feedback for additional commands, please let us know in #lookerbot-support.*"
+          mrkdwn_in: ["text"]
+        )
+        closestCommand = findClosestCommand(message.text, commandNames)
+        helpText = commandNameToHelpText[closestCommand]
+        triedText = "The command you tried is: *#{message.text}*."
+        if closestCommand
+          triedText += " Did you mean *#{closestCommand}* #{helpText}?"
+        helpAttachments.push(
+          text: triedText
+          mrkdwn_in: ["text"]
+        )
+
+      context.replyPrivate({attachments: helpAttachments})
 
     refreshCommands()
 
@@ -346,6 +393,8 @@ runCLI = (context, message) ->
 
 find = (context, message) ->
   [__, type, query] = message.match
+  if not type
+    type = 'command'
 
   firstWord = query.split(" ")[0]
   foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
@@ -369,8 +418,8 @@ checkMessage = (bot, message) ->
     for looker in lookers
 
       # Starts with Looker base URL?
-      if url.lastIndexOf(looker.url, 0) == 0
         context = new ReplyContext(defaultBot, bot, message)
+      if url.lastIndexOf(looker.url, 0) == 0
         context.looker = looker
         annotateLook(context, url, message, looker)
         annotateShareUrl(context, url, message, looker)
@@ -386,3 +435,24 @@ annotateShareUrl = (context, url, sourceMessage, looker) ->
     console.log "Expanding Share URL #{url}"
     runner = new QueryRunner(context, {slug: matches[1]})
     runner.start()
+
+findClosestCommand = (userAttempt, commandNames) ->
+  # Convert [a,b] to [{id: a}, {id: b}]
+  commandNameMaps = []
+  for commandName in commandNames
+    commandNameMaps.push({id: commandName})
+  # See https://github.com/krisk/Fuse
+  options = {
+    keys: ['id'],
+    id: 'id',
+    include: ['score']
+  }
+  fuse = new Fuse(commandNameMaps, options)
+  # Also uses heuristic: try user's search without everything after last whitespace
+  # For example, if she searches find my id 12345, then trying find my id has a better
+  # chance of finding a good match.
+  userAttemptWithoutId = userAttempt.split(' ').slice(0, -1).join(' ')
+  results = fuse.search(userAttempt).concat(fuse.search(userAttemptWithoutId)).sort((a,b) -> a.score - b.score)
+  console.log("Results for \"#{userAttempt}\" and \"#{userAttemptWithoutId}: #{JSON.stringify(results)}")
+  if results.length > 0
+    return results[0].item

@@ -14,6 +14,7 @@ module.exports = class DashboardQueryRunner extends QueryRunner
     if elements.length > 1
       @reply("Dashboards with more than one element aren't currently supported for Slack commands.")
       return
+    # console.log('@filters: ' + JSON.stringify(@filters, null, 2))
 
     for element in elements
       @replyContext.looker.client.get(
@@ -28,6 +29,7 @@ module.exports = class DashboardQueryRunner extends QueryRunner
 
           queryDef.filter_config = null
           queryDef.client_id = null
+
 
           @replyContext.looker.client.post(
             "queries"
