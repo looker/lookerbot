@@ -43,6 +43,7 @@ sassyMessages = [
   "<#{translate}|:flag-#{country}:> _#{message}..._"
 )
 
+
 module.exports = class FancyReplier
 
   constructor: (@replyContext) ->
@@ -78,6 +79,7 @@ module.exports = class FancyReplier
       "…"
     else
       sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+
 
     if process.env.DEV == "true"
       sass = "[DEVELOPMENT] #{sass}"
