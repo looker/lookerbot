@@ -26,7 +26,7 @@ ScheduleReceiver = require('./schedule_receiver')
 DataActionReceiver = require('./data_action_receiver')
 HealthCheckReceiver = require('./health_check_receiver')
 
-LOOKER_BOT_CHANNEL_ID = 'C14KGPH38' # hard coded to #looker-bot
+#LOOKER_BOT_CHANNEL_ID = 'C14KGPH38' # hard coded to #looker-bot
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
