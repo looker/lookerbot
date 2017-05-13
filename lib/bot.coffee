@@ -1,9 +1,13 @@
-Fuse = require('./fuse.min')
+require('dotenv').config()
+
 
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
 AzureStorage = require('azure-storage')
+gcs = require('@google-cloud/storage')
+
+streamBuffers = require('stream-buffers')
 crypto = require('crypto')
 _ = require('underscore')
 SlackUtils = require('./slack_utils')
@@ -18,6 +22,9 @@ QueryRunner = require('./repliers/query_runner')
 LookQueryRunner = require('./repliers/look_query_runner')
 
 versionChecker = require('./version_checker')
+ScheduleReceiver = require('./schedule_receiver')
+DataActionReceiver = require('./data_action_receiver')
+HealthCheckReceiver = require('./health_check_receiver')
 
 LOOKER_BOT_CHANNEL_ID = 'C14KGPH38' # hard coded to #looker-bot
 
@@ -40,19 +47,19 @@ else
     clientId: process.env.LOOKER_API_3_CLIENT_ID
     clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET
     customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID
+    webhookToken: process.env.LOOKER_WEBHOOK_TOKEN
   }]
+
+randomPNGPath = ->
+  path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
+  "#{path.join("/")}.png"
 
 lookers = lookerConfig.map((looker) ->
 
   # Amazon S3
-  if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+  if process.env.SLACKBOT_S3_BUCKET
     looker.storeBlob = (blob, success, error) ->
-      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-      key = "looker-bot-pictures/#{path.join("/")}.png"
-
-      unless blob.length
-        error("No image data returned.", "S3 Error")
-        return
+      key = randomPNGPath()
 
       region = process.env.SLACKBOT_S3_BUCKET_REGION
       domain = if region && region != "us-east-1"
@@ -77,13 +84,9 @@ lookers = lookerConfig.map((looker) ->
           success("https://#{domain}/#{params.Bucket}/#{key}")
 
   # Azure
-  if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+  else if process.env.SLACKBOT_AZURE_CONTAINER
     looker.storeBlob = (blob, success, error) ->
-      path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-      key = "#{path.join("/")}.png"
-      unless blob.length
-        error("No image data returned.", "Azure Error")
-        return
+      key = randomPNGPath()
       container = process.env.SLACKBOT_AZURE_CONTAINER
       options =
           ContentType: "image/png"
@@ -94,6 +97,31 @@ lookers = lookerConfig.map((looker) ->
         else
           storageAccount = process.env.AZURE_STORAGE_ACCOUNT
           success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
+
+  else if process.env.GOOGLE_CLOUD_BUCKET
+    looker.storeBlob = (blob, success, error) ->
+
+      blobStream = new streamBuffers.ReadableStreamBuffer()
+      blobStream.put(blob)
+      blobStream.stop()
+
+      storage = gcs(
+        projectId: process.env.GOOGLE_CLOUD_PROJECT
+        credentials: if process.env.GOOGLE_CLOUD_CREDENTIALS_JSON then JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) else undefined
+      )
+
+      bucketName = process.env.GOOGLE_CLOUD_BUCKET
+      bucket = storage.bucket(bucketName)
+      key = randomPNGPath()
+      file = bucket.file(key)
+
+      blobStream.pipe(file.createWriteStream(
+        public: true
+      )).on("error", (err) ->
+        error("```\n#{JSON.stringify(err)}\n```", "Google Cloud Storage Error")
+      ).on("finish", ->
+        success("https://storage.googleapis.com/#{bucketName}/#{key}")
+      )
 
   looker.refreshCommands = ->
     return unless looker.customCommandSpaceId
@@ -114,8 +142,9 @@ lookers = lookerConfig.map((looker) ->
 
           command.helptext = ""
 
-          if dashboard.filters?.length > 0
-            command.helptext = "<#{dashboard.filters[0].title.toLowerCase()}>"
+          dashboard_filters = dashboard.dashboard_filters || dashboard.filters
+          if dashboard_filters?.length > 0
+            command.helptext = "<#{dashboard_filters[0].title.toLowerCase()}>"
 
           customCommands[command.name] = command
 
@@ -165,9 +194,6 @@ controller = Botkit.slackbot(
   debug: process.env.DEBUG_MODE == "true"
 )
 
-controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
-  controller.createWebhookEndpoints(expressWebserver)
-
 defaultBot = controller.spawn({
   token: process.env.SLACK_API_KEY,
   retry: 10,
@@ -182,6 +208,12 @@ defaultBot.api.team.info {}, (err, response) ->
     )
   else
     throw new Error("Could not connect to the Slack API.")
+
+controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
+  controller.createWebhookEndpoints(expressWebserver)
+  ScheduleReceiver.listen(expressWebserver, defaultBot, lookers)
+  DataActionReceiver.listen(expressWebserver, defaultBot, lookers)
+  HealthCheckReceiver.listen(expressWebserver, defaultBot, lookers)
 
 controller.on 'rtm_reconnect_failed', ->
   throw new Error("Failed to reconnect to the Slack RTM API.")
@@ -246,14 +278,19 @@ processCommand = (bot, message, isDM = false) ->
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
-      query = message.text[matchedCommand.name.length..].trim().split('|').map((t) -> t.trim())
+      dashboard = matchedCommand.dashboard
+      query = message.text[matchedCommand.name.length..].trim()
+
       message.text.toLowerCase().indexOf(matchedCommand.name)
 
       context.looker = matchedCommand.looker
 
       filters = {}
-      for filter, index in matchedCommand.dashboard.filters
-        filters[filter.name] = query[index]
+
+      dashboard_filters = dashboard.dashboard_filters || dashboard.filters
+      for filter in dashboard_filters
+        filters[filter.name] = query
+
       runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
       runner.start()
 
@@ -312,7 +349,7 @@ processCommand = (bot, message, isDM = false) ->
 
       if newVersion
         helpAttachments.push(
-          text: "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+          text: "\n\n:scream: *<#{newVersion.html_url}|Lookerbot is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
           color: "warning"
           mrkdwn_in: ["text"]
         )
@@ -373,6 +410,8 @@ find = (context, message) ->
 checkMessage = (bot, message) ->
   return if !message.text || message.subtype == "bot_message"
 
+  return unless process.env.LOOKER_SLACKBOT_EXPAND_URLS == "true"
+
   # URL Expansion
   for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
 
@@ -394,7 +433,7 @@ annotateLook = (context, url, sourceMessage, looker) ->
 annotateShareUrl = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/x\/([A-Za-z0-9]+)$/)
     console.log "Expanding Share URL #{url}"
-    runner = new QueryRunner(context, matches[1])
+    runner = new QueryRunner(context, {slug: matches[1]})
     runner.start()
 
 findClosestCommand = (userAttempt, commandNames) ->

@@ -3,40 +3,49 @@ FancyReplier = require('./fancy_replier')
 
 module.exports = class QueryRunner extends FancyReplier
 
-  constructor: (@replyContext, @querySlug) ->
+  constructor: (@replyContext, queryParam) ->
+    @querySlug = queryParam?.slug
+    @queryId = queryParam?.id
     super @replyContext
 
   showShareUrl: -> false
 
+  linkText: (shareUrl) ->
+    shareUrl
+
+  linkUrl: (shareUrl) ->
+    shareUrl
+
+  shareUrlContent: (shareUrl) ->
+    if @linkText(shareUrl) == @linkUrl(shareUrl)
+      "<#{@linkUrl(shareUrl)}>"
+    else
+      "<#{@linkUrl(shareUrl)}|#{@linkText(shareUrl)}>"
+
   postImage: (query, imageData, options = {}) ->
     if @replyContext.looker.storeBlob
+
       success = (url) =>
         @reply(
           attachments: [
             _.extend({}, options, {
               image_url: url
-              title: share
-              title_link: share
+              title: if @showShareUrl() then @linkText(query.share_url) else ""
+              title_link: if @showShareUrl() then @linkUrl(query.share_url) else ""
               color: "#64518A"
             })
           ]
           text: ""
         )
+
       error = (error, context) =>
         @reply(":warning: *#{context}* #{error}")
 
-      # Heuristic: check if PNG has more than 80% '0's. If so, we pretend it has no result.
-      zeroes = 0
-      for i in [0..imageData.length-1]
-        if imageData[i] == 0
-          zeroes += 1
-      zeroPercent = 100.0 * zeroes / imageData.length
-      console.log("percent of PNG are zeroes? #{zeroPercent}")
-      share = if @showShareUrl() then query.share_url else ""
-      if (zeroPercent > 80 || imageData.length == 0)
-        @reply("#{share}\nNo results.")
-      else
+      if imageData.length
         @replyContext.looker.storeBlob(imageData, success, error)
+      else
+        error("No image data returned for query.", "Looker Render Error")
+
     else
       @reply(":warning: No storage is configured for visualization images in the bot configuration.")
 
@@ -57,15 +66,16 @@ module.exports = class QueryRunner extends FancyReplier
 
     renderableFields = dimension_like.concat(measure_like)
 
-    shareUrl = "<#{query.share_url}>"
+    shareUrl = @shareUrlContent(query.share_url)
 
     renderString = (d) ->
       d.rendered || d.value
 
     renderField = (f, row) =>
       d = row[f.name]
-      if d.drilldown_uri && (f.is_measure || f.measure)
-        "<#{@replyContext.looker.url}#{d.drilldown_uri}|#{renderString(d)}>"
+      drill = d.links?[0]
+      if drill && drill.type == "measure_default"
+        "<#{@replyContext.looker.url}#{drill.url}|#{renderString(d)}>"
       else if d? && d.value != null
         renderString(d)
       else
@@ -117,13 +127,24 @@ module.exports = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment], text: if @showShareUrl() then shareUrl else "")
 
   work: ->
-    @replyContext.looker.client.get(
-      "queries/slug/#{@querySlug}"
-      (query) => @runQuery(query)
-      (r) => @replyError(r)
-      {}
-      @replyContext
-    )
+    if @querySlug
+      @replyContext.looker.client.get(
+        "queries/slug/#{@querySlug}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
+    else if @queryId
+      @replyContext.looker.client.get(
+        "queries/#{@queryId}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
+    else
+      throw "Must set slug or id when creating QueryRunner, or override work"
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"

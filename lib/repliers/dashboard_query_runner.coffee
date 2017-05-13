@@ -9,12 +9,14 @@ module.exports = class DashboardQueryRunner extends QueryRunner
 
   work: ->
 
-    if @dashboard.elements.length > 1
+    elements = @dashboard.dashboard_elements || @dashboard.elements
+
+    if elements.length > 1
       @reply("Dashboards with more than one element aren't currently supported for Slack commands.")
       return
     # console.log('@filters: ' + JSON.stringify(@filters, null, 2))
 
-    for element in @dashboard.elements
+    for element in elements
       @replyContext.looker.client.get(
         "looks/#{element.look_id}"
         (look) =>
@@ -26,7 +28,8 @@ module.exports = class DashboardQueryRunner extends QueryRunner
               queryDef.filters[fieldName] = @filters[dashFilterName]
 
           queryDef.filter_config = null
-          # console.log('queryDef: ' + JSON.stringify(queryDef, null, 2));
+          queryDef.client_id = null
+
 
           @replyContext.looker.client.post(
             "queries"

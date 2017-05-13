@@ -1,14 +1,48 @@
 _ = require("underscore")
 
 sassyMessages = [
-  "Thinking..."
-  "Twiddling thumbs..."
-  "Crunching the numbers..."
-  "Querying oracle..."
-  "Spinning up the hamster..."
-  "Shovelling coal into the server..."
-  "Warming up Large Hadron Collider..."
-]
+
+  # English
+  ["us", "Just a second"]
+  ["us", "Thinking"]
+  ["ca", "On it"]
+  ["us", "Working on it"]
+  ["gb", "Queueing"]
+  ["gb", "Having a think"]
+  ["ca", "One moment please"]
+  ["in", "Give me a minute"]
+  ["pk", "Hold on"]
+  ["ng", "Looking into it"]
+  ["ph", "One sec"]
+  ["ph", "Working it out"]
+  ["us", "Hold please"]
+  ["eg", "Wait a moment"]
+  ["eg", "Hmm"]
+
+  # Cooler Languages
+  ["es", "Un momento, por favor"]
+  ["mx", "Por favor espera"]
+  ["de", "Bitte warten Sie einen Augenblick"]
+  ["jp", "お待ちください"]
+  ["ca", "Un moment s'il vous plait"]
+  ["cn", "稍等一會兒"]
+  ["nl", "Even geduld aub"]
+  ["so", "Ka shaqeeya waxaa ku"]
+  ["th", "กรุณารอสักครู่"]
+  ["ru", "один момент, пожалуйста"]
+  ["fi", "Hetkinen"]
+  ["ro", "Lucrez la asta"]
+  ["is", "Eitt andartak"]
+  ["az", "Bir dəqiqə zəhmət olmasa"]
+  ["ie", "Fán le do thoil"]
+  ["ne", "कृपया पर्खनुहोस्"]
+  ["in", "कृपया एक क्षण के लिए"]
+
+].map(([country, message] = pair) ->
+  translate = "https://translate.google.com/#auto/auto/#{encodeURIComponent(message)}"
+  "<#{translate}|:flag-#{country}:> _#{message}..._"
+)
+
 
 module.exports = class FancyReplier
 
@@ -36,7 +70,16 @@ module.exports = class FancyReplier
 
   startLoading: (cb) ->
 
-    sass = sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+    # Scheduled messages don't have a loading indicator, why distract everything?
+    if @replyContext.scheduled
+      cb()
+      return
+
+    sass = if @replyContext.isSlashCommand()
+      "…"
+    else
+      sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
+
 
     if process.env.DEV == "true"
       sass = "[DEVELOPMENT] #{sass}"
@@ -54,7 +97,7 @@ module.exports = class FancyReplier
     )
 
   start: ->
-    if process.env.LOOKER_SLACKBOT_STEALTH_EDIT == "true"
+    if process.env.LOOKER_SLACKBOT_LOADING_MESSAGES != "false"
       @startLoading(=>
         @work()
       )

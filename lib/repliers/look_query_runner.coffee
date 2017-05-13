@@ -2,26 +2,38 @@ QueryRunner = require('./query_runner')
 
 module.exports = class LookQueryRunner extends QueryRunner
 
-  constructor: (@replyContext, @lookId) ->
+  constructor: (@replyContext, @lookId, @filterInfo = null) ->
     super @replyContext, null
 
-  showShareUrl: -> false
+  showShareUrl: -> true
+
+  linkText: (shareUrl) ->
+    if @loadedLook
+      @loadedLook.title
+    else
+      super(shareUrl)
+
+  linkUrl: (shareUrl) ->
+    if @loadedLook
+      if @isFilteredLook()
+        @filterInfo.url
+      else
+        "#{@replyContext.looker.url}#{@loadedLook.short_url}"
+    else
+      super(shareUrl)
+
+  isFilteredLook: ->
+    @filterInfo? && @loadedLook.query.id != @filterInfo.queryId
 
   work: ->
     @replyContext.looker.client.get("looks/#{@lookId}", (look) =>
-      message =
-        attachments: [
-          fallback: look.title
-          title: look.title
-          text: look.description
-          color: "#64518A"
-          title_link: "#{@replyContext.looker.url}#{look.short_url}"
-          image_url: if look.public then "#{look.image_embed_url}?width=606" else null
-        ]
 
-      @reply(message)
+      @loadedLook = look
 
-      if !look.public
-        @runQuery(look.query, message.attachments[0])
+      if @isFilteredLook()
+        @queryId = @filterInfo.queryId
+      else
+        @querySlug = look.query.slug
 
+      super
     (r) => @replyError(r))
