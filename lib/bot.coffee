@@ -31,6 +31,8 @@ if process.env.DEV == "true"
 
 enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
 
+enableGuestUsers = process.env.ALLOW_SLACK_GUEST_USERS == "true"
+
 customCommands = {}
 
 lookerConfig = if process.env.LOOKERS
@@ -247,7 +249,7 @@ ensureUserAuthorized = (bot, message, callback, options = {}) ->
         text: "Could not fetch your user info from Slack. #{error || ""}"
       )
     else
-      if user.is_restricted || user.is_ultra_restricted
+      if !enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
         context?.replyPrivate(
           text: "Sorry @#{user.name}, as a guest user you're not able to use this command."
         )
