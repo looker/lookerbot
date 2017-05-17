@@ -198,14 +198,12 @@ defaultBot = controller.spawn({
 }).startRTM()
 
 defaultBot.api.team.info {}, (err, response) ->
-  if err
-    console.error(err)
-  if response
+  if response?.ok
     controller.saveTeam(response.team, ->
       console.log "Saved the team information..."
     )
   else
-    throw new Error("Could not connect to the Slack API.")
+    throw new Error("Could not connect to the Slack API. Ensure your Slack API key is correct. (#{err})")
 
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
