@@ -31,6 +31,8 @@ if process.env.DEV == "true"
 
 enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
 
+enableGuestUsers = process.env.ALLOW_SLACK_GUEST_USERS == "true"
+
 customCommands = {}
 
 lookerConfig = if process.env.LOOKERS
@@ -215,7 +217,7 @@ controller.on 'rtm_reconnect_failed', ->
   throw new Error("Failed to reconnect to the Slack RTM API.")
 
 controller.on 'ambient', (bot, message) ->
-  checkMessage(bot, message)
+  attemptExpandUrl(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
@@ -235,7 +237,36 @@ controller.on "direct_message", (bot, message) ->
     message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
+ensureUserAuthorized = (bot, message, callback, options = {}) ->
+
+  unless options.silent
+    context = new ReplyContext(defaultBot, bot, message)
+
+  bot.api.users.info({user: message.user}, (error, response) ->
+    user = response?.user
+    if error || !user
+      context?.replyPrivate(
+        text: "Could not fetch your user info from Slack. #{error || ""}"
+      )
+    else
+      if !enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
+        context?.replyPrivate(
+          text: "Sorry @#{user.name}, as a guest user you're not able to use this command."
+        )
+      else if user.is_bot
+        context?.replyPrivate(
+          text: "Sorry @#{user.name}, as a bot you're not able to use this command."
+        )
+      else
+        callback()
+  )
+
 processCommand = (bot, message, isDM = false) ->
+  ensureUserAuthorized(bot, message, ->
+    processCommandInternal(bot, message, isDM)
+  )
+
+processCommandInternal = (bot, message, isDM) ->
 
   message.text = message.text.split('“').join('"')
   message.text = message.text.split('”').join('"')
@@ -358,22 +389,27 @@ find = (context, message) ->
   runner = new LookFinder(context, type, query)
   runner.start()
 
-checkMessage = (bot, message) ->
+attemptExpandUrl = (bot, message) ->
+
   return if !message.text || message.subtype == "bot_message"
 
   return unless process.env.LOOKER_SLACKBOT_EXPAND_URLS == "true"
 
-  # URL Expansion
-  for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
+  ensureUserAuthorized(bot, message, ->
 
-    for looker in lookers
+    # URL Expansion
+    for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
 
-      # Starts with Looker base URL?
-      if url.lastIndexOf(looker.url, 0) == 0
-        context = new ReplyContext(defaultBot, bot, message)
-        context.looker = looker
-        annotateLook(context, url, message, looker)
-        annotateShareUrl(context, url, message, looker)
+      for looker in lookers
+
+        # Starts with Looker base URL?
+        if url.lastIndexOf(looker.url, 0) == 0
+          context = new ReplyContext(defaultBot, bot, message)
+          context.looker = looker
+          annotateLook(context, url, message, looker)
+          annotateShareUrl(context, url, message, looker)
+
+  , {silent: true})
 
 annotateLook = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
