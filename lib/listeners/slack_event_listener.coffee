@@ -12,8 +12,6 @@ class SlackEventListener extends Listener
 
       payload = req.body
 
-      console.log JSON.stringify(payload)
-
       if SlackUtils.checkToken(null, payload)
         if payload.challenge
           res.send payload.challenge

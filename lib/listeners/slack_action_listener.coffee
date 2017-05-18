@@ -46,13 +46,13 @@ class SlackActionListener extends Listener
 
           success = (actionResult) =>
             if actionResult.success
-              text = ":white_check_mark: Done!"
+              text = ":white_check_mark: #{actionResult.message || "Done"}!"
             else if actionResult.validation_errors
               text = actionResult.validation_errors.errors.map((e) ->
                 ":x: #{e.message}"
               ).join("\n")
             else
-              text = ":x: Couldn't perform action."
+              text = ":x: #{actionResult.message || "Something went wrong performing the action."}."
 
             reply =
               response_type: "ephemeral"

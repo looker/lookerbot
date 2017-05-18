@@ -89,7 +89,7 @@ class DataActionListener extends Listener
 
       if typeof(msg) == "string"
         context.replyPublic(msg)
-        @reply res, {looker: {success: true}}
+        @reply res, {looker: {success: true, message: "Sent message to #{channel}!"}}
       else
         @reply res, {looker: {success: false, message: "Message must be a string."}}
         return
