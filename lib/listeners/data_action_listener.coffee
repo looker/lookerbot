@@ -1,25 +1,18 @@
-ReplyContext = require('./reply_context')
-LookQueryRunner = require('./repliers/look_query_runner')
+ReplyContext = require('../reply_context')
+LookQueryRunner = require('../repliers/look_query_runner')
 _ = require('underscore')
+Listener = require("./listener")
 
-reply = (res, json) ->
-  res.setHeader 'Content-Type', 'application/json'
-  res.send JSON.stringify(json)
-  console.log("Replied to data action webhook.", json)
+class DataActionListener extends Listener
 
-validateToken = (res, req, lookers) ->
-  if lookers.map((l) -> l.webhookToken).indexOf(req.headers['x-looker-webhook-token']) == -1
-    reply(res, {looker: {success: false}, reason: "Invalid webhook token."})
-    return false
-  return true
+  type: ->
+    "data action listener"
 
-module.exports =
+  listen: ->
 
-  listen: (server, bot, lookers) ->
+    @server.post("/", (req, res) =>
 
-    server.post("/", (req, res) =>
-
-      return unless validateToken(res, req, lookers)
+      return unless @validateToken(req, res)
 
       label = if process.env.DEV == "true"
         sass = "[DEVELOPMENT] Lookerbot"
@@ -44,9 +37,9 @@ module.exports =
 
     )
 
-    server.post("/data_actions/form", (req, res) =>
+    @server.post("/data_actions/form", (req, res) =>
 
-      return unless validateToken(res, req, lookers)
+      return unless @validateToken(req, res)
 
       bot.api.channels.list {exclude_archived: 1}, (err, response) ->
         if err
@@ -67,7 +60,7 @@ module.exports =
             )
           }]
 
-          reply(res, response)
+          @reply(res, response)
           return
 
         else
@@ -75,18 +68,18 @@ module.exports =
 
     )
 
-    server.post("/data_actions", (req, res) =>
+    @server.post("/data_actions", (req, res) =>
 
       getParam = (name) ->
         req.body.form_params?[name] || req.body.data?[name]
 
-      return unless validateToken(res, req, lookers)
+      return unless @validateToken(req, res)
 
       msg = getParam("message")
       channel = getParam("channel")
 
       unless typeof(channel) == "string"
-        reply res, {looker: {success: false, message: "Channel must be a string."}}
+        @reply res, {looker: {success: false, message: "Channel must be a string."}}
         return
 
       context = new ReplyContext(bot, bot, {
@@ -96,10 +89,11 @@ module.exports =
 
       if typeof(msg) == "string"
         context.replyPublic(msg)
-        reply res, {looker: {success: true}}
+        @reply res, {looker: {success: true}}
       else
-        reply res, {looker: {success: false, message: "Message must be a string."}}
+        @reply res, {looker: {success: false, message: "Message must be a string."}}
         return
 
     )
 
+module.exports = DataActionListener
