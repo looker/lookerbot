@@ -1,5 +1,7 @@
 _ = require("underscore")
 FancyReplier = require('./fancy_replier')
+uuid = require("uuid/v4")
+SlackUtils = require('../slack_utils')
 
 module.exports = class QueryRunner extends FancyReplier
 
@@ -41,6 +43,7 @@ module.exports = class QueryRunner extends FancyReplier
       error = (error, context) =>
         @reply(":warning: *#{context}* #{error}")
 
+
       if imageData.length
         @replyContext.looker.storeBlob(imageData, success, error)
       else
@@ -66,6 +69,20 @@ module.exports = class QueryRunner extends FancyReplier
     renderableFields = dimension_like.concat(measure_like)
 
     shareUrl = @shareUrlContent(query.share_url)
+
+    addSlackButtons = (f, row, attachment) =>
+      return unless SlackUtils.slackButtonsEnabled
+      d = row[f.name]
+      return unless d.links
+      usableActions = d.links.filter((l) -> l.type == "action" && !l.form && !l.form_url)
+      return unless usableActions.length > 0
+      attachment.actions = usableActions.map((link) =>
+        name: "data_action"
+        text: link.label
+        type: "button"
+        value: JSON.stringify({lookerUrl: @replyContext.looker.url, action: link})
+      )
+      attachment.callback_id = uuid()
 
     renderString = (d) ->
       d.rendered || d.value
@@ -99,9 +116,12 @@ module.exports = class QueryRunner extends FancyReplier
     else if query.vis_config?.type == "single_value"
       field = measure_like[0] || dimension_like[0]
       share = if @showShareUrl() then "\n#{shareUrl}" else ""
-      rendered = renderField(field, result.data[0])
+      datum = result.data[0]
+      rendered = renderField(field, datum)
       text = "*#{rendered}*#{share}"
-      @reply({attachments: [{text: text, fallback: rendered, color: "#64518A", mrkdwn_in: ["text"]}],})
+      attachment = {text: text, fallback: rendered, color: "#64518A", mrkdwn_in: ["text"]}
+      addSlackButtons(field, datum, attachment)
+      @reply({attachments: [attachment]})
 
     else if result.data.length == 1 || query.vis_config?.type == "looker_single_record"
       attachment = _.extend({}, options, {

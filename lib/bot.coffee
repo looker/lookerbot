@@ -23,9 +23,11 @@ LookQueryRunner = require('./repliers/look_query_runner')
 versionChecker = require('./version_checker')
 
 listeners = [
-  require('./listeners/schedule_listener')
   require('./listeners/data_action_listener')
   require('./listeners/health_check_listener')
+  require('./listeners/schedule_listener')
+  require('./listeners/slack_action_listener')
+  require('./listeners/slack_event_listener')
 ]
 
 if process.env.DEV == "true"
@@ -229,10 +231,8 @@ QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
 
 controller.on "slash_command", (bot, message) ->
-  if process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && process.env.SLACK_SLASH_COMMAND_TOKEN == message.token
-    processCommand(bot, message)
-  else
-    bot.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.")
+  return unless SlackUtils.checkToken(bot, message)
+  processCommand(bot, message)
 
 controller.on "direct_mention", (bot, message) ->
   message.text = SlackUtils.stripMessageText(message.text)

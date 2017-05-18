@@ -12,7 +12,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 ### Requirements
 
-- [Looker](https://looker.com) 3.42 or later
+- [Looker](https://looker.com) 4.12 or later
   - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
 - A web server capable of running [Node.js](https://nodejs.org/) applications to deploy the bot application to
   - [Node.js](https://nodejs.org/) 6.10.3 is required
@@ -69,7 +69,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
-- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with Lookerbot, provide the verification token from the "Basic Information" section of the app settings. This is how the bot will verify the integrity of incoming slash commands.
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands or interactive messages with Lookerbot, provide the verification token from the "Basic Information" section of the app settings. This is how the bot will verify the integrity of incoming slash commands.
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
@@ -82,6 +82,8 @@ There are a couple environment variables that can be used to tweak behavior:
 - `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to.
 
 - `LOOKER_SLACKBOT_LOADING_MESSAGES` – Set this to `false` to disable posting loading messages.
+
+- `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES` – Set this to `false` to disable making data action buttons available to Slack users.
 
 ##### (optional) Storage Services for Visualization Images
 
@@ -190,7 +192,22 @@ You can use the bot to send scheduled Looks to Slack.
 
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
-### Using Data Actions with Slack
+### Data Actions
+
+#### Performing Data Actions from Slack
+
+By default, simple data actions will appear in Slack for single value visualizations. Data actions that have forms are not currently supported.
+
+This can be disabled on a per-action basis by using Liquid templating in the action definition to restrict access to certain users. Alternately, the action buttons can be disabled entirely with the bot configuration variable `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES`.
+
+There's a quick additional configuration that's needed to use Data Actions from Slack:
+
+1. Go to https://api.slack.com/apps and find your app.
+2. Choose "Interactive Messages" and enable that feature.
+3. For the "Request URL", set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose). The path to for interactive message requests is `/slack/action`, so if your server is at `https://example.com`, the Request URL would be `https://example.com/slack/action`.
+4. Configure the Slash Command Token [as described here](#configuring-slash-commands).
+
+#### Sending Slack Messages via Data Actions
 
 The bot server also implements endpoints to allow you to easily send [Data Actions](https://discourse.looker.com/t/data-actions/3573) to Slack.
 
