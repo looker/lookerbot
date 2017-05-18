@@ -82,7 +82,7 @@ class DataActionListener extends Listener
         @reply res, {looker: {success: false, message: "Channel must be a string."}}
         return
 
-      context = new ReplyContext(bot, bot, {
+      context = new ReplyContext(@bot, @bot, {
         channel: channel
       })
       context.dataAction = true
