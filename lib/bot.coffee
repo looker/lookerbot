@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 Botkit = require('botkit')
 getUrls = require('get-urls')
 AWS = require('aws-sdk')
@@ -19,16 +21,22 @@ QueryRunner = require('./repliers/query_runner')
 LookQueryRunner = require('./repliers/look_query_runner')
 
 versionChecker = require('./version_checker')
-ScheduleListener = require('./listeners/schedule_listener')
-DataActionListener = require('./listeners/data_action_listener')
-SlackActionListener = require('./listeners/slack_action_listener')
-SlackEventListener = require('./listeners/slack_event_listener')
+
+listeners = [
+  require('./listeners/data_action_listener')
+  require('./listeners/health_check_listener')
+  require('./listeners/schedule_listener')
+  require('./listeners/slack_action_listener')
+  require('./listeners/slack_event_listener')
+]
 
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
 enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
+
+enableGuestUsers = process.env.ALLOW_SLACK_GUEST_USERS == "true"
 
 customCommands = {}
 
@@ -53,7 +61,7 @@ randomPNGPath = ->
 lookers = lookerConfig.map((looker) ->
 
   # Amazon S3
-  if process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
+  if process.env.SLACKBOT_S3_BUCKET
     looker.storeBlob = (blob, success, error) ->
       key = randomPNGPath()
       region = process.env.SLACKBOT_S3_BUCKET_REGION
@@ -79,7 +87,7 @@ lookers = lookerConfig.map((looker) ->
           success("https://#{domain}/#{params.Bucket}/#{key}")
 
   # Azure
-  else if process.env.AZURE_STORAGE_ACCOUNT && process.env.AZURE_STORAGE_ACCESS_KEY
+  else if process.env.SLACKBOT_AZURE_CONTAINER
     looker.storeBlob = (blob, success, error) ->
       key = randomPNGPath()
       container = process.env.SLACKBOT_AZURE_CONTAINER
@@ -195,35 +203,31 @@ defaultBot = controller.spawn({
 }).startRTM()
 
 defaultBot.api.team.info {}, (err, response) ->
-  if err
-    console.error(err)
-  if response
+  if response?.ok
     controller.saveTeam(response.team, ->
       console.log "Saved the team information..."
     )
   else
-    throw new Error("Could not connect to the Slack API.")
+    throw new Error("Could not connect to the Slack API. Ensure your Slack API key is correct. (#{err})")
+
+runningListeners = []
 
 listeners = []
 
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
-  listeners = [
-    new ScheduleListener(expressWebserver, defaultBot, lookers)
-    new DataActionListener(expressWebserver, defaultBot, lookers)
-    new SlackActionListener(expressWebserver, defaultBot, lookers)
-    new SlackEventListener(expressWebserver, defaultBot, lookers)
-  ]
-
   for listener in listeners
-    listener.listen()
+    instance = new listener(expressWebserver, defaultBot, lookers)
+    instance.listen()
+
+    runningListeners.push(instance)
 
 controller.on 'rtm_reconnect_failed', ->
   throw new Error("Failed to reconnect to the Slack RTM API.")
 
 controller.on 'ambient', (bot, message) ->
-  checkMessage(bot, message)
+  attemptExpandUrl(bot, message)
 
 QUERY_REGEX = '(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)'
 FIND_REGEX = 'find (dashboard|look )? ?(.+)'
@@ -241,7 +245,36 @@ controller.on "direct_message", (bot, message) ->
     message.text = SlackUtils.stripMessageText(message.text)
     processCommand(bot, message, true)
 
+ensureUserAuthorized = (bot, message, callback, options = {}) ->
+
+  unless options.silent
+    context = new ReplyContext(defaultBot, bot, message)
+
+  bot.api.users.info({user: message.user}, (error, response) ->
+    user = response?.user
+    if error || !user
+      context?.replyPrivate(
+        text: "Could not fetch your user info from Slack. #{error || ""}"
+      )
+    else
+      if !enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
+        context?.replyPrivate(
+          text: "Sorry @#{user.name}, as a guest user you're not able to use this command."
+        )
+      else if user.is_bot
+        context?.replyPrivate(
+          text: "Sorry @#{user.name}, as a bot you're not able to use this command."
+        )
+      else
+        callback()
+  )
+
 processCommand = (bot, message, isDM = false) ->
+  ensureUserAuthorized(bot, message, ->
+    processCommandInternal(bot, message, isDM)
+  )
+
+processCommandInternal = (bot, message, isDM) ->
 
   message.text = message.text.split('“').join('"')
   message.text = message.text.split('”').join('"')
@@ -320,7 +353,7 @@ processCommand = (bot, message, isDM = false) ->
 
       if newVersion
         helpAttachments.push(
-          text: "\n\n:scream: *<#{newVersion.html_url}|The Looker Slack integration is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+          text: "\n\n:scream: *<#{newVersion.html_url}|Lookerbot is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
           color: "warning"
           mrkdwn_in: ["text"]
         )
@@ -364,22 +397,27 @@ find = (context, message) ->
   runner = new LookFinder(context, type, query)
   runner.start()
 
-checkMessage = (bot, message) ->
+attemptExpandUrl = (bot, message) ->
+
   return if !message.text || message.subtype == "bot_message"
 
   return unless process.env.LOOKER_SLACKBOT_EXPAND_URLS == "true"
 
-  # URL Expansion
-  for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
+  ensureUserAuthorized(bot, message, ->
 
-    for looker in lookers
+    # URL Expansion
+    for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
 
-      # Starts with Looker base URL?
-      if url.lastIndexOf(looker.url, 0) == 0
-        context = new ReplyContext(defaultBot, bot, message)
-        context.looker = looker
-        annotateLook(context, url, message, looker)
-        annotateShareUrl(context, url, message, looker)
+      for looker in lookers
+
+        # Starts with Looker base URL?
+        if url.lastIndexOf(looker.url, 0) == 0
+          context = new ReplyContext(defaultBot, bot, message)
+          context.looker = looker
+          annotateLook(context, url, message, looker)
+          annotateShareUrl(context, url, message, looker)
+
+  , {silent: true})
 
 annotateLook = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/looks\/([0-9]+)$/)
@@ -390,5 +428,5 @@ annotateLook = (context, url, sourceMessage, looker) ->
 annotateShareUrl = (context, url, sourceMessage, looker) ->
   if matches = url.match(/\/x\/([A-Za-z0-9]+)$/)
     console.log "Expanding Share URL #{url}"
-    runner = new QueryRunner(context, matches[1])
+    runner = new QueryRunner(context, {slug: matches[1]})
     runner.start()

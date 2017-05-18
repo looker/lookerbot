@@ -4,7 +4,9 @@ uuid = require("uuid/v4")
 
 module.exports = class QueryRunner extends FancyReplier
 
-  constructor: (@replyContext, @querySlug) ->
+  constructor: (@replyContext, queryParam) ->
+    @querySlug = queryParam?.slug
+    @queryId = queryParam?.id
     super @replyContext
 
   showShareUrl: -> false
@@ -142,13 +144,24 @@ module.exports = class QueryRunner extends FancyReplier
       @reply(attachments: [attachment], text: if @showShareUrl() then shareUrl else "")
 
   work: ->
-    @replyContext.looker.client.get(
-      "queries/slug/#{@querySlug}"
-      (query) => @runQuery(query)
-      (r) => @replyError(r)
-      {}
-      @replyContext
-    )
+    if @querySlug
+      @replyContext.looker.client.get(
+        "queries/slug/#{@querySlug}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
+    else if @queryId
+      @replyContext.looker.client.get(
+        "queries/#{@queryId}"
+        (query) => @runQuery(query)
+        (r) => @replyError(r)
+        {}
+        @replyContext
+      )
+    else
+      throw "Must set slug or id when creating QueryRunner, or override work"
 
   runQuery: (query, options = {}) ->
     type = query.vis_config?.type || "table"
