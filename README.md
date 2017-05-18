@@ -69,7 +69,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
-- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands with Lookerbot, provide the verification token from the "Basic Information" section of the app settings. This is how the bot will verify the integrity of incoming slash commands.
+- `SLACK_SLASH_COMMAND_TOKEN` (optional) – If you want to use slash commands or interactive messages with Lookerbot, provide the verification token from the "Basic Information" section of the app settings. This is how the bot will verify the integrity of incoming slash commands.
 
 - `PORT` (optional) – The port that the bot web server will run on to accept slash commands. Defaults to `3333`.
 
@@ -205,6 +205,7 @@ There's a quick additional configuration that's needed to use Data Actions from 
 1. Go to https://api.slack.com/apps and find your app.
 2. Choose "Interactive Messages" and enable that feature.
 3. For the "Request URL", set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose). The path to for interactive message requests is `/slack/action`, so if your server is at `https://example.com`, the Request URL would be `https://example.com/slack/action`.
+4. Configure the Slash Command Token [as described here](#configuring-slash-commands).
 
 #### Sending Slack Messages via Data Actions
 

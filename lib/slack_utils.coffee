@@ -10,4 +10,4 @@ module.exports = class SlackUtils
       bot?.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.")
       return false
 
-  @slackButtonsEnabled: process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES != "false"
+  @slackButtonsEnabled: process.env.SLACK_SLASH_COMMAND_TOKEN && process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES != "false"
