@@ -41,7 +41,7 @@ class DataActionListener extends Listener
 
       return unless @validateToken(req, res)
 
-      bot.api.channels.list {exclude_archived: 1}, (err, response) ->
+      @bot.api.channels.list {exclude_archived: 1}, (err, response) =>
         if err
           console.error(err)
         if response?.ok
