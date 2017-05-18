@@ -212,8 +212,6 @@ defaultBot.api.team.info {}, (err, response) ->
 
 runningListeners = []
 
-listeners = []
-
 controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
