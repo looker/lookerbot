@@ -33,7 +33,7 @@ class ScheduleListener extends Listener
           else if channelType == "channel"
             channelName = "##{channelName}"
 
-          for looker in lookers
+          for looker in @lookers
             if req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) == 0
               if @validateTokenForLooker(req, looker)
                 context = new ReplyContext(bot, bot, {
