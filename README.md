@@ -12,7 +12,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 ### Requirements
 
-- [Looker](https://looker.com) 3.42 or later
+- [Looker](https://looker.com) 4.12 or later
   - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
 - A web server capable of running [Node.js](https://nodejs.org/) applications to deploy the bot application to
   - [Node.js](https://nodejs.org/) 6.10.3 is required
