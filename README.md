@@ -200,6 +200,12 @@ By default, simple data actions will appear in Slack for single value visualizat
 
 This can be disabled on a per-action basis by using Liquid templating in the action definition to restrict access to certain users. Alternately, the action buttons can be disabled entirely with the bot configuration variable `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES`.
 
+There's a quick additional configuration that's needed to use Data Actions from Slack:
+
+1. Go to https://api.slack.com/apps and find your app.
+2. Choose "Interactive Messages" and enable that feature.
+3. For the "Request URL", set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose). The path to for interactive message requests is `/slack/action`, so if your server is at `https://example.com`, the Request URL would be `https://example.com/slack/action`.
+
 #### Sending Slack Messages via Data Actions
 
 The bot server also implements endpoints to allow you to easily send [Data Actions](https://discourse.looker.com/t/data-actions/3573) to Slack.
