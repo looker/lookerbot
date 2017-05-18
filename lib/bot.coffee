@@ -248,7 +248,7 @@ ensureUserAuthorized = (bot, message, callback, options = {}) ->
   unless options.silent
     context = new ReplyContext(defaultBot, bot, message)
 
-  bot.api.users.info({user: message.user}, (error, response) ->
+  defaultBot.api.users.info({user: message.user}, (error, response) ->
     user = response?.user
     if error || !user
       context?.replyPrivate(
