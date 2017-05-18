@@ -1,6 +1,7 @@
 _ = require("underscore")
 FancyReplier = require('./fancy_replier')
 uuid = require("uuid/v4")
+SlackUtils = require('../slack_utils')
 
 module.exports = class QueryRunner extends FancyReplier
 
@@ -70,6 +71,7 @@ module.exports = class QueryRunner extends FancyReplier
     shareUrl = @shareUrlContent(query.share_url)
 
     addSlackButtons = (f, row, attachment) =>
+      return unless SlackUtils.slackButtonsEnabled
       d = row[f.name]
       return unless d.links
       usableActions = d.links.filter((l) -> l.type == "action" && !l.form && !l.form_url)

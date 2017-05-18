@@ -8,6 +8,8 @@ class SlackActionListener extends Listener
 
   listen: ->
 
+    return unless SlackUtils.slackButtonsEnabled
+
     @server.post("/slack/action", (req, res) =>
 
       try

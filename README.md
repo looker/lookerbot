@@ -83,6 +83,8 @@ There are a couple environment variables that can be used to tweak behavior:
 
 - `LOOKER_SLACKBOT_LOADING_MESSAGES` – Set this to `false` to disable posting loading messages.
 
+- `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES` – Set this to `false` to disable making data action buttons available to Slack users.
+
 ##### (optional) Storage Services for Visualization Images
 
 ###### Amazon S3
@@ -190,7 +192,15 @@ You can use the bot to send scheduled Looks to Slack.
 
 5. You'll need to make sure that the `LOOKER_WEBHOOK_TOKEN` environment variable is properly set to the same verification token found in the Looker admin panel.
 
-### Using Data Actions with Slack
+### Data Actions
+
+#### Performing Data Actions from Slack
+
+By default, simple data actions will appear in Slack for single value visualizations. Data actions that have forms are not currently supported.
+
+This can be disabled on a per-action basis by using Liquid templating in the action definition to restrict access to certain users. Alternately, the action buttons can be disabled entirely with the bot configuration variable `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES`.
+
+#### Sending Slack Messages via Data Actions
 
 The bot server also implements endpoints to allow you to easily send [Data Actions](https://discourse.looker.com/t/data-actions/3573) to Slack.
 
