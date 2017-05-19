@@ -45,7 +45,8 @@ sassyMessages = [
 
 module.exports = class FancyReplier
 
-  constructor: (@replyContext) ->
+  constructor: (replyContext) ->
+    @replyContext = replyContext
 
   reply: (obj, cb) ->
     if @loadingMessage

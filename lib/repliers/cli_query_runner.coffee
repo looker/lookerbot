@@ -3,8 +3,10 @@ QueryRunner = require('./query_runner')
 
 module.exports = class CLIQueryRunner extends QueryRunner
 
-  constructor: (@replyContext, @textQuery, @visualization) ->
-    super @replyContext
+  constructor: (replyContext, textQuery, visualization) ->
+    super replyContext
+    @textQuery = textQuery
+    @visualization = visualization
 
   showShareUrl: -> true
 

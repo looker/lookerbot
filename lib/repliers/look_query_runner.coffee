@@ -2,8 +2,10 @@ QueryRunner = require('./query_runner')
 
 module.exports = class LookQueryRunner extends QueryRunner
 
-  constructor: (@replyContext, @lookId, @filterInfo = null) ->
-    super @replyContext, null
+  constructor: (replyContext, lookId, filterInfo = null) ->
+    super replyContext, null
+    @lookId = lookId
+    @filterInfo = filterInfo
 
   showShareUrl: -> true
 

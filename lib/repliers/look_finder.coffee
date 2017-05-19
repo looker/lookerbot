@@ -4,8 +4,10 @@ QueryRunner = require('./query_runner')
 
 module.exports = class LookFinder extends QueryRunner
 
-  constructor: (@replyContext, @type, @query) ->
-    super @replyContext
+  constructor: (replyContext, type, query) ->
+    super replyContext
+    @type = type
+    @query = query
 
   matchLooks: (query, cb) ->
     @replyContext.looker.client.get(

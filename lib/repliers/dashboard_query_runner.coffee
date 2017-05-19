@@ -2,8 +2,10 @@ QueryRunner = require('./query_runner')
 
 module.exports = class DashboardQueryRunner extends QueryRunner
 
-  constructor: (@replyContext, @dashboard, @filters = {}) ->
-    super @replyContext, null
+  constructor: (replyContext, dashboard, filters = {}) ->
+    super replyContext, null
+    @dashboard = dashboard
+    @filters = filters
 
   showShareUrl: -> true
 
