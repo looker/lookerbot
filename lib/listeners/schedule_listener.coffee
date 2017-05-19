@@ -11,7 +11,7 @@ class ScheduleListener extends Listener
     @server.post("/slack/post/:post_type/:channel_name", @handleRequest)
     @server.post("/slack/post_from_query_action", @handleRequest)
 
-  handleRequest: (req, res) =>
+  handleRequest: (req, res) ->
 
     channelName = req.params.channel_name || req.form_params?.channel
     channelType = req.params.post_type
