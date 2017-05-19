@@ -5,10 +5,10 @@ SlackUtils = require('../slack_utils')
 
 module.exports = class QueryRunner extends FancyReplier
 
-  constructor: (@replyContext, queryParam) ->
+  constructor: (replyContext, queryParam) ->
+    super replyContext
     @querySlug = queryParam?.slug
     @queryId = queryParam?.id
-    super @replyContext
 
   showShareUrl: -> false
 

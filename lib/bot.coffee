@@ -2,16 +2,11 @@ require('dotenv').config()
 
 Botkit = require('botkit')
 getUrls = require('get-urls')
-AWS = require('aws-sdk')
-AzureStorage = require('azure-storage')
-gcs = require('@google-cloud/storage')
 
-streamBuffers = require('stream-buffers')
-crypto = require('crypto')
 _ = require('underscore')
 SlackUtils = require('./slack_utils')
 
-LookerClient = require('./looker_client')
+Looker = require('./looker')
 ReplyContext = require('./reply_context')
 
 CLIQueryRunner = require('./repliers/cli_query_runner')
@@ -30,6 +25,8 @@ listeners = [
   require('./listeners/slack_event_listener')
 ]
 
+blobStores = require('./stores/index')
+
 if process.env.DEV == "true"
   # Allow communicating with Lookers running on localhost with self-signed certificates
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
@@ -38,140 +35,10 @@ enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
 
 enableGuestUsers = process.env.ALLOW_SLACK_GUEST_USERS == "true"
 
-customCommands = {}
-
-lookerConfig = if process.env.LOOKERS
-  console.log("Using Looker information specified in LOOKERS environment variable.")
-  JSON.parse(process.env.LOOKERS)
-else
-  console.log("Using Looker information specified in individual environment variables.")
-  [{
-    url: process.env.LOOKER_URL
-    apiBaseUrl: process.env.LOOKER_API_BASE_URL
-    clientId: process.env.LOOKER_API_3_CLIENT_ID
-    clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET
-    customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID
-    webhookToken: process.env.LOOKER_WEBHOOK_TOKEN
-  }]
-
-randomPNGPath = ->
-  path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g)
-  "#{path.join("/")}.png"
-
-lookers = lookerConfig.map((looker) ->
-
-  # Amazon S3
-  if process.env.SLACKBOT_S3_BUCKET
-    looker.storeBlob = (blob, success, error) ->
-      key = randomPNGPath()
-      region = process.env.SLACKBOT_S3_BUCKET_REGION
-      domain = if region && region != "us-east-1"
-        "s3-#{process.env.SLACKBOT_S3_BUCKET_REGION}.amazonaws.com"
-      else
-        "s3.amazonaws.com"
-
-      params =
-        Bucket: process.env.SLACKBOT_S3_BUCKET
-        Key: key
-        Body: blob
-        ACL: 'public-read'
-        ContentType: "image/png"
-
-      s3 = new AWS.S3(
-        endpoint: new AWS.Endpoint(domain)
-      )
-      s3.putObject params, (err, data) ->
-        if err
-          error(err, "S3 Error")
-        else
-          success("https://#{domain}/#{params.Bucket}/#{key}")
-
-  # Azure
-  else if process.env.SLACKBOT_AZURE_CONTAINER
-    looker.storeBlob = (blob, success, error) ->
-      key = randomPNGPath()
-      container = process.env.SLACKBOT_AZURE_CONTAINER
-      options =
-          ContentType: "image/png"
-      wasb = new AzureStorage.createBlobService()
-      wasb.createBlockBlobFromText container, key, blob, options, (err, result, response) ->
-        if err
-          error(err, "Azure Error")
-        else
-          storageAccount = process.env.AZURE_STORAGE_ACCOUNT
-          success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
-
-  else if process.env.GOOGLE_CLOUD_BUCKET
-    looker.storeBlob = (blob, success, error) ->
-
-      blobStream = new streamBuffers.ReadableStreamBuffer()
-      blobStream.put(blob)
-      blobStream.stop()
-
-      storage = gcs(
-        projectId: process.env.GOOGLE_CLOUD_PROJECT
-        credentials: if process.env.GOOGLE_CLOUD_CREDENTIALS_JSON then JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) else undefined
-      )
-
-      bucketName = process.env.GOOGLE_CLOUD_BUCKET
-      bucket = storage.bucket(bucketName)
-      key = randomPNGPath()
-      file = bucket.file(key)
-
-      blobStream.pipe(file.createWriteStream(
-        public: true
-      )).on("error", (err) ->
-        error("```\n#{JSON.stringify(err)}\n```", "Google Cloud Storage Error")
-      ).on("finish", ->
-        success("https://storage.googleapis.com/#{bucketName}/#{key}")
-      )
-
-  looker.refreshCommands = ->
-    return unless looker.customCommandSpaceId
-    console.log "Refreshing custom commands for #{looker.url}..."
-
-    addCommandsForSpace = (space, category) ->
-      for partialDashboard in space.dashboards
-        looker.client.get("dashboards/#{partialDashboard.id}", (dashboard) ->
-
-          command =
-            name: dashboard.title.toLowerCase().trim()
-            description: dashboard.description
-            dashboard: dashboard
-            looker: looker
-            category: category
-
-          command.hidden = category.toLowerCase().indexOf("[hidden]") != -1 || command.name.indexOf("[hidden]") != -1
-
-          command.helptext = ""
-
-          dashboard_filters = dashboard.dashboard_filters || dashboard.filters
-          if dashboard_filters?.length > 0
-            command.helptext = "<#{dashboard_filters[0].title.toLowerCase()}>"
-
-          customCommands[command.name] = command
-
-        console.log)
-
-    looker.client.get("spaces/#{looker.customCommandSpaceId}", (space) ->
-      addCommandsForSpace(space, "Shortcuts")
-      looker.client.get("spaces/#{looker.customCommandSpaceId}/children", (children) ->
-        for child in children
-          addCommandsForSpace(child, child.name)
-      console.log)
-    console.log)
-
-  looker.client = new LookerClient(
-    baseUrl: looker.apiBaseUrl
-    clientId: looker.clientId
-    clientSecret: looker.clientSecret
-    afterConnect: looker.refreshCommands
-  )
-  looker
-)
+Looker.loadAll()
 
 refreshCommands = ->
-  for looker in lookers
+  for looker in Looker.all
     looker.refreshCommands()
 
 newVersion = null
@@ -184,7 +51,7 @@ checkVersion()
 
 # Update access tokens every half hour
 setInterval(->
-  for looker in lookers
+  for looker in Looker.all
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
 
@@ -216,7 +83,7 @@ controller.setupWebserver process.env.PORT || 3333, (err, expressWebserver) ->
   controller.createWebhookEndpoints(expressWebserver)
 
   for listener in listeners
-    instance = new listener(expressWebserver, defaultBot, lookers)
+    instance = new listener(expressWebserver, defaultBot, Looker.all)
     instance.listen()
 
     runningListeners.push(instance)
@@ -286,7 +153,7 @@ processCommandInternal = (bot, message, isDM) ->
     message.match = match
     find(context, message)
   else
-    shortCommands = _.sortBy(_.values(customCommands), (c) -> -c.name.length)
+    shortCommands = _.sortBy(_.values(Looker.customCommands), (c) -> -c.name.length)
     matchedCommand = shortCommands.filter((c) -> message.text.toLowerCase().indexOf(c.name) == 0)?[0]
     if matchedCommand
 
@@ -306,7 +173,7 @@ processCommandInternal = (bot, message, isDM) ->
     else
       helpAttachments = []
 
-      groups = _.groupBy(customCommands, 'category')
+      groups = _.groupBy(Looker.customCommands, 'category')
 
       for groupName, groupCommmands of groups
         groupText = ""
@@ -340,7 +207,7 @@ processCommandInternal = (bot, message, isDM) ->
       )
 
 
-      spaces = lookers.filter((l) -> l.customCommandSpaceId ).map((l) ->
+      spaces = Looker.all.filter((l) -> l.customCommandSpaceId ).map((l) ->
         "<#{l.url}/spaces/#{l.customCommandSpaceId}|this space>"
       ).join(" or ")
       if spaces
@@ -372,9 +239,9 @@ runCLI = (context, message) ->
   [txt, type, ignore, lookerName, query] = message.match
 
   context.looker = if lookerName
-    lookers.filter((l) -> l.url.indexOf(lookerName) != -1)[0] || lookers[0]
+    Looker.all.filter((l) -> l.url.indexOf(lookerName) != -1)[0] || Looker.all[0]
   else
-    lookers[0]
+    Looker.all[0]
 
   type = "data" if type == "q" || type == "query"
 
@@ -385,12 +252,12 @@ find = (context, message) ->
   [__, type, query] = message.match
 
   firstWord = query.split(" ")[0]
-  foundLooker = lookers.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
+  foundLooker = Looker.all.filter((l) -> l.url.indexOf(firstWord) != -1)[0]
   if foundLooker
     words = query.split(" ")
     words.shift()
     query = words.join(" ")
-  context.looker = foundLooker || lookers[0]
+  context.looker = foundLooker || Looker.all[0]
 
   runner = new LookFinder(context, type, query)
   runner.start()
@@ -406,7 +273,7 @@ attemptExpandUrl = (bot, message) ->
     # URL Expansion
     for url in getUrls(message.text).map((url) -> url.replace("%3E", ""))
 
-      for looker in lookers
+      for looker in Looker.all
 
         # Starts with Looker base URL?
         if url.lastIndexOf(looker.url, 0) == 0
