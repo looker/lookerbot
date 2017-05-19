@@ -26,4 +26,10 @@ state.commander = new Commander({
     require('./listeners/slack_action_listener')
     require('./listeners/slack_event_listener')
   ]
+  commands: [
+    require('./commands/cli_command')
+    require('./commands/search_command')
+    require('./commands/custom_command')
+    require('./commands/help_command')
+  ]
 })

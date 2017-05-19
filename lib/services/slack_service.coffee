@@ -88,6 +88,8 @@ module.exports = class SlackService
           @urlHandler(context, url)
       , {silent: true})
 
+    return
+
   ensureUserAuthorized: (context, callback, options = {}) ->
 
     if options.silent
@@ -111,3 +113,5 @@ module.exports = class SlackService
         else
           callback()
     )
+
+    return
