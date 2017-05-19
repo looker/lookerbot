@@ -31,7 +31,7 @@ module.exports = class Commander
     message.text = message.text.split('“').join('"')
     message.text = message.text.split('”').join('"')
 
-    if match = message.text.match(new RegExp(QUERY_REGEX)) && settings.enableQueryCli
+    if match = message.text.match(new RegExp(QUERY_REGEX)) && config.enableQueryCli
       message.match = match
       @runCLI(context, message)
     else if match = message.text.match(new RegExp(FIND_REGEX))
@@ -81,7 +81,7 @@ module.exports = class Commander
         • *find* <look search term> — _Shows the top five Looks matching the search._
         """
 
-        if settings.enableQueryCli
+        if config.enableQueryCli
           defaultText += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n"
 
         helpAttachments.push(

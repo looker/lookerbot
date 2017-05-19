@@ -100,7 +100,7 @@ module.exports = class SlackService
           text: "Could not fetch your user info from Slack. #{error || ""}"
         )
       else
-        if !settings.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
+        if !config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
           context?.replyPrivate(
             text: "Sorry @#{user.name}, as a guest user you're not able to use this command."
           )
