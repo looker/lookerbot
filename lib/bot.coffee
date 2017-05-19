@@ -13,7 +13,7 @@ DashboardQueryRunner = require('./repliers/dashboard_query_runner')
 QueryRunner = require('./repliers/query_runner')
 LookQueryRunner = require('./repliers/look_query_runner')
 
-versionChecker = require('./version_checker')
+VersionChecker = require('./version_checker')
 
 config = require('./config')
 
@@ -29,28 +29,17 @@ blobStores = require('./stores/index')
 
 Looker.loadAll()
 
+currentVersionChecker = new VersionChecker()
+
 refreshCommands = ->
   for looker in Looker.all
     looker.refreshCommands()
-
-newVersion = null
-checkVersion = ->
-  versionChecker((version) ->
-    newVersion = version
-  )
-
-checkVersion()
 
 # Update access tokens every half hour
 setInterval(->
   for looker in Looker.all
     looker.client.fetchAccessToken()
 , 30 * 60 * 1000)
-
-# Check for new versions every day
-setInterval(->
-  checkVersion()
-, 24 * 60 * 60 * 1000)
 
 controller = Botkit.slackbot(
   debug: process.env.DEBUG_MODE == "true"
@@ -208,9 +197,9 @@ processCommandInternal = (bot, message, isDM) ->
           mrkdwn_in: ["text"]
         )
 
-      if newVersion
+      if currentVersionChecker.newVersion
         helpAttachments.push(
-          text: "\n\n:scream: *<#{newVersion.html_url}|Lookerbot is out of date! Version #{newVersion.tag_name} is now available.>* :scream:"
+          text: "\n\n:scream: *<#{currentVersionChecker.newVersion.url}|Lookerbot is out of date! Version #{currentVersionChecker.newVersion.number} is now available.>* :scream:"
           color: "warning"
           mrkdwn_in: ["text"]
         )
