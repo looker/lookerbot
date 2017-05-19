@@ -1,5 +1,5 @@
+import SlackUtils from "../slack_utils";
 import Listener from "./listener";
-import SlackUtils from '../slack_utils';
 
 export default class SlackActionListener extends Listener {
 
@@ -38,7 +38,7 @@ export default class SlackActionListener extends Listener {
 
         for (let action of message.actions) {
 
-          var text;
+          let text;
           try {
             payload = JSON.parse(action.value);
           } catch (error2) {
@@ -48,18 +48,18 @@ export default class SlackActionListener extends Listener {
             return;
           }
 
-          let looker = this.lookers.filter(l => l.url === payload.lookerUrl)[0];
+          let looker = this.lookers.filter((l) => l.url === payload.lookerUrl)[0];
           if (!looker) {
             res.status(400);
             this.reply(res, {error: "Unknown looker"});
             return;
           }
 
-          let success = actionResult => {
+          let success = (actionResult) => {
             if (actionResult.success) {
               text = `:white_check_mark: ${actionResult.message || "Done"}!`;
             } else if (actionResult.validation_errors) {
-              text = actionResult.validation_errors.errors.map(e => `:x: ${e.message}`).join("\n");
+              text = actionResult.validation_errors.errors.map((e) => `:x: ${e.message}`).join("\n");
             } else {
               text = `:x: ${actionResult.message || "Something went wrong performing the action."}.`;
             }
@@ -67,16 +67,16 @@ export default class SlackActionListener extends Listener {
             reply = {
               response_type: "ephemeral",
               replace_original: false,
-              text
+              text,
             };
             return this.bot.replyPrivateDelayed(message, reply);
           };
 
-          error = error => {
+          error = (error) => {
             reply = {
               response_type: "ephemeral",
               replace_original: false,
-              text: `:warning: Couldn't perform action due to an error: \`${JSON.stringify(error)}\``
+              text: `:warning: Couldn't perform action due to an error: \`${JSON.stringify(error)}\``,
             };
             return this.bot.replyPrivateDelayed(message, reply);
           };
@@ -85,7 +85,7 @@ export default class SlackActionListener extends Listener {
             "data_actions",
             {action: payload.action},
             success,
-            error
+            error,
           );
 
           // Return OK immediately

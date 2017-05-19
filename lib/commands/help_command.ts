@@ -1,16 +1,16 @@
-import DashboardQueryRunner from '../repliers/dashboard_query_runner';
-import Command from "./command";
+import * as _ from "underscore";
 import config from "../config";
 import Looker from "../looker";
-import VersionChecker from '../version_checker';
-import * as _ from 'underscore';
+import DashboardQueryRunner from "../repliers/dashboard_query_runner";
+import VersionChecker from "../version_checker";
+import Command from "./command";
 
 export default class HelpCommand extends Command {
 
   attempt(context) {
     let helpAttachments = [];
 
-    let groups = _.groupBy(Looker.customCommandList(), 'category');
+    let groups = _.groupBy(Looker.customCommandList(), "category");
 
     for (let groupName in groups) {
       let groupCommmands = groups[groupName];
@@ -30,7 +30,7 @@ export default class HelpCommand extends Command {
           title: groupName,
           text: groupText,
           color: "#64518A",
-          mrkdwn_in: ["text"]
+          mrkdwn_in: ["text"],
         });
       }
     }
@@ -47,14 +47,14 @@ export default class HelpCommand extends Command {
       title: "Built-in Commands",
       text: defaultText,
       color: "#64518A",
-      mrkdwn_in: ["text"]
+      mrkdwn_in: ["text"],
     });
 
-    let spaces = Looker.all.filter(l => l.customCommandSpaceId).map(l => `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`).join(" or ");
+    let spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`).join(" or ");
     if (spaces) {
       helpAttachments.push({
         text: `\n_To add your own commands, add a dashboard to ${spaces}._`,
-        mrkdwn_in: ["text"]
+        mrkdwn_in: ["text"],
       });
     }
 
@@ -62,7 +62,7 @@ export default class HelpCommand extends Command {
       helpAttachments.push({
         text: `\n\n:scream: *<${VersionChecker.newVersion.url}|Lookerbot is out of date! Version ${VersionChecker.newVersion.number} is now available.>* :scream:`,
         color: "warning",
-        mrkdwn_in: ["text"]
+        mrkdwn_in: ["text"],
       });
     }
 

@@ -1,4 +1,4 @@
-import QueryRunner from './query_runner';
+import QueryRunner from "./query_runner";
 
 export default class DashboardQueryRunner extends QueryRunner {
 
@@ -26,7 +26,7 @@ export default class DashboardQueryRunner extends QueryRunner {
     elements.map((element) =>
       this.replyContext.looker.client.get(
         `looks/${element.look_id}`,
-        look => {
+        (look) => {
           let queryDef = look.query;
 
           for (let dashFilterName in element.listen) {
@@ -43,16 +43,15 @@ export default class DashboardQueryRunner extends QueryRunner {
           this.replyContext.looker.client.post(
             "queries",
             queryDef,
-            query => this.runQuery(query),
-            r => this.replyError(r),
-            this.replyContext
+            (query) => this.runQuery(query),
+            (r) => this.replyError(r),
+            this.replyContext,
           );
         },
-        r => this.replyError(r),
+        (r) => this.replyError(r),
         {},
-        this.replyContext
+        this.replyContext,
       ));
   }
 
 }
-

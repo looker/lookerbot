@@ -1,5 +1,5 @@
-import * as _ from 'underscore';
-import Looker from './looker';
+import * as _ from "underscore";
+import Looker from "./looker";
 
 export default class ReplyContext {
 
@@ -47,7 +47,7 @@ export default class ReplyContext {
 
   startTyping() {
     if (this.isSlashCommand()) {
-      return this.messageBot.replyPublicDelayed(this.sourceMessage, { type: 'typing' });
+      return this.messageBot.replyPublicDelayed(this.sourceMessage, { type: "typing" });
     } else {
       return this.defaultBot.startTyping(this.sourceMessage);
     }

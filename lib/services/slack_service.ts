@@ -1,15 +1,15 @@
+import * as Botkit from "botkit";
+import getUrls from "get-urls";
 import config from "../config";
 import Looker from "../looker";
-import * as Botkit from "botkit";
+import ReplyContext from "../reply_context";
 import SlackUtils from "../slack_utils";
-import getUrls from 'get-urls';
-import ReplyContext from '../reply_context';
 
-import Listener from '../listeners/listener';
+import Listener from "../listeners/listener";
 
 export default class SlackService {
 
-  listeners: (typeof Listener)[];
+  listeners: Array<typeof Listener>;
   runningListeners: Listener[];
   messageHandler: (context: ReplyContext) => void;
   urlHandler: (context: ReplyContext, url: string) => void;
@@ -26,7 +26,7 @@ export default class SlackService {
 
     let context;
     this.controller = Botkit.slackbot({
-      debug: config.debugMode
+      debug: config.debugMode,
     });
 
     this.defaultBot = this.controller.spawn({
@@ -92,7 +92,7 @@ export default class SlackService {
       }
     });
 
-    this.controller.on('ambient', (bot, message) => {
+    this.controller.on("ambient", (bot, message) => {
 
       if (!message.text || (message.subtype === "bot_message")) { return; }
 
@@ -123,20 +123,20 @@ export default class SlackService {
       if (error || !user) {
         if (context) {
           context.replyPrivate({
-            text: `Could not fetch your user info from Slack. ${error || ""}`
+            text: `Could not fetch your user info from Slack. ${error || ""}`,
           });
         }
       } else {
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           if (context) {
             context.replyPrivate({
-              text: `Sorry @${user.name}, as a guest user you're not able to use this command.`
+              text: `Sorry @${user.name}, as a guest user you're not able to use this command.`,
             });
           }
         } else if (user.is_bot) {
           if (context) {
             context.replyPrivate({
-              text: `Sorry @${user.name}, as a bot you're not able to use this command.`
+              text: `Sorry @${user.name}, as a bot you're not able to use this command.`,
             });
           }
         } else {

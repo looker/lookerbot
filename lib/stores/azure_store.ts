@@ -1,5 +1,5 @@
+import * as AzureStorage from "azure-storage";
 import Store from "./store";
-import * as AzureStorage from 'azure-storage';
 
 export default class AzureStore extends Store {
 

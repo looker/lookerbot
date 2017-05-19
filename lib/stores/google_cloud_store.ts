@@ -1,6 +1,6 @@
+import * as gcs from "@google-cloud/storage";
+import * as streamBuffers from "stream-buffers";
 import Store from "./store";
-import * as gcs from '@google-cloud/storage';
-import * as streamBuffers from 'stream-buffers';
 
 export default class GoogleCloudStore extends Store {
 
@@ -15,7 +15,7 @@ export default class GoogleCloudStore extends Store {
 
     let storage = gcs({
       projectId: process.env.GOOGLE_CLOUD_PROJECT,
-      credentials: process.env.GOOGLE_CLOUD_CREDENTIALS_JSON ? JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) : undefined
+      credentials: process.env.GOOGLE_CLOUD_CREDENTIALS_JSON ? JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) : undefined,
     });
 
     let bucketName = process.env.GOOGLE_CLOUD_BUCKET;
@@ -24,8 +24,8 @@ export default class GoogleCloudStore extends Store {
     let file = bucket.file(key);
 
     blobStream.pipe(file.createWriteStream({
-      public: true
-    })).on("error", err => error(`\`\`\`\n${JSON.stringify(err)}\n\`\`\``, "Google Cloud Storage Error")).on("finish", () => success(`https://storage.googleapis.com/${bucketName}/${key}`));
+      public: true,
+    })).on("error", (err) => error(`\`\`\`\n${JSON.stringify(err)}\n\`\`\``, "Google Cloud Storage Error")).on("finish", () => success(`https://storage.googleapis.com/${bucketName}/${key}`));
 
   }
 

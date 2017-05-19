@@ -1,6 +1,6 @@
-import ReplyContext from '../reply_context';
-import LookQueryRunner from '../repliers/look_query_runner';
-import * as _ from 'underscore';
+import * as _ from "underscore";
+import LookQueryRunner from "../repliers/look_query_runner";
+import ReplyContext from "../reply_context";
 import Listener from "./listener";
 
 export default class DataActionListener extends Listener {
@@ -22,7 +22,7 @@ export default class DataActionListener extends Listener {
       :
         "Lookerbot";
 
-      let baseUrl = req.protocol + '://' + req.get('host');
+      let baseUrl = req.protocol + "://" + req.get("host");
 
       let out = {
         label,
@@ -32,8 +32,8 @@ export default class DataActionListener extends Listener {
           description: "Send data to Slack as the bot user configured for Lookerbot.",
           url: `${baseUrl}/slack/post_from_query_action`,
           form_url: `${baseUrl}/data_actions/form`,
-          supported_action_types: ["query"]
-        }]
+          supported_action_types: ["query"],
+        }],
       };
 
       return res.json(out);
@@ -50,7 +50,7 @@ export default class DataActionListener extends Listener {
         }
         if (response != null ? response.ok : undefined) {
 
-          let channels = response.channels.filter(c => c.is_member && !c.is_archived);
+          let channels = response.channels.filter((c) => c.is_member && !c.is_archived);
           channels = _.sortBy(channels, "name");
 
           response = [{
@@ -59,7 +59,7 @@ export default class DataActionListener extends Listener {
             description: "The bot user must be a member of the channel.",
             required: true,
             type: "select",
-            options: channels.map(channel => ({name: channel.id, label: `#${channel.name}`}))
+            options: channels.map((channel) => ({name: channel.id, label: `#${channel.name}`})),
           }];
 
           this.reply(res, response);
@@ -74,7 +74,7 @@ export default class DataActionListener extends Listener {
 
     return this.server.post("/data_actions", (req, res) => {
 
-      let getParam = name => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
+      let getParam = (name) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
 
       if (!this.validateToken(req, res)) { return; }
 
@@ -87,7 +87,7 @@ export default class DataActionListener extends Listener {
       }
 
       let context = new ReplyContext(this.bot, this.bot, {
-        channel
+        channel,
       });
       context.dataAction = true;
 

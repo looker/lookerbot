@@ -1,5 +1,5 @@
 import * as _ from "underscore";
-import QueryRunner from './query_runner';
+import QueryRunner from "./query_runner";
 
 export default class CLIQueryRunner extends QueryRunner {
 
@@ -23,14 +23,14 @@ export default class CLIQueryRunner extends QueryRunner {
       limit = +(stringLimit.trim());
     }
 
-    let pathParts = path.split("/").filter(p => p);
+    let pathParts = path.split("/").filter((p) => p);
 
     if (pathParts.length !== 2) {
       this.reply("You've got to specify the model and explore!");
       return;
     }
 
-    let fullyQualified = fieldNames.split(",").map(f => f.trim()).map(function(f) {
+    let fullyQualified = fieldNames.split(",").map((f) => f.trim()).map(function(f) {
       if (f.indexOf(".") === -1) {
         return `${pathParts[1]}.${f}`;
       } else {
@@ -65,7 +65,7 @@ export default class CLIQueryRunner extends QueryRunner {
       filters,
       sorts,
       limit,
-      vis_config: undefined
+      vis_config: undefined,
     };
 
     if (this.visualization !== "data") {
@@ -73,21 +73,21 @@ export default class CLIQueryRunner extends QueryRunner {
         {type: `looker_${this.visualization}`};
     }
 
-    return this.replyContext.looker.client.post("queries", queryDef, query => {
+    return this.replyContext.looker.client.post("queries", queryDef, (query) => {
       if (this.visualization === "data") {
-        return this.replyContext.looker.client.get(`queries/${query.id}/run/unified`, result => {
+        return this.replyContext.looker.client.get(`queries/${query.id}/run/unified`, (result) => {
           return this.postResult(query, result);
         },
-        r => this.replyError(r));
+        (r) => this.replyError(r));
       } else {
-        return this.replyContext.looker.client.get(`queries/${query.id}/run/png`, result => {
+        return this.replyContext.looker.client.get(`queries/${query.id}/run/png`, (result) => {
           return this.postImage(query, result);
         },
-        r => this.replyError(r),
+        (r) => this.replyError(r),
         {encoding: null});
       }
     }
-    , r => this.replyError(r));
+    , (r) => this.replyError(r));
   }
 
 };

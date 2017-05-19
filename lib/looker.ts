@@ -1,5 +1,5 @@
-import LookerAPIClient from './looker_client';
-import blobStores from './stores/index';
+import LookerAPIClient from "./looker_client";
+import blobStores from "./stores/index";
 
 export interface CustomCommand {
   name: string;
@@ -17,7 +17,7 @@ export default class Looker {
   static customCommands: {[key: string]: CustomCommand} = {};
 
   static customCommandList() {
-    return Object.keys(Looker.customCommands).map(key => Looker.customCommands[key]);
+    return Object.keys(Looker.customCommands).map((key) => Looker.customCommands[key]);
   }
 
   static loadAll() {
@@ -32,9 +32,9 @@ export default class Looker {
         clientId: process.env.LOOKER_API_3_CLIENT_ID,
         clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET,
         customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID,
-        webhookToken: process.env.LOOKER_WEBHOOK_TOKEN
+        webhookToken: process.env.LOOKER_WEBHOOK_TOKEN,
       }]);
-    return this.all = configs.map(config => new Looker(config));
+    return this.all = configs.map((config) => new Looker(config));
   }
 
   url: string;
@@ -54,7 +54,7 @@ export default class Looker {
       clientSecret: options.clientSecret,
       afterConnect: () => {
         return this.refreshCommands();
-      }
+      },
     });
   }
 
@@ -69,9 +69,9 @@ export default class Looker {
     }
     console.log(`Refreshing custom commands for ${this.url}...`);
 
-    this.client.get(`spaces/${this.customCommandSpaceId}`, space => {
+    this.client.get(`spaces/${this.customCommandSpaceId}`, (space) => {
       this.addCommandsForSpace(space, "Shortcuts");
-      this.client.get(`spaces/${this.customCommandSpaceId}/children`, children => {
+      this.client.get(`spaces/${this.customCommandSpaceId}/children`, (children) => {
         children.map((child) =>
           this.addCommandsForSpace(child, child.name));
       },
@@ -82,7 +82,7 @@ export default class Looker {
 
   addCommandsForSpace(space, category: string) {
     space.dashboards.forEach((partialDashboard) =>
-      this.client.get(`dashboards/${partialDashboard.id}`, dashboard => {
+      this.client.get(`dashboards/${partialDashboard.id}`, (dashboard) => {
 
         let command: CustomCommand = {
           name: dashboard.title.toLowerCase().trim(),
@@ -90,7 +90,7 @@ export default class Looker {
           dashboard,
           looker: this,
           category,
-          hidden: false
+          hidden: false,
         };
 
         command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1);

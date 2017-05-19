@@ -1,6 +1,6 @@
+import * as crypto from "crypto";
 import * as request from "request";
 import * as _ from "underscore";
-import * as crypto from "crypto";
 import config from "./config";
 
 export default class LookerAPIClient {
@@ -43,25 +43,25 @@ export default class LookerAPIClient {
 
     requestConfig.url = `${this.options.baseUrl}/${requestConfig.path}`;
     let headers = {
-      Authorization: `token ${this.token}`,
-      "User-Agent": `looker-slackbot/${config.npmPackage.version}${metadata}`
+      "Authorization": `token ${this.token}`,
+      "User-Agent": `looker-slackbot/${config.npmPackage.version}${metadata}`,
     };
     requestConfig.headers = _.extend(headers, requestConfig.headers || {});
     return request(requestConfig, (error, response, body) => {
       if (error) {
-        return (typeof errorCallback === 'function' ? errorCallback(error) : undefined);
+        return (typeof errorCallback === "function" ? errorCallback(error) : undefined);
       } else if (response.statusCode === 200) {
-        if (response.headers['content-type'].indexOf("application/json") !== -1) {
-          return (typeof successCallback === 'function' ? successCallback(JSON.parse(body)) : undefined);
+        if (response.headers["content-type"].indexOf("application/json") !== -1) {
+          return (typeof successCallback === "function" ? successCallback(JSON.parse(body)) : undefined);
         } else {
-          return (typeof successCallback === 'function' ? successCallback(body) : undefined);
+          return (typeof successCallback === "function" ? successCallback(body) : undefined);
         }
       } else {
         try {
           if (Buffer.isBuffer(body) && (body.length === 0)) {
-            return (typeof errorCallback === 'function' ? errorCallback({error: "Received empty response from Looker."}) : undefined);
+            return (typeof errorCallback === "function" ? errorCallback({error: "Received empty response from Looker."}) : undefined);
           } else {
-            return (typeof errorCallback === 'function' ? errorCallback(JSON.parse(body)) : undefined);
+            return (typeof errorCallback === "function" ? errorCallback(JSON.parse(body)) : undefined);
           }
         } catch (error1) {
           console.error("JSON parse failed:");
@@ -83,12 +83,12 @@ export default class LookerAPIClient {
         path,
         body: JSON.stringify(body),
         headers: {
-          "content-type": "application/json"
-        }
+          "content-type": "application/json",
+        },
       },
       successCallback,
       errorCallback,
-      replyContext
+      replyContext,
     );
   }
 
@@ -99,8 +99,8 @@ export default class LookerAPIClient {
       url: `${this.options.baseUrl}/login`,
       form: {
         client_id: this.options.clientId,
-        client_secret: this.options.clientSecret
-      }
+        client_secret: this.options.clientSecret,
+      },
     };
 
     return request(options, (error, response, body) => {
@@ -117,7 +117,7 @@ export default class LookerAPIClient {
         this.token = null;
         console.warn(`Failed fetchAccessToken for Looker ${this.options.baseUrl}: ${body}`);
       }
-      return (typeof this.options.afterConnect === 'function' ? this.options.afterConnect() : undefined);
+      return (typeof this.options.afterConnect === "function" ? this.options.afterConnect() : undefined);
     });
   }
 

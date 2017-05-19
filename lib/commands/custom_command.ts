@@ -1,15 +1,15 @@
-import DashboardQueryRunner from '../repliers/dashboard_query_runner';
-import Command from "./command";
+import * as _ from "underscore";
 import config from "../config";
 import Looker from "../looker";
-import * as _ from 'underscore';
+import DashboardQueryRunner from "../repliers/dashboard_query_runner";
+import Command from "./command";
 
 export default class CustomCommand extends Command {
 
   attempt(context) {
     let normalizedText = context.sourceMessage.text.toLowerCase();
-    let shortCommands = _.sortBy(_.values(Looker.customCommands), c => -c.name.length);
-    let matchedCommand = __guard__(shortCommands.filter(c => normalizedText.indexOf(c.name) === 0), x => x[0]);
+    let shortCommands = _.sortBy(_.values(Looker.customCommands), (c) => -c.name.length);
+    let matchedCommand = __guard__(shortCommands.filter((c) => normalizedText.indexOf(c.name) === 0), (x) => x[0]);
     if (matchedCommand) {
 
       let { dashboard } = matchedCommand;
@@ -35,5 +35,5 @@ export default class CustomCommand extends Command {
 }
 
 function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+  return (typeof value !== "undefined" && value !== null) ? transform(value) : undefined;
 }

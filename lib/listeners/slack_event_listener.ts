@@ -1,7 +1,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
+import SlackUtils from "../slack_utils";
 import Listener from "./listener";
-import SlackUtils from '../slack_utils';
 
 class SlackEventListener extends Listener {
 

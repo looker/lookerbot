@@ -1,6 +1,6 @@
 import * as request from "request";
-import * as semver from 'semver';
-import config from './config';
+import * as semver from "semver";
+import config from "./config";
 
 export default class VersionChecker {
 

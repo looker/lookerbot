@@ -1,4 +1,4 @@
-import QueryRunner from './query_runner';
+import QueryRunner from "./query_runner";
 
 export default class LookQueryRunner extends QueryRunner {
 
@@ -52,7 +52,7 @@ export default class LookQueryRunner extends QueryRunner {
       super.work();
 
     },
-    r => this.replyError(r));
+    (r) => this.replyError(r));
   }
 
 }

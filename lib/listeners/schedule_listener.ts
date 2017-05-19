@@ -1,6 +1,6 @@
-import ReplyContext from '../reply_context';
-import LookQueryRunner from '../repliers/look_query_runner';
-import QueryRunner from '../repliers/query_runner';
+import LookQueryRunner from "../repliers/look_query_runner";
+import QueryRunner from "../repliers/query_runner";
+import ReplyContext from "../reply_context";
 import Listener from "./listener";
 
 export default class ScheduleListener extends Listener {
@@ -28,7 +28,7 @@ export default class ScheduleListener extends Listener {
       if (req.body.scheduled_plan.type === "Look") {
 
         let qid = req.body.scheduled_plan.query_id;
-        let lookId = __guard__(req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/), x => x[1]);
+        let lookId = __guard__(req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/), (x) => x[1]);
 
         if (qid || lookId) {
 
@@ -43,9 +43,9 @@ export default class ScheduleListener extends Listener {
             let item;
             if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
               if (this.validateTokenForLooker(req, res, looker)) {
-                var runner;
+                let runner;
                 let context = new ReplyContext(this.bot, this.bot, {
-                  channel: channelName
+                  channel: channelName,
                 });
                 context.looker = looker;
                 context.scheduled = true;
@@ -81,5 +81,5 @@ export default class ScheduleListener extends Listener {
 }
 
 function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+  return (typeof value !== "undefined" && value !== null) ? transform(value) : undefined;
 }

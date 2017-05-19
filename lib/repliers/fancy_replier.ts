@@ -1,6 +1,6 @@
 import * as _ from "underscore";
-import ReplyContext from "../reply_context";
 import config from "../config";
+import ReplyContext from "../reply_context";
 
 const sassyMessages = [
 
@@ -38,7 +38,7 @@ const sassyMessages = [
   ["az", "Bir dəqiqə zəhmət olmasa"],
   ["ie", "Fán le do thoil"],
   ["ne", "कृपया पर्खनुहोस्"],
-  ["in", "कृपया एक क्षण के लिए"]
+  ["in", "कृपया एक क्षण के लिए"],
 
 ].map(function(param ) {
   let [country, message] = param;
@@ -60,7 +60,7 @@ export default abstract class FancyReplier {
 
       // Hacky stealth update of message to preserve chat order
 
-      if (typeof(obj) === 'string') {
+      if (typeof(obj) === "string") {
         obj = {text: obj, channel: this.replyContext.sourceMessage.channel};
       }
 
@@ -100,7 +100,7 @@ export default abstract class FancyReplier {
       as_user: true,
       attachments: [], // Override some Botkit stuff
       unfurl_links: false,
-      unfurl_media: false
+      unfurl_media: false,
     };
 
     return this.replyContext.replyPublic(params, (error, response) => {

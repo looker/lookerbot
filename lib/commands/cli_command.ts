@@ -1,9 +1,9 @@
-import CLIQueryRunner from '../repliers/cli_query_runner';
-import Command from "./command";
 import config from "../config";
 import Looker from "../looker";
+import CLIQueryRunner from "../repliers/cli_query_runner";
+import Command from "./command";
 
-let QUERY_REGEX = new RegExp('(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)');
+let QUERY_REGEX = new RegExp("(query|q|column|bar|line|pie|scatter|map)( )?(\\w+)? (.+)");
 
 export default class CLICommand extends Command {
 
@@ -14,8 +14,8 @@ export default class CLICommand extends Command {
       let [txt, type, ignore, lookerName, query] = match;
 
       if (lookerName) {
-        context.looker = Looker.all.filter(l => {
-          l.url.indexOf(lookerName) !== -1
+        context.looker = Looker.all.filter((l) => {
+          l.url.indexOf(lookerName) !== -1;
         })[0] || Looker.all[0];
       }
       else {

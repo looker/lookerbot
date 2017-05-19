@@ -1,5 +1,5 @@
-import * as jsonfile from "jsonfile";
 import * as dotenv from "dotenv";
+import * as jsonfile from "jsonfile";
 
 dotenv.config();
 
@@ -9,7 +9,7 @@ let config = {
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
   slackApiKey: process.env.SLACK_API_KEY,
   debugMode: process.env.DEBUG_MODE === "true",
-  npmPackage: require('./../package.json')
+  npmPackage: require("./../package.json"),
 };
 
 if (config.unsafeLocalDev) {

@@ -1,5 +1,5 @@
+import * as AWS from "aws-sdk";
 import Store from "./store";
-import * as AWS from 'aws-sdk';
 
 export default class AmazonS3Store extends Store {
 
@@ -19,12 +19,12 @@ export default class AmazonS3Store extends Store {
       Bucket: process.env.SLACKBOT_S3_BUCKET,
       Key: key,
       Body: blob,
-      ACL: 'public-read',
-      ContentType: "image/png"
+      ACL: "public-read",
+      ContentType: "image/png",
     };
 
     let s3 = new AWS.S3({
-      endpoint: new AWS.Endpoint(domain) as any
+      endpoint: new AWS.Endpoint(domain) as any,
     });
     s3.putObject(params, function(err, data) {
       if (err) {

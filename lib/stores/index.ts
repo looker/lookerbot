@@ -7,7 +7,7 @@ import GoogleCloudStore from "./google_cloud_store";
 let stores: Store[] = [
   new AmazonS3Store(),
   new AzureStore(),
-  new GoogleCloudStore()
+  new GoogleCloudStore(),
 ];
 
 let currentStore;
@@ -20,5 +20,5 @@ for (let store of stores) {
 }
 
 export default {
-  current: currentStore
-}
+  current: currentStore,
+};

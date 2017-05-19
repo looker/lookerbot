@@ -1,36 +1,36 @@
-import SlackService from './services/slack_service';
+import Command from "./commands/command";
+import Listener from "./listeners/listener";
 import Looker from "./looker";
-import QueryRunner from './repliers/query_runner';
-import LookQueryRunner from './repliers/look_query_runner';
-import Command from './commands/command';
-import Listener from './listeners/listener';
+import LookQueryRunner from "./repliers/look_query_runner";
+import QueryRunner from "./repliers/query_runner";
+import SlackService from "./services/slack_service";
 
 export default class Commander {
 
   service: SlackService;
   commands: Command[];
 
-  constructor(opts: {listeners: (typeof Listener)[], commands: (typeof Command)[]}) {
+  constructor(opts: {listeners: Array<typeof Listener>, commands: Array<typeof Command>}) {
     this.service = new SlackService({
       listeners: opts.listeners,
-      messageHandler: context => {
+      messageHandler: (context) => {
         return this.handleMessage(context);
       },
       urlHandler: (context, url) => {
         return this.handleUrlExpansion(context, url);
-      }
+      },
     });
     this.service.begin();
 
-    this.commands = opts.commands.map(c => new c());
+    this.commands = opts.commands.map((c) => new c());
   }
 
   handleMessage(context) {
 
     let message = context.sourceMessage;
 
-    message.text = message.text.split('“').join('"');
-    message.text = message.text.split('”').join('"');
+    message.text = message.text.split("“").join('"');
+    message.text = message.text.split("”").join('"');
 
     for (let command of Array.from(this.commands)) {
       if (command.attempt(context)) {
@@ -40,7 +40,7 @@ export default class Commander {
 
     if (context.isSlashCommand() && !context.hasRepliedPrivately) {
       // Return 200 immediately for slash commands
-      context.messageBot.res.setHeader('Content-Type', 'application/json');
+      context.messageBot.res.setHeader("Content-Type", "application/json");
       context.messageBot.res.send(JSON.stringify({response_type: "in_channel"}));
     }
 

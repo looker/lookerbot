@@ -1,7 +1,7 @@
 import * as _ from "underscore";
-import FancyReplier from './fancy_replier';
 import uuid from "uuid/v4";
-import SlackUtils from '../slack_utils';
+import SlackUtils from "../slack_utils";
+import FancyReplier from "./fancy_replier";
 
 export default class QueryRunner extends FancyReplier {
 
@@ -35,24 +35,23 @@ export default class QueryRunner extends FancyReplier {
   postImage(query, imageData, options = {}) {
     if (this.replyContext.looker.storeBlob) {
 
-      let success = url => {
+      let success = (url) => {
         return this.reply({
           attachments: [
             _.extend({}, options, {
               image_url: url,
               title: this.showShareUrl() ? this.linkText(query.share_url) : "",
               title_link: this.showShareUrl() ? this.linkUrl(query.share_url) : "",
-              color: "#64518A"
-            })
+              color: "#64518A",
+            }),
           ],
-          text: ""
+          text: "",
         });
       };
 
       let error = (error, context) => {
         return this.reply(`:warning: *${context}* ${error}`);
       };
-
 
       if (imageData.length) {
         return this.replyContext.looker.storeBlob(imageData, success, error);
@@ -74,15 +73,15 @@ export default class QueryRunner extends FancyReplier {
     if ((hiddenFields != null ? hiddenFields.length : undefined) > 0) {
       for (let k in result.fields) {
         let v = result.fields[k];
-        result.fields[k] = v.filter(field => hiddenFields.indexOf(field.name) === -1);
+        result.fields[k] = v.filter((field) => hiddenFields.indexOf(field.name) === -1);
       }
     }
 
     let calcs = result.fields.table_calculations || [];
     let dimensions = result.fields.dimensions || [];
     let measures = result.fields.measures || [];
-    let measure_like = measures.concat(calcs.filter(c => c.is_measure));
-    let dimension_like = dimensions.concat(calcs.filter(c => !c.is_measure));
+    let measure_like = measures.concat(calcs.filter((c) => c.is_measure));
+    let dimension_like = dimensions.concat(calcs.filter((c) => !c.is_measure));
 
     let renderableFields = dimension_like.concat(measure_like);
 
@@ -92,20 +91,20 @@ export default class QueryRunner extends FancyReplier {
       if (!SlackUtils.slackButtonsEnabled) { return; }
       d = row[f.name];
       if (!d.links) { return; }
-      let usableActions = d.links.filter(l => (l.type === "action") && !l.form && !l.form_url);
+      let usableActions = d.links.filter((l) => (l.type === "action") && !l.form && !l.form_url);
       if (!(usableActions.length > 0)) { return; }
-      attachment.actions = usableActions.map(link => {
+      attachment.actions = usableActions.map((link) => {
         return {
           name: "data_action",
           text: link.label,
           type: "button",
-          value: JSON.stringify({lookerUrl: this.replyContext.looker.url, action: link})
+          value: JSON.stringify({lookerUrl: this.replyContext.looker.url, action: link}),
         };
       });
       return attachment.callback_id = uuid();
     };
 
-    let renderString = d => d.rendered || d.value;
+    let renderString = (d) => d.rendered || d.value;
 
     let renderField = (f, row) => {
       d = row[f.name];
@@ -132,7 +131,7 @@ export default class QueryRunner extends FancyReplier {
 
     } else if (result.data.length === 0) {
       if ((result.errors != null ? result.errors.length : undefined)) {
-        let txt = result.errors.map(e => `${e.message}\`\`\`${e.message_details}\`\`\``).join("\n");
+        let txt = result.errors.map((e) => `${e.message}\`\`\`${e.message_details}\`\`\``).join("\n");
         return this.reply(`:warning: ${shareUrl}\n${txt}`);
       } else {
         return this.reply(`${shareUrl}\nNo results.`);
@@ -155,16 +154,16 @@ export default class QueryRunner extends FancyReplier {
         fields: renderableFields.map(function(m) {
           rendered = renderField(m, result.data[0]);
           return {title: renderFieldLabel(m), value: rendered, fallback: rendered, short: true};
-        })
+        }),
       });
       attachment.text = this.showShareUrl() ? shareUrl : "";
       return this.reply({attachments: [attachment]});
 
     } else {
       attachment = _.extend({color: "#64518A"}, options, {
-        title: renderableFields.map(f => renderFieldLabel(f)).join(" – "),
-        text: result.data.map(d => renderableFields.map(f => renderField(f, d)).join(" – ")).join("\n"),
-        fallback: shareUrl
+        title: renderableFields.map((f) => renderFieldLabel(f)).join(" – "),
+        text: result.data.map((d) => renderableFields.map((f) => renderField(f, d)).join(" – ")).join("\n"),
+        fallback: shareUrl,
       });
       return this.reply({attachments: [attachment], text: this.showShareUrl() ? shareUrl : ""});
     }
@@ -174,18 +173,18 @@ export default class QueryRunner extends FancyReplier {
     if (this.querySlug) {
       this.replyContext.looker.client.get(
         `queries/slug/${this.querySlug}`,
-        query => this.runQuery(query),
-        r => this.replyError(r),
+        (query) => this.runQuery(query),
+        (r) => this.replyError(r),
         {},
-        this.replyContext
+        this.replyContext,
       );
     } else if (this.queryId) {
       this.replyContext.looker.client.get(
         `queries/${this.queryId}`,
-        query => this.runQuery(query),
-        r => this.replyError(r),
+        (query) => this.runQuery(query),
+        (r) => this.replyError(r),
         {},
-        this.replyContext
+        this.replyContext,
       );
     } else {
       throw "Must set slug or id when creating QueryRunner, or override work";
@@ -197,16 +196,16 @@ export default class QueryRunner extends FancyReplier {
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
       return this.replyContext.looker.client.get(
         `queries/${query.id}/run/unified`,
-        result => this.postResult(query, result, options),
-        r => this.replyError(r),
+        (result) => this.postResult(query, result, options),
+        (r) => this.replyError(r),
         {},
-        this.replyContext
+        this.replyContext,
       );
     } else {
       return this.replyContext.looker.client.get(
         `queries/${query.id}/run/png`,
-        result => this.postImage(query, result, options),
-        r => {
+        (result) => this.postImage(query, result, options),
+        (r) => {
           if ((r != null ? r.error : undefined) === "Received empty response from Looker.") {
             return this.replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."});
           } else {
@@ -214,7 +213,7 @@ export default class QueryRunner extends FancyReplier {
           }
         },
         {encoding: null},
-        this.replyContext
+        this.replyContext,
       );
     }
   }
