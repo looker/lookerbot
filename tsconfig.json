@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "module": "CommonJS",
+      "noEmitOnError": true,
+      "outDir": "lib",
+      "sourceMap": false,
+      "target": "ES6"
+    }
+}
