@@ -1,5 +1,6 @@
 import * as _ from "underscore";
 import ReplyContext from "../reply_context";
+import config from "../config";
 
 const sassyMessages = [
 
@@ -90,7 +91,7 @@ export default abstract class FancyReplier {
     :
       sassyMessages[Math.floor(Math.random() * sassyMessages.length)];
 
-    if (process.env.DEV === "true") {
+    if (config.unsafeLocalDev) {
       sass = `[DEVELOPMENT] ${sass}`;
     }
 

@@ -1,6 +1,6 @@
 import Store from "./store";
-import gcs from '@google-cloud/storage';
-import streamBuffers from 'stream-buffers';
+import * as gcs from '@google-cloud/storage';
+import * as streamBuffers from 'stream-buffers';
 
 export default class GoogleCloudStore extends Store {
 
