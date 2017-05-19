@@ -1,9 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import Listener from "./listener";
 import SlackUtils from '../slack_utils';
 
-class SlackActionListener extends Listener {
+export default class SlackActionListener extends Listener {
 
   type() {
     return "slack action listener";
@@ -26,7 +24,7 @@ class SlackActionListener extends Listener {
       }
 
       // Make this look like a botkit message
-      let message = {};
+      let message: any = {};
       for (let key in payload) {
         message[key] = payload[key];
       }
@@ -38,7 +36,7 @@ class SlackActionListener extends Listener {
 
       if (SlackUtils.checkToken(this.bot, message)) {
 
-        for (let action of Array.from(message.actions)) {
+        for (let action of message.actions) {
 
           var text;
           try {
@@ -102,5 +100,3 @@ class SlackActionListener extends Listener {
     });
   }
 }
-
-export default SlackActionListener;

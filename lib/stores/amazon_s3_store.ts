@@ -1,9 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import Store from "./store";
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 
-class AmazonS3Store extends Store {
+export default class AmazonS3Store extends Store {
 
   configured() {
     return !!process.env.SLACKBOT_S3_BUCKET;
@@ -26,7 +24,7 @@ class AmazonS3Store extends Store {
     };
 
     let s3 = new AWS.S3({
-      endpoint: new AWS.Endpoint(domain)
+      endpoint: new AWS.Endpoint(domain) as any
     });
     s3.putObject(params, function(err, data) {
       if (err) {
@@ -38,4 +36,3 @@ class AmazonS3Store extends Store {
 
   }
 }
-export default AmazonS3Store;

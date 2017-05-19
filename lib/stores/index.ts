@@ -1,15 +1,24 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let stores = [
-  require('./amazon_s3_store'),
-  require('./azure_store'),
-  require('./google_cloud_store')
+import Store from "./store";
+
+import AmazonS3Store from "./amazon_s3_store";
+import AzureStore from "./azure_store";
+import GoogleCloudStore from "./google_cloud_store";
+
+let stores: Store[] = [
+  new AmazonS3Store(),
+  new AzureStore(),
+  new GoogleCloudStore()
 ];
 
-for (let storeClass of Array.from(stores)) {
-  let store = new storeClass();
+let currentStore;
+
+for (let store of stores) {
   if (store.configured()) {
-    module.exports = {current: store};
+    currentStore = store;
     break;
   }
+}
+
+export default {
+  current: currentStore
 }

@@ -4,6 +4,7 @@
       "noEmitOnError": true,
       "outDir": "lib",
       "sourceMap": false,
-      "target": "ES6"
+      "target": "ES6",
+      "types": ["node"]
     }
 }

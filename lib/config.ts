@@ -1,6 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-require('dotenv').config();
+import * as jsonfile from "jsonfile";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 let config = {
   enableQueryCli: process.env.LOOKER_EXPERIMENTAL_QUERY_CLI === "true",

@@ -1,11 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import ReplyContext from '../reply_context';
 import LookQueryRunner from '../repliers/look_query_runner';
-import _ from 'underscore';
+import * as _ from 'underscore';
 import Listener from "./listener";
 
-class DataActionListener extends Listener {
+export default class DataActionListener extends Listener {
 
   type() {
     return "data action listener";
@@ -104,5 +102,3 @@ class DataActionListener extends Listener {
     });
   }
 }
-
-export default DataActionListener;

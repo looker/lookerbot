@@ -1,11 +1,11 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LookFinder;
 import FuzzySearch from 'fuzzysearch-js';
 import levenshteinFS from 'fuzzysearch-js/js/modules/LevenshteinFS';
 import QueryRunner from './query_runner';
 
-export default (LookFinder = class LookFinder extends QueryRunner {
+export default class LookFinder extends QueryRunner {
+
+  type: string;
+  query: string;
 
   constructor(replyContext, type, query) {
     super(replyContext);
@@ -48,4 +48,5 @@ export default (LookFinder = class LookFinder extends QueryRunner {
       }
     });
   }
-});
+
+}

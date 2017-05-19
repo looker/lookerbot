@@ -1,14 +1,14 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let QueryRunner;
-import _ from "underscore";
+import * as _ from "underscore";
 import FancyReplier from './fancy_replier';
 import uuid from "uuid/v4";
 import SlackUtils from '../slack_utils';
 
-export default (QueryRunner = class QueryRunner extends FancyReplier {
+export default class QueryRunner extends FancyReplier {
 
-  constructor(replyContext, queryParam) {
+  querySlug: string;
+  queryId: number;
+
+  constructor(replyContext, queryParam = null) {
     super(replyContext);
     this.querySlug = queryParam != null ? queryParam.slug : undefined;
     this.queryId = queryParam != null ? queryParam.id : undefined;
@@ -32,8 +32,7 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
     }
   }
 
-  postImage(query, imageData, options) {
-    if (options == null) { options = {}; }
+  postImage(query, imageData, options = {}) {
     if (this.replyContext.looker.storeBlob) {
 
       let success = url => {
@@ -66,11 +65,11 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
     }
   }
 
-  postResult(query, result, options) {
+  postResult(query, result, options = {}) {
 
     // Handle hidden fields
     let attachment, d, rendered, text;
-    if (options == null) { options = {}; }
+
     let hiddenFields = (query.vis_config != null ? query.vis_config.hidden_fields : undefined) || [];
     if ((hiddenFields != null ? hiddenFields.length : undefined) > 0) {
       for (let k in result.fields) {
@@ -173,7 +172,7 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
 
   work() {
     if (this.querySlug) {
-      return this.replyContext.looker.client.get(
+      this.replyContext.looker.client.get(
         `queries/slug/${this.querySlug}`,
         query => this.runQuery(query),
         r => this.replyError(r),
@@ -181,7 +180,7 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
         this.replyContext
       );
     } else if (this.queryId) {
-      return this.replyContext.looker.client.get(
+      this.replyContext.looker.client.get(
         `queries/${this.queryId}`,
         query => this.runQuery(query),
         r => this.replyError(r),
@@ -193,8 +192,7 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
     }
   }
 
-  runQuery(query, options) {
-    if (options == null) { options = {}; }
+  runQuery(query, options = {}) {
     let type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
       return this.replyContext.looker.client.get(
@@ -220,4 +218,5 @@ export default (QueryRunner = class QueryRunner extends FancyReplier {
       );
     }
   }
-});
+
+}

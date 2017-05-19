@@ -1,9 +1,7 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let FancyReplier;
-import _ from "underscore";
+import * as _ from "underscore";
+import ReplyContext from "../reply_context";
 
-let sassyMessages = [
+const sassyMessages = [
 
   // English
   ["us", "Just a second"],
@@ -41,20 +39,22 @@ let sassyMessages = [
   ["ne", "कृपया पर्खनुहोस्"],
   ["in", "कृपया एक क्षण के लिए"]
 
-].map(function(param) {
-  if (param == null) { param = pair; }
-  let [country, message] = Array.from(param);
+].map(function(param ) {
+  let [country, message] = param;
   let translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`;
   return `<${translate}|:flag-${country}:> _${message}..._`;
 });
 
-export default (FancyReplier = class FancyReplier {
+export default abstract class FancyReplier {
+
+  replyContext: ReplyContext;
+  loadingMessage: any;
 
   constructor(replyContext) {
     this.replyContext = replyContext;
   }
 
-  reply(obj, cb) {
+  reply(obj, cb = undefined) {
     if (this.loadingMessage) {
 
       // Hacky stealth update of message to preserve chat order
@@ -129,7 +129,6 @@ export default (FancyReplier = class FancyReplier {
     }
   }
 
-  work() {}
-});
+  abstract work(): void;
 
-    // implement in subclass
+}

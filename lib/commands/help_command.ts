@@ -1,24 +1,21 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let HelpCommand;
 import DashboardQueryRunner from '../repliers/dashboard_query_runner';
 import Command from "./command";
 import config from "../config";
 import Looker from "../looker";
 import VersionChecker from '../version_checker';
-import _ from 'underscore';
+import * as _ from 'underscore';
 
-export default (HelpCommand = class HelpCommand extends Command {
+export default class HelpCommand extends Command {
 
   attempt(context) {
     let helpAttachments = [];
 
-    let groups = _.groupBy(Looker.customCommands, 'category');
+    let groups = _.groupBy(Looker.customCommandList(), 'category');
 
     for (let groupName in groups) {
       let groupCommmands = groups[groupName];
       let groupText = "";
-      for (let command of Array.from(_.sortBy(_.values(groupCommmands), "name"))) {
+      for (let command of _.sortBy(_.values(groupCommmands), "name")) {
         if (!command.hidden) {
           groupText += `• *<${command.looker.url}/dashboards/${command.dashboard.id}|${command.name}>* ${command.helptext}`;
           if (command.description) {
@@ -81,4 +78,5 @@ export default (HelpCommand = class HelpCommand extends Command {
 
     return true;
   }
-});
+
+}

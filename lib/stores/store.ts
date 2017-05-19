@@ -1,14 +1,18 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
-class Store {
+export default class Store {
 
-  randomPath(extension) {
-    if (extension == null) { extension = "png"; }
+  configured(): boolean {
+    throw "subclass";
+  }
+
+  storeBlob(blob, success, error) {
+    throw "subclass";
+  }
+
+  randomPath(extension = "png") {
     let path = crypto.randomBytes(256).toString('hex').match(/.{1,128}/g);
     return `${path.join("/")}.${extension}`;
   }
-}
 
-export default Store;
+}

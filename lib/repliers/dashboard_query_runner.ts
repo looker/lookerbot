@@ -1,9 +1,9 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let DashboardQueryRunner;
 import QueryRunner from './query_runner';
 
-export default (DashboardQueryRunner = class DashboardQueryRunner extends QueryRunner {
+export default class DashboardQueryRunner extends QueryRunner {
+
+  dashboard: any;
+  filters: any;
 
   constructor(replyContext, dashboard, filters) {
     if (filters == null) { filters = {}; }
@@ -23,7 +23,7 @@ export default (DashboardQueryRunner = class DashboardQueryRunner extends QueryR
       return;
     }
 
-    return Array.from(elements).map((element) =>
+    elements.map((element) =>
       this.replyContext.looker.client.get(
         `looks/${element.look_id}`,
         look => {
@@ -40,7 +40,7 @@ export default (DashboardQueryRunner = class DashboardQueryRunner extends QueryR
           queryDef.filter_config = null;
           queryDef.client_id = null;
 
-          return this.replyContext.looker.client.post(
+          this.replyContext.looker.client.post(
             "queries",
             queryDef,
             query => this.runQuery(query),
@@ -53,5 +53,6 @@ export default (DashboardQueryRunner = class DashboardQueryRunner extends QueryR
         this.replyContext
       ));
   }
-});
+
+}
 

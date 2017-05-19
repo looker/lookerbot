@@ -1,6 +1,3 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let SearchCommand;
 import LookFinder from '../repliers/look_finder';
 import Command from "./command";
 import config from "../config";
@@ -8,13 +5,14 @@ import Looker from "../looker";
 
 let FIND_REGEX = new RegExp('find (dashboard|look )? ?(.+)');
 
-export default (SearchCommand = class SearchCommand extends Command {
+export default class SearchCommand extends Command {
 
   attempt(context) {
+
     let match;
     if (match = context.sourceMessage.text.match(FIND_REGEX)) {
 
-      let [__, type, query] = Array.from(match);
+      let [__, type, query] = match;
 
       let firstWord = query.split(" ")[0];
       let foundLooker = Looker.all.filter(l => l.url.indexOf(firstWord) !== -1)[0];
@@ -33,4 +31,5 @@ export default (SearchCommand = class SearchCommand extends Command {
       return false;
     }
   }
-});
+
+}

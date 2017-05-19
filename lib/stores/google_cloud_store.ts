@@ -1,10 +1,8 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import Store from "./store";
 import gcs from '@google-cloud/storage';
 import streamBuffers from 'stream-buffers';
 
-class GoogleCloudStore extends Store {
+export default class GoogleCloudStore extends Store {
 
   configured() {
     return !!process.env.GOOGLE_CLOUD_BUCKET;
@@ -30,6 +28,5 @@ class GoogleCloudStore extends Store {
     })).on("error", err => error(`\`\`\`\n${JSON.stringify(err)}\n\`\`\``, "Google Cloud Storage Error")).on("finish", () => success(`https://storage.googleapis.com/${bucketName}/${key}`));
 
   }
-}
 
-export default GoogleCloudStore;
+}

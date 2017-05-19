@@ -1,28 +1,20 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let SlackUtils;
-export default (SlackUtils = (function() {
-  SlackUtils = class SlackUtils {
-    static initClass() {
-  
-      this.slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
-    }
+export default class SlackUtils {
 
-    static stripMessageText(text) {
-      return text.split("&gt;").join(">").split("&lt;").join("<");
-    }
+  static slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
 
-    static checkToken(bot, message) {
-      if (process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && (process.env.SLACK_SLASH_COMMAND_TOKEN === message.token)) {
-        return true;
-      } else {
-        if (bot != null) {
-          bot.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.");
-        }
-        return false;
+  static stripMessageText(text: string) {
+    return text.split("&gt;").join(">").split("&lt;").join("<");
+  }
+
+  static checkToken(bot, message) {
+    if (process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && (process.env.SLACK_SLASH_COMMAND_TOKEN === message.token)) {
+      return true;
+    } else {
+      if (bot != null) {
+        bot.replyPrivate(message, "This bot cannot accept slash commands until `SLACK_SLASH_COMMAND_TOKEN` is configured.");
       }
+      return false;
     }
-  };
-  SlackUtils.initClass();
-  return SlackUtils;
-})());
+  }
+
+}

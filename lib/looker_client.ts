@@ -1,12 +1,13 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LookerAPIClient;
-import request from "request";
-import _ from "underscore";
-import npmPackage from './../package.json';
-import crypto from "crypto";
+import * as request from "request";
+import * as _ from "underscore";
+import * as crypto from "crypto";
+import config from "./config";
 
-export default (LookerAPIClient = class LookerAPIClient {
+export default class LookerAPIClient {
+
+  options: any;
+  token: string;
+  tokenError: string;
 
   constructor(options) {
     this.options = options;
@@ -17,7 +18,7 @@ export default (LookerAPIClient = class LookerAPIClient {
     return (this.token != null);
   }
 
-  request(requestConfig, successCallback, errorCallback, replyContext) {
+  request(requestConfig, successCallback = undefined, errorCallback = undefined, replyContext = undefined) {
 
     if (!this.reachable()) {
       errorCallback({error: `Looker ${this.options.baseUrl} not reachable.\n${this.tokenError || ""}`});
@@ -43,7 +44,7 @@ export default (LookerAPIClient = class LookerAPIClient {
     requestConfig.url = `${this.options.baseUrl}/${requestConfig.path}`;
     let headers = {
       Authorization: `token ${this.token}`,
-      "User-Agent": `looker-slackbot/${npmPackage.version}${metadata}`
+      "User-Agent": `looker-slackbot/${config.npmPackage.version}${metadata}`
     };
     requestConfig.headers = _.extend(headers, requestConfig.headers || {});
     return request(requestConfig, (error, response, body) => {
@@ -71,11 +72,11 @@ export default (LookerAPIClient = class LookerAPIClient {
     });
   }
 
-  get(path, successCallback, errorCallback, options, replyContext) {
+  get(path, successCallback = undefined, errorCallback = undefined, options = undefined, replyContext = undefined) {
     return this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
   }
 
-  post(path, body, successCallback, errorCallback, replyContext) {
+  post(path, body, successCallback = undefined, errorCallback = undefined, replyContext = undefined) {
     return this.request(
       {
         method: "POST",
@@ -125,4 +126,4 @@ export default (LookerAPIClient = class LookerAPIClient {
     shasum.update(text);
     return shasum.digest("hex");
   }
-});
+}

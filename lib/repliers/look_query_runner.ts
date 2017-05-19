@@ -1,12 +1,12 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let LookQueryRunner;
 import QueryRunner from './query_runner';
 
-export default (LookQueryRunner = class LookQueryRunner extends QueryRunner {
+export default class LookQueryRunner extends QueryRunner {
 
-  constructor(replyContext, lookId, filterInfo) {
-    if (filterInfo == null) { filterInfo = null; }
+  lookId: number;
+  filterInfo: any;
+  loadedLook: any;
+
+  constructor(replyContext, lookId, filterInfo = null) {
     super(replyContext, null);
     this.lookId = lookId;
     this.filterInfo = filterInfo;
@@ -39,7 +39,7 @@ export default (LookQueryRunner = class LookQueryRunner extends QueryRunner {
   }
 
   work() {
-    return this.replyContext.looker.client.get(`looks/${this.lookId}`, function(look) {
+    return this.replyContext.looker.client.get(`looks/${this.lookId}`, (look) => {
 
       this.loadedLook = look;
 
@@ -49,8 +49,10 @@ export default (LookQueryRunner = class LookQueryRunner extends QueryRunner {
         this.querySlug = look.query.slug;
       }
 
-      return LookQueryRunner.prototype.__proto__.work.call(this, ...arguments);
-    }.bind(this),
+      super.work();
+
+    },
     r => this.replyError(r));
   }
-});
+
+}

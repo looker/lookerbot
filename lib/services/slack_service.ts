@@ -1,14 +1,20 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let SlackService;
 import config from "../config";
 import Looker from "../looker";
-import Botkit from "botkit";
+import * as Botkit from "botkit";
 import SlackUtils from "../slack_utils";
 import getUrls from 'get-urls';
 import ReplyContext from '../reply_context';
 
-export default (SlackService = class SlackService {
+import Listener from '../listeners/listener';
+
+export default class SlackService {
+
+  listeners: (typeof Listener)[];
+  runningListeners: Listener[];
+  messageHandler: (context: ReplyContext) => void;
+  urlHandler: (context: ReplyContext, url: string) => void;
+  controller: any;
+  defaultBot: any;
 
   constructor(opts) {
     this.listeners = opts.listeners;
@@ -57,8 +63,7 @@ export default (SlackService = class SlackService {
 
     // Listen to the various events
 
-    let processCommand = (bot, message, isDM) => {
-      if (isDM == null) { isDM = false; }
+    let processCommand = (bot, message, isDM = false) => {
       context = new ReplyContext(this.defaultBot, bot, message);
       context.isDM = isDM;
       return this.ensureUserAuthorized(context, () => {
@@ -94,21 +99,21 @@ export default (SlackService = class SlackService {
       if (process.env.LOOKER_SLACKBOT_EXPAND_URLS !== "true") { return; }
 
       context = new ReplyContext(this.defaultBot, bot, message);
-      context.isDM = isDM;
 
       return this.ensureUserAuthorized(context, () => {
         // URL Expansion
-        return Array.from(getUrls(message.text).map(url => url.replace("%3E", ""))).map((url) =>
-          this.urlHandler(context, url));
+        let urls = getUrls(message.text).map((url) => url.replace("%3E", ""));
+        urls.forEach((url) => {
+          this.urlHandler(context, url);
+        });
       }
       , {silent: true});
     });
 
   }
 
-  ensureUserAuthorized(context, callback, options) {
+  ensureUserAuthorized(context: ReplyContext, callback, options: {silent: boolean} = {silent: false}) {
 
-    if (options == null) { options = {}; }
     if (options.silent) {
       context = null;
     }
@@ -116,23 +121,30 @@ export default (SlackService = class SlackService {
     this.defaultBot.api.users.info({user: context.sourceMessage.user}, function(error, response) {
       let user = response != null ? response.user : undefined;
       if (error || !user) {
-        return (context != null ? context.replyPrivate({
-          text: `Could not fetch your user info from Slack. ${error || ""}`
-        }) : undefined);
+        if (context) {
+          context.replyPrivate({
+            text: `Could not fetch your user info from Slack. ${error || ""}`
+          });
+        }
       } else {
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
-          return (context != null ? context.replyPrivate({
-            text: `Sorry @${user.name}, as a guest user you're not able to use this command.`
-          }) : undefined);
+          if (context) {
+            context.replyPrivate({
+              text: `Sorry @${user.name}, as a guest user you're not able to use this command.`
+            });
+          }
         } else if (user.is_bot) {
-          return (context != null ? context.replyPrivate({
-            text: `Sorry @${user.name}, as a bot you're not able to use this command.`
-          }) : undefined);
+          if (context) {
+            context.replyPrivate({
+              text: `Sorry @${user.name}, as a bot you're not able to use this command.`
+            });
+          }
         } else {
-          return callback();
+          callback();
         }
       }
     });
 
   }
-});
+
+}

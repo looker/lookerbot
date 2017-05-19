@@ -1,9 +1,16 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let ReplyContext;
-import _ from 'underscore';
+import * as _ from 'underscore';
+import Looker from './looker';
 
-export default (ReplyContext = class ReplyContext {
+export default class ReplyContext {
+
+  looker: Looker;
+  defaultBot: any;
+  messageBot: any;
+  sourceMessage: any;
+  isDM = false;
+  scheduled = false;
+  dataAction = false;
+  hasRepliedPrivately = false;
 
   constructor(defaultBot, messageBot, sourceMessage) {
     this.defaultBot = defaultBot;
@@ -15,7 +22,7 @@ export default (ReplyContext = class ReplyContext {
     return !!this.messageBot.res;
   }
 
-  replyPrivate(message, cb) {
+  replyPrivate(message, cb = undefined) {
     message = this._rtmOptOut(message);
     if (this.isSlashCommand()) {
       if (this.hasRepliedPrivately) {
@@ -29,7 +36,7 @@ export default (ReplyContext = class ReplyContext {
     }
   }
 
-  replyPublic(message, cb) {
+  replyPublic(message, cb = undefined) {
     message = this._rtmOptOut(message);
     if (this.isSlashCommand()) {
       return this.messageBot.replyPublicDelayed(this.sourceMessage, message, cb);
@@ -56,5 +63,4 @@ export default (ReplyContext = class ReplyContext {
       return message;
     }
   }
-});
-
+}

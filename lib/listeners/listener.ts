@@ -1,6 +1,11 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-class Listener {
+import * as express from "express";
+import Looker from "../looker";
+
+export default class Listener {
+
+  server: express.Application;
+  bot: any;
+  lookers: Looker[];
 
   constructor(server, bot, lookers) {
     this.server = server;
@@ -20,7 +25,7 @@ class Listener {
     return true;
   }
 
-  validateTokenForLooker(req, looker) {
+  validateTokenForLooker(req, res, looker) {
     if (!req.headers['x-looker-webhook-token']) {
       this.reply(res, {looker: {success: false}, reason: "No x-looker-webhook-token token provided."});
       return false;
@@ -34,12 +39,10 @@ class Listener {
 
   reply(res, json) {
     res.json(json);
-    return console.log(`Replied to ${this.type()}.`, json);
+    console.log(`Replied to ${this.type()}.`, json);
   }
 
-  type() {
-    return "url listener";
-  }
+  type(): string { throw "implement" };
+  listen() { throw "implement" };
+
 }
-
-export default Listener;

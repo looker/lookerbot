@@ -1,20 +1,22 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let Commander;
 import SlackService from './services/slack_service';
 import Looker from "./looker";
 import QueryRunner from './repliers/query_runner';
 import LookQueryRunner from './repliers/look_query_runner';
+import Command from './commands/command';
+import Listener from './listeners/listener';
 
-export default (Commander = class Commander {
+export default class Commander {
 
-  constructor(opts) {
+  service: SlackService;
+  commands: Command[];
+
+  constructor(opts: {listeners: (typeof Listener)[], commands: (typeof Command)[]}) {
     this.service = new SlackService({
       listeners: opts.listeners,
       messageHandler: context => {
         return this.handleMessage(context);
       },
-      urlHandler: context => {
+      urlHandler: (context, url) => {
         return this.handleUrlExpansion(context, url);
       }
     });
@@ -73,6 +75,6 @@ export default (Commander = class Commander {
       let runner = new QueryRunner(context, {slug: matches[1]});
       runner.start();
     }
-
   }
-});
+
+}

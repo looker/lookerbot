@@ -1,10 +1,10 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-let CLIQueryRunner;
-import _ from "underscore";
+import * as _ from "underscore";
 import QueryRunner from './query_runner';
 
-export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
+export default class CLIQueryRunner extends QueryRunner {
+
+  textQuery: string;
+  visualization: any;
 
   constructor(replyContext, textQuery, visualization) {
     super(replyContext);
@@ -16,9 +16,12 @@ export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
 
   work() {
 
-    let [txt, limit, path, ignore, fields] = Array.from(this.textQuery.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/));
+    let [txt, stringLimit, path, ignore, fieldNames] = this.textQuery.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/);
 
-    if (limit) { limit = +(limit.trim()); }
+    let limit;
+    if (stringLimit) {
+      limit = +(stringLimit.trim());
+    }
 
     let pathParts = path.split("/").filter(p => p);
 
@@ -27,7 +30,7 @@ export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
       return;
     }
 
-    let fullyQualified = fields.split(",").map(f => f.trim()).map(function(f) {
+    let fullyQualified = fieldNames.split(",").map(f => f.trim()).map(function(f) {
       if (f.indexOf(".") === -1) {
         return `${pathParts[1]}.${f}`;
       } else {
@@ -35,7 +38,7 @@ export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
       }
     });
 
-    fields = [];
+    let fields = [];
     let filters = {};
     let sorts = [];
 
@@ -61,7 +64,8 @@ export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
       fields,
       filters,
       sorts,
-      limit
+      limit,
+      vis_config: undefined
     };
 
     if (this.visualization !== "data") {
@@ -85,4 +89,5 @@ export default (CLIQueryRunner = class CLIQueryRunner extends QueryRunner {
     }
     , r => this.replyError(r));
   }
-});
+
+};

@@ -1,14 +1,23 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
-import LookerClient from './looker_client';
+import LookerAPIClient from './looker_client';
 import blobStores from './stores/index';
 
-class Looker {
-  static initClass() {
-  
-    this.customCommands = {};
-  
-    this.all = undefined;
+export interface CustomCommand {
+  name: string;
+  description: string;
+  dashboard: any;
+  looker: Looker;
+  category: string;
+  helptext?: string;
+  hidden: boolean;
+}
+
+export default class Looker {
+
+  static all: Looker[];
+  static customCommands: {[key: string]: CustomCommand} = {};
+
+  static customCommandList() {
+    return Object.keys(Looker.customCommands).map(key => Looker.customCommands[key]);
   }
 
   static loadAll() {
@@ -28,13 +37,18 @@ class Looker {
     return this.all = configs.map(config => new Looker(config));
   }
 
+  url: string;
+  customCommandSpaceId: string;
+  webhookToken: string;
+  client: LookerAPIClient;
+
   constructor(options) {
 
     this.url = options.url;
     this.customCommandSpaceId = options.customCommandSpaceId;
     this.webhookToken = options.webhookToken;
 
-    this.client = new LookerClient({
+    this.client = new LookerAPIClient({
       baseUrl: options.apiBaseUrl,
       clientId: options.clientId,
       clientSecret: options.clientSecret,
@@ -55,10 +69,10 @@ class Looker {
     }
     console.log(`Refreshing custom commands for ${this.url}...`);
 
-    return this.client.get(`spaces/${this.customCommandSpaceId}`, space => {
+    this.client.get(`spaces/${this.customCommandSpaceId}`, space => {
       this.addCommandsForSpace(space, "Shortcuts");
-      return this.client.get(`spaces/${this.customCommandSpaceId}/children`, children => {
-        return Array.from(children).map((child) =>
+      this.client.get(`spaces/${this.customCommandSpaceId}/children`, children => {
+        children.map((child) =>
           this.addCommandsForSpace(child, child.name));
       },
       console.log);
@@ -66,16 +80,17 @@ class Looker {
     console.log);
   }
 
-  addCommandsForSpace(space, category) {
-    return Array.from(space.dashboards).map((partialDashboard) =>
+  addCommandsForSpace(space, category: string) {
+    space.dashboards.forEach((partialDashboard) =>
       this.client.get(`dashboards/${partialDashboard.id}`, dashboard => {
 
-        let command = {
+        let command: CustomCommand = {
           name: dashboard.title.toLowerCase().trim(),
           description: dashboard.description,
           dashboard,
           looker: this,
-          category
+          category,
+          hidden: false
         };
 
         command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1);
@@ -87,12 +102,9 @@ class Looker {
           command.helptext = `<${dashboard_filters[0].title.toLowerCase()}>`;
         }
 
-        return this.constructor.customCommands[command.name] = command;
+        Looker.customCommands[command.name] = command;
       },
 
       console.log));
   }
 }
-Looker.initClass();
-
-export default Looker;
