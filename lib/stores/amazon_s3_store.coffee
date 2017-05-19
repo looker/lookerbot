@@ -30,4 +30,5 @@ class AmazonS3Store extends Store
       else
         success("https://#{domain}/#{params.Bucket}/#{key}")
 
+    return
 module.exports = AmazonS3Store

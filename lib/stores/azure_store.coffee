@@ -18,5 +18,6 @@ class AzureStore extends Store
       else
         storageAccount = process.env.AZURE_STORAGE_ACCOUNT
         success("https://#{storageAccount}.blob.core.windows.net/#{container}/#{key}")
+    return
 
 module.exports = AzureStore

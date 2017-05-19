@@ -30,4 +30,6 @@ class GoogleCloudStore extends Store
       success("https://storage.googleapis.com/#{bucketName}/#{key}")
     )
 
+    return
+
 module.exports = GoogleCloudStore
