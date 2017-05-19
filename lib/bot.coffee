@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 Botkit = require('botkit')
 getUrls = require('get-urls')
 
@@ -17,6 +15,8 @@ LookQueryRunner = require('./repliers/look_query_runner')
 
 versionChecker = require('./version_checker')
 
+config = require('./config')
+
 listeners = [
   require('./listeners/data_action_listener')
   require('./listeners/health_check_listener')
@@ -26,14 +26,6 @@ listeners = [
 ]
 
 blobStores = require('./stores/index')
-
-if process.env.DEV == "true"
-  # Allow communicating with Lookers running on localhost with self-signed certificates
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
-
-enableQueryCli = process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
-
-enableGuestUsers = process.env.ALLOW_SLACK_GUEST_USERS == "true"
 
 Looker.loadAll()
 
@@ -122,7 +114,7 @@ ensureUserAuthorized = (bot, message, callback, options = {}) ->
         text: "Could not fetch your user info from Slack. #{error || ""}"
       )
     else
-      if !enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
+      if !settings.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)
         context?.replyPrivate(
           text: "Sorry @#{user.name}, as a guest user you're not able to use this command."
         )
@@ -146,7 +138,7 @@ processCommandInternal = (bot, message, isDM) ->
 
   context = new ReplyContext(defaultBot, bot, message)
 
-  if match = message.text.match(new RegExp(QUERY_REGEX)) && enableQueryCli
+  if match = message.text.match(new RegExp(QUERY_REGEX)) && settings.enableQueryCli
     message.match = match
     runCLI(context, message)
   else if match = message.text.match(new RegExp(FIND_REGEX))
@@ -196,7 +188,7 @@ processCommandInternal = (bot, message, isDM) ->
       • *find* <look search term> — _Shows the top five Looks matching the search._
       """
 
-      if enableQueryCli
+      if settings.enableQueryCli
         defaultText += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n"
 
       helpAttachments.push(
