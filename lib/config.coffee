@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-settings =
+config =
   enableQueryCli: process.env.LOOKER_EXPERIMENTAL_QUERY_CLI == "true"
   enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS == "true"
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV == "true"
@@ -8,8 +8,8 @@ settings =
   debugMode: process.env.DEBUG_MODE == "true"
   npmPackage: require('./../package.json')
 
-if settings.unsafeLocalDev
+if config.unsafeLocalDev
   # Allow communicating with Lookers running on localhost with self-signed certificates
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 
-module.exports = settings
+module.exports = config
