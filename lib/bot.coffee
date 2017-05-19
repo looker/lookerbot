@@ -25,10 +25,6 @@ Looker.loadAll()
 
 currentVersionChecker = new VersionChecker()
 
-refreshCommands = ->
-  for looker in Looker.all
-    looker.refreshCommands()
-
 # Update access tokens every half hour
 setInterval(->
   for looker in Looker.all

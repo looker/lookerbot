@@ -93,7 +93,7 @@ module.exports = class SlackService
     if options.silent
       context = null
 
-    defaultBot.api.users.info({user: message.user}, (error, response) ->
+    @defaultBot.api.users.info({user: context.sourceMessage.user}, (error, response) ->
       user = response?.user
       if error || !user
         context?.replyPrivate(

@@ -1,5 +1,7 @@
 config = require('./config')
 SlackService = require('./services/slack_service')
+_ = require('underscore')
+VersionChecker = require('./version_checker')
 
 Looker = require("./looker")
 
@@ -26,7 +28,7 @@ module.exports = class Commander
 
   handleMessage: (context) ->
 
-    console.log "handling message"
+    message = context.sourceMessage
 
     message.text = message.text.split('“').join('"')
     message.text = message.text.split('”').join('"')
@@ -101,19 +103,20 @@ module.exports = class Commander
             mrkdwn_in: ["text"]
           )
 
-        if currentVersionChecker.newVersion
+        if VersionChecker.newVersion
           helpAttachments.push(
-            text: "\n\n:scream: *<#{currentVersionChecker.newVersion.url}|Lookerbot is out of date! Version #{currentVersionChecker.newVersion.number} is now available.>* :scream:"
+            text: "\n\n:scream: *<#{VersionChecker.newVersion.url}|Lookerbot is out of date! Version #{VersionChecker.newVersion.number} is now available.>* :scream:"
             color: "warning"
             mrkdwn_in: ["text"]
           )
 
-        if isDM && message.text.toLowerCase() != "help"
+        if context.isDM && message.text.toLowerCase() != "help"
           context.replyPrivate(":crying_cat_face: I couldn't understand that command. You can use `help` to see the list of possible commands.")
         else
           context.replyPrivate({attachments: helpAttachments})
 
-      refreshCommands()
+      for looker in Looker.all
+        looker.refreshCommands()
 
     if context.isSlashCommand() && !context.hasRepliedPrivately
       # Return 200 immediately for slash commands
