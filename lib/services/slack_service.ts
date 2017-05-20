@@ -114,31 +114,21 @@ export default class SlackService {
 
   ensureUserAuthorized(context: ReplyContext, callback, options: {silent: boolean} = {silent: false}) {
 
-    if (options.silent) {
-      context = null;
+    let reply = (text: string) => {
+      if (!options.silent) {
+        context.replyPrivate({text});
+      }
     }
 
     this.defaultBot.api.users.info({user: context.sourceMessage.user}, function(error, response) {
-      let user = response != null ? response.user : undefined;
-      if (error || !user) {
-        if (context) {
-          context.replyPrivate({
-            text: `Could not fetch your user info from Slack. ${error || ""}`,
-          });
-        }
+      if (error || !response.user) {
+        reply(`Could not fetch your user info from Slack. ${error || ""}`);
       } else {
+        let user = response.user;
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
-          if (context) {
-            context.replyPrivate({
-              text: `Sorry @${user.name}, as a guest user you're not able to use this command.`,
-            });
-          }
+          reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`);
         } else if (user.is_bot) {
-          if (context) {
-            context.replyPrivate({
-              text: `Sorry @${user.name}, as a bot you're not able to use this command.`,
-            });
-          }
+          reply(`Sorry @${user.name}, as a bot you're not able to use this command.`)
         } else {
           callback();
         }

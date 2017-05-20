@@ -55,7 +55,7 @@ export default abstract class FancyReplier {
     this.replyContext = replyContext;
   }
 
-  reply(obj, cb = undefined) {
+  reply(obj, cb?: any) {
     if (this.loadingMessage) {
 
       // Hacky stealth update of message to preserve chat order

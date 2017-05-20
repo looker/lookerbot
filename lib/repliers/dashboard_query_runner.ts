@@ -7,7 +7,7 @@ export default class DashboardQueryRunner extends QueryRunner {
 
   constructor(replyContext, dashboard, filters) {
     if (filters == null) { filters = {}; }
-    super(replyContext, null);
+    super(replyContext);
     this.dashboard = dashboard;
     this.filters = filters;
   }

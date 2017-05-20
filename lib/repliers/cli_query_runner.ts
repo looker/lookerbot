@@ -4,7 +4,7 @@ import QueryRunner from "./query_runner";
 export default class CLIQueryRunner extends QueryRunner {
 
   textQuery: string;
-  visualization: any;
+  visualization: string;
 
   constructor(replyContext, textQuery, visualization) {
     super(replyContext);
@@ -16,7 +16,14 @@ export default class CLIQueryRunner extends QueryRunner {
 
   work() {
 
-    let [txt, stringLimit, path, ignore, fieldNames] = this.textQuery.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/);
+    let matches = this.textQuery.match(/([0-9]+ )?(([\w]+\/){0,2})(.+)/);
+
+    if (!matches) {
+      this.reply("Invalid syntax.");
+      return;
+    }
+
+    let [txt, stringLimit, path, ignore, fieldNames] = matches;
 
     let limit;
     if (stringLimit) {
@@ -38,14 +45,19 @@ export default class CLIQueryRunner extends QueryRunner {
       }
     });
 
-    let fields = [];
+    let fields: string[] = [];
     let filters = {};
-    let sorts = [];
+    let sorts: string[] = [];
 
-    for (let field of Array.from(fullyQualified)) {
-      let __, filter, minus, sort;
-      let matches = field.match(/([A-Za-z._ ]+)(\[(.+)\])?(-)? ?(asc|desc)?/i);
-      [__, field, __, filter, minus, sort] = Array.from(matches);
+    for (let fqf of fullyQualified) {
+      let matches = fqf.match(/([A-Za-z._ ]+)(\[(.+)\])?(-)? ?(asc|desc)?/i);
+
+      if (!matches) {
+        this.reply("Invalid syntax in field.");
+        return;
+      }
+
+      let [, field, , filter, minus, sort] = matches;
       field = field.toLowerCase().trim().split(" ").join("_");
       if (filter) {
         filters[field] = _.unescape(filter);
@@ -58,6 +70,11 @@ export default class CLIQueryRunner extends QueryRunner {
       }
     }
 
+    let visConfig: {type: string} | undefined = {type: `looker_${this.visualization}`};
+    if (this.visualization === "data") {
+      visConfig = undefined;
+    }
+
     let queryDef = {
       model: pathParts[0].toLowerCase(),
       view: pathParts[1].toLowerCase(),
@@ -65,13 +82,9 @@ export default class CLIQueryRunner extends QueryRunner {
       filters,
       sorts,
       limit,
-      vis_config: undefined,
+      vis_config: visConfig,
     };
 
-    if (this.visualization !== "data") {
-      queryDef.vis_config =
-        {type: `looker_${this.visualization}`};
-    }
 
     return this.replyContext.looker.client.post("queries", queryDef, (query) => {
       if (this.visualization === "data") {

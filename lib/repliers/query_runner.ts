@@ -5,13 +5,13 @@ import FancyReplier from "./fancy_replier";
 
 export default class QueryRunner extends FancyReplier {
 
-  querySlug: string;
-  queryId: number;
+  querySlug?: string;
+  queryId?: number;
 
-  constructor(replyContext, queryParam = null) {
+  constructor(replyContext, queryParam: {slug?: string, id?: number} = {}) {
     super(replyContext);
-    this.querySlug = queryParam != null ? queryParam.slug : undefined;
-    this.queryId = queryParam != null ? queryParam.id : undefined;
+    this.querySlug = queryParam.slug;
+    this.queryId = queryParam.id;
   }
 
   showShareUrl() { return false; }

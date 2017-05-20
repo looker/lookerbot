@@ -38,12 +38,10 @@ export default class ScheduleListener extends Listener {
             channelName = `#${channelName}`;
           }
 
-          let result = [];
-          for (let looker of Array.from(this.lookers)) {
-            let item;
+          for (let looker of this.lookers) {
             if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
               if (this.validateTokenForLooker(req, res, looker)) {
-                let runner;
+
                 let context = new ReplyContext(this.bot, this.bot, {
                   channel: channelName,
                 });
@@ -51,20 +49,19 @@ export default class ScheduleListener extends Listener {
                 context.scheduled = true;
 
                 if (lookId) {
-                  runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
+                  let runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
                   runner.start();
-                  item = this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
+                  this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
                 } else {
-                  runner = new QueryRunner(context, {id: qid});
+                  let runner = new QueryRunner(context, {id: qid});
                   runner.start();
-                  item = this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
+                  this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
                 }
 
               } else {
-                item = this.reply(res, {success: false, reason: "Invalid webhook token."});
+                this.reply(res, {success: false, reason: "Invalid webhook token."});
               }
             }
-            result.push(item);
           }
           return;
 

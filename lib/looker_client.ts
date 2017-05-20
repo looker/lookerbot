@@ -6,8 +6,8 @@ import config from "./config";
 export default class LookerAPIClient {
 
   options: any;
-  token: string;
-  tokenError: string;
+  token?: string;
+  tokenError?: string;
 
   constructor(options) {
     this.options = options;
@@ -18,7 +18,7 @@ export default class LookerAPIClient {
     return (this.token != null);
   }
 
-  request(requestConfig, successCallback = undefined, errorCallback = undefined, replyContext = undefined) {
+  request(requestConfig, successCallback?: any, errorCallback?: any, replyContext?: any) {
 
     if (!this.reachable()) {
       errorCallback({error: `Looker ${this.options.baseUrl} not reachable.\n${this.tokenError || ""}`});
@@ -72,11 +72,11 @@ export default class LookerAPIClient {
     });
   }
 
-  get(path, successCallback = undefined, errorCallback = undefined, options = undefined, replyContext = undefined) {
+  get(path, successCallback?: any, errorCallback?: any, options?: any, replyContext?: any) {
     return this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
   }
 
-  post(path, body, successCallback = undefined, errorCallback = undefined, replyContext = undefined) {
+  post(path, body, successCallback?: any, errorCallback?: any, replyContext?: any) {
     return this.request(
       {
         method: "POST",
@@ -104,17 +104,17 @@ export default class LookerAPIClient {
     };
 
     return request(options, (error, response, body) => {
-      this.tokenError = null;
+      this.tokenError = undefined;
       if (error) {
         console.warn(`Couldn't fetchAccessToken for Looker ${this.options.baseUrl}: ${error}`);
         this.tokenError = error;
-        this.token = null;
+        this.token = undefined;
       } else if (response.statusCode === 200) {
         let json = JSON.parse(body);
         this.token = json.access_token;
         console.log(`Updated API token for ${this.options.baseUrl}`);
       } else {
-        this.token = null;
+        this.token = undefined;
         console.warn(`Failed fetchAccessToken for Looker ${this.options.baseUrl}: ${body}`);
       }
       return (typeof this.options.afterConnect === "function" ? this.options.afterConnect() : undefined);

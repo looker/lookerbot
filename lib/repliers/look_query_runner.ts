@@ -3,11 +3,11 @@ import QueryRunner from "./query_runner";
 export default class LookQueryRunner extends QueryRunner {
 
   lookId: number;
-  filterInfo: any;
+  filterInfo?: any;
   loadedLook: any;
 
-  constructor(replyContext, lookId, filterInfo = null) {
-    super(replyContext, null);
+  constructor(replyContext, lookId, filterInfo?: any) {
+    super(replyContext);
     this.lookId = lookId;
     this.filterInfo = filterInfo;
   }

@@ -22,7 +22,7 @@ export default class ReplyContext {
     return !!this.messageBot.res;
   }
 
-  replyPrivate(message, cb = undefined) {
+  replyPrivate(message, cb?: any) {
     message = this._rtmOptOut(message);
     if (this.isSlashCommand()) {
       if (this.hasRepliedPrivately) {
@@ -36,7 +36,7 @@ export default class ReplyContext {
     }
   }
 
-  replyPublic(message, cb = undefined) {
+  replyPublic(message, cb?: any) {
     message = this._rtmOptOut(message);
     if (this.isSlashCommand()) {
       return this.messageBot.replyPublicDelayed(this.sourceMessage, message, cb);

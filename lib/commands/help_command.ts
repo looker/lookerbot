@@ -8,7 +8,7 @@ import Command from "./command";
 export default class HelpCommand extends Command {
 
   attempt(context) {
-    let helpAttachments = [];
+    let helpAttachments: any = [];
 
     let groups = _.groupBy(Looker.customCommandList(), "category");
 
