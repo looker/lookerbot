@@ -17,7 +17,7 @@ export default class LookFinder extends QueryRunner {
     let looks = await this.replyContext.looker.client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
       {},
-      this.replyContext
+      this.replyContext,
     );
 
     let fuzzySearch = new FuzzySearch(looks, {termPath: "title"});

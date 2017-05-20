@@ -85,7 +85,6 @@ export default class CLIQueryRunner extends QueryRunner {
       vis_config: visConfig,
     };
 
-
     return this.replyContext.looker.client.post("queries", queryDef, (query) => {
       if (this.visualization === "data") {
         return this.replyContext.looker.client.get(`queries/${query.id}/run/unified`, (result) => {

@@ -118,7 +118,7 @@ export default class SlackService {
       if (!options.silent) {
         context.replyPrivate({text});
       }
-    }
+    };
 
     this.defaultBot.api.users.info({user: context.sourceMessage.user}, function(error, response) {
       if (error || !response.user) {
@@ -128,7 +128,7 @@ export default class SlackService {
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`);
         } else if (user.is_bot) {
-          reply(`Sorry @${user.name}, as a bot you're not able to use this command.`)
+          reply(`Sorry @${user.name}, as a bot you're not able to use this command.`);
         } else {
           callback();
         }

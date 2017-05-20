@@ -9,7 +9,7 @@ export type LookerRequestConfig = {
   path: string,
   replyContext?: ReplyContext,
   headers?: request.Headers,
-  body?: any
+  body?: any,
 };
 
 export default class LookerAPIClient {
@@ -18,7 +18,7 @@ export default class LookerAPIClient {
     baseUrl: string,
     clientId: string,
     clientSecret: string,
-    afterConnect?: () => void
+    afterConnect?: () => void,
   };
   token?: string;
   tokenError?: string;
@@ -36,7 +36,7 @@ export default class LookerAPIClient {
     requestConfig: LookerRequestConfig,
     successCallback?: any,
     errorCallback?: any,
-    replyContext?: ReplyContext
+    replyContext?: ReplyContext,
   ) : void {
 
     if (!this.reachable()) {
@@ -51,7 +51,7 @@ export default class LookerAPIClient {
       headers: {
         "Authorization": `token ${this.token}`,
         "User-Agent": `looker-slackbot/${config.npmPackage.version}${replyContext ? this.buildMetadata(replyContext) : ""}`,
-      }
+      },
     };
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {});
@@ -84,7 +84,7 @@ export default class LookerAPIClient {
 
   requestAsync(
     requestConfig: LookerRequestConfig,
-    replyContext?: ReplyContext
+    replyContext?: ReplyContext,
   ){
     return new Promise((resolve, reject) => {
       this.request(requestConfig, resolve, reject, replyContext);
@@ -98,7 +98,7 @@ export default class LookerAPIClient {
   getAsync(
     path: string,
     options?: any,
-    replyContext?: ReplyContext
+    replyContext?: ReplyContext,
   ){
     return new Promise((resolve, reject) => {
       this.get(path, resolve, reject, options, replyContext);
@@ -125,7 +125,7 @@ export default class LookerAPIClient {
     path: string,
     body: any,
     options?: any,
-    replyContext?: ReplyContext
+    replyContext?: ReplyContext,
   ){
     return new Promise((resolve, reject) => {
       this.post(path, body, resolve, reject, replyContext);
