@@ -3,21 +3,20 @@ import Listener from "./listener";
 
 export default class SlackActionListener extends Listener {
 
-  type() {
+  public type() {
     return "slack action listener";
   }
 
-  listen() {
+  public listen() {
 
     if (!SlackUtils.slackButtonsEnabled) { return; }
 
-    return this.server.post("/slack/action", (req, res) => {
+    this.server.post("/slack/action", async (req, res) => {
 
-      let e, error, payload, reply;
+      let payload;
       try {
         payload = JSON.parse(req.body.payload);
-      } catch (error1) {
-        e = error1;
+      } catch (e) {
         res.status(400);
         this.reply(res, {error: "Malformed action payload"});
         return;
@@ -34,67 +33,60 @@ export default class SlackActionListener extends Listener {
 
       console.log(`Received slack action: ${JSON.stringify(message)}`);
 
-      if (SlackUtils.checkToken(this.bot, message)) {
+      if (!SlackUtils.checkToken(this.bot, message)) {
+        res.status(401);
+        this.reply(res, {error: "Slack token incorrect."});
+        return;
+      }
 
-        for (const action of message.actions) {
+      const action = message.actions[0];
 
-          let text;
-          try {
-            payload = JSON.parse(action.value);
-          } catch (error2) {
-            e = error2;
-            res.status(400);
-            this.reply(res, {error: "Malformed action value"});
-            return;
-          }
+      try {
+        payload = JSON.parse(action.value);
+      } catch (e) {
+        res.status(400);
+        this.reply(res, {error: "Malformed action value"});
+        return;
+      }
 
-          const looker = this.lookers.filter((l) => l.url === payload.lookerUrl)[0];
-          if (!looker) {
-            res.status(400);
-            this.reply(res, {error: "Unknown looker"});
-            return;
-          }
+      const looker = this.lookers.filter((l) => l.url === payload.lookerUrl)[0];
+      if (!looker) {
+        res.status(400);
+        this.reply(res, {error: "Unknown looker"});
+        return;
+      }
 
-          const success = (actionResult) => {
-            if (actionResult.success) {
-              text = `:white_check_mark: ${actionResult.message || "Done"}!`;
-            } else if (actionResult.validation_errors) {
-              text = actionResult.validation_errors.errors.map((e) => `:x: ${e.message}`).join("\n");
-            } else {
-              text = `:x: ${actionResult.message || "Something went wrong performing the action."}.`;
-            }
+      // Return OK immediately
+      res.send("");
 
-            reply = {
-              response_type: "ephemeral",
-              replace_original: false,
-              text,
-            };
-            return this.bot.replyPrivateDelayed(message, reply);
-          };
+      try {
 
-          error = (error) => {
-            reply = {
-              response_type: "ephemeral",
-              replace_original: false,
-              text: `:warning: Couldn't perform action due to an error: \`${JSON.stringify(error)}\``,
-            };
-            return this.bot.replyPrivateDelayed(message, reply);
-          };
+        const actionResult = await looker.client.postAsync(
+          "data_actions",
+          {action: payload.action},
+        );
 
-          looker.client.post(
-            "data_actions",
-            {action: payload.action},
-            success,
-            error,
-          );
-
-          // Return OK immediately
-          res.send("");
+        let text: string;
+        if (actionResult.success) {
+          text = `:white_check_mark: ${actionResult.message || "Done"}!`;
+        } else if (actionResult.validation_errors) {
+          text = actionResult.validation_errors.errors.map((e) => `:x: ${e.message}`).join("\n");
+        } else {
+          text = `:x: ${actionResult.message || "Something went wrong performing the action."}.`;
         }
 
-      } else {
-        res.status(401);
-        return this.reply(res, {error: "Slack token incorrect."});
+        this.bot.replyPrivateDelayed(message, {
+          response_type: "ephemeral",
+          replace_original: false,
+          text,
+        });
+
+      } catch(error) {
+        this.bot.replyPrivateDelayed(message, {
+          response_type: "ephemeral",
+          replace_original: false,
+          text: `:warning: Couldn't perform action due to an error: \`${JSON.stringify(error)}\``,
+        });
       }
 
     });
