@@ -78,7 +78,7 @@ export default abstract class FancyReplier {
     }
   }
 
-  startLoading(cb) {
+  private startLoading(cb) {
 
     // Scheduled messages don't have a loading indicator, why distract everything?
     if (this.replyContext.scheduled) {
@@ -111,11 +111,18 @@ export default abstract class FancyReplier {
 
   start() {
     if (process.env.LOOKER_SLACKBOT_LOADING_MESSAGES !== "false") {
-      return this.startLoading(() => {
-        return this.work();
+      this.startLoading(() => {
+        this.performWork();
       });
     } else {
-      return this.work();
+      this.performWork();
+    }
+  }
+
+  private performWork() {
+    let promise = this.work();
+    if (promise) {
+      promise.catch((err) => this.replyError(err));
     }
   }
 
@@ -130,6 +137,6 @@ export default abstract class FancyReplier {
     }
   }
 
-  abstract work(): void;
+  abstract async work();
 
 }

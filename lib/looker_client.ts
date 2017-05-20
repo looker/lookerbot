@@ -82,12 +82,31 @@ export default class LookerAPIClient {
 
   }
 
+  requestAsync(
+    requestConfig: LookerRequestConfig,
+    replyContext?: ReplyContext
+  ){
+    return new Promise((resolve, reject) => {
+      this.request(requestConfig, resolve, reject, replyContext);
+    });
+  }
+
   get(path: string, successCallback?: any, errorCallback?: any, options?: any, replyContext?: ReplyContext) {
-    return this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
+    this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
+  }
+
+  getAsync(
+    path: string,
+    options?: any,
+    replyContext?: ReplyContext
+  ){
+    return new Promise((resolve, reject) => {
+      this.get(path, resolve, reject, options, replyContext);
+    });
   }
 
   post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
-    return this.request(
+    this.request(
       {
         method: "POST",
         path,
@@ -100,6 +119,17 @@ export default class LookerAPIClient {
       errorCallback,
       replyContext,
     );
+  }
+
+  postAsync(
+    path: string,
+    body: any,
+    options?: any,
+    replyContext?: ReplyContext
+  ){
+    return new Promise((resolve, reject) => {
+      this.post(path, body, resolve, reject, replyContext);
+    });
   }
 
   fetchAccessToken() {
