@@ -2,10 +2,24 @@ import * as crypto from "crypto";
 import * as request from "request";
 import * as _ from "underscore";
 import config from "./config";
+import ReplyContext from "./reply_context";
+
+export type LookerRequestConfig = {
+  method: string,
+  path: string,
+  replyContext?: ReplyContext,
+  headers?: request.Headers,
+  body?: any
+};
 
 export default class LookerAPIClient {
 
-  options: any;
+  options: {
+    baseUrl: string,
+    clientId: string,
+    clientSecret: string,
+    afterConnect?: () => void
+  };
   token?: string;
   tokenError?: string;
 
@@ -18,65 +32,61 @@ export default class LookerAPIClient {
     return (this.token != null);
   }
 
-  request(requestConfig, successCallback?: any, errorCallback?: any, replyContext?: any) {
+  request(
+    requestConfig: LookerRequestConfig,
+    successCallback?: any,
+    errorCallback?: any,
+    replyContext?: ReplyContext
+  ) : void {
 
     if (!this.reachable()) {
       errorCallback({error: `Looker ${this.options.baseUrl} not reachable.\n${this.tokenError || ""}`});
       return;
     }
 
-    let msg = replyContext != null ? replyContext.sourceMessage : undefined;
-    let metadata = "";
-    if (msg != null ? msg.user : undefined) {
-      metadata += ` user=${this._sha(msg.user)}`;
-    }
-    if (msg != null ? msg.team : undefined) {
-      metadata += ` team=${this._sha(msg.team)}`;
-    }
-    if (msg != null ? msg.channel : undefined) {
-      metadata += ` channel=${this._sha(msg.channel)}`;
-      metadata += ` channel_type=${msg.channel[0]}`;
-    }
-    if (replyContext) {
-      metadata += ` slash=${replyContext.isSlashCommand()}`;
-    }
-
-    requestConfig.url = `${this.options.baseUrl}/${requestConfig.path}`;
-    let headers = {
-      "Authorization": `token ${this.token}`,
-      "User-Agent": `looker-slackbot/${config.npmPackage.version}${metadata}`,
+    let newConfig = {
+      method: requestConfig.method,
+      url: `${this.options.baseUrl}/${requestConfig.path}`,
+      body: requestConfig.body,
+      headers: {
+        "Authorization": `token ${this.token}`,
+        "User-Agent": `looker-slackbot/${config.npmPackage.version}${replyContext ? this.buildMetadata(replyContext) : ""}`,
+      }
     };
-    requestConfig.headers = _.extend(headers, requestConfig.headers || {});
-    return request(requestConfig, (error, response, body) => {
+
+    newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {});
+
+    request(newConfig, (error, response, body) => {
       if (error) {
-        return (typeof errorCallback === "function" ? errorCallback(error) : undefined);
+        errorCallback && errorCallback(error);
       } else if (response.statusCode === 200) {
         if (response.headers["content-type"].indexOf("application/json") !== -1) {
-          return (typeof successCallback === "function" ? successCallback(JSON.parse(body)) : undefined);
+          successCallback && successCallback(JSON.parse(body));
         } else {
-          return (typeof successCallback === "function" ? successCallback(body) : undefined);
+          successCallback && successCallback(body);
         }
       } else {
         try {
           if (Buffer.isBuffer(body) && (body.length === 0)) {
-            return (typeof errorCallback === "function" ? errorCallback({error: "Received empty response from Looker."}) : undefined);
+            errorCallback && errorCallback({error: "Received empty response from Looker."});
           } else {
-            return (typeof errorCallback === "function" ? errorCallback(JSON.parse(body)) : undefined);
+            errorCallback && errorCallback(JSON.parse(body));
           }
         } catch (error1) {
           console.error("JSON parse failed:");
           console.error(body);
-          return errorCallback({error: "Couldn't parse Looker response. The server may be offline."});
+          errorCallback && errorCallback({error: "Couldn't parse Looker response. The server may be offline."});
         }
       }
     });
+
   }
 
-  get(path, successCallback?: any, errorCallback?: any, options?: any, replyContext?: any) {
+  get(path: string, successCallback?: any, errorCallback?: any, options?: any, replyContext?: ReplyContext) {
     return this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
   }
 
-  post(path, body, successCallback?: any, errorCallback?: any, replyContext?: any) {
+  post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
     return this.request(
       {
         method: "POST",
@@ -103,7 +113,7 @@ export default class LookerAPIClient {
       },
     };
 
-    return request(options, (error, response, body) => {
+    request(options, (error, response, body) => {
       this.tokenError = undefined;
       if (error) {
         console.warn(`Couldn't fetchAccessToken for Looker ${this.options.baseUrl}: ${error}`);
@@ -117,13 +127,37 @@ export default class LookerAPIClient {
         this.token = undefined;
         console.warn(`Failed fetchAccessToken for Looker ${this.options.baseUrl}: ${body}`);
       }
-      return (typeof this.options.afterConnect === "function" ? this.options.afterConnect() : undefined);
+
+      if (this.options.afterConnect) {
+        this.options.afterConnect();
+      }
+
     });
   }
 
-  _sha(text) {
+  private buildMetadata(context: ReplyContext) {
+    let msg = context.sourceMessage;
+    let metadata = "";
+    if (msg.user) {
+      metadata += ` user=${this.sha(msg.user)}`;
+    }
+    if (msg.team) {
+      metadata += ` team=${this.sha(msg.team)}`;
+    }
+    if (msg.channel) {
+      metadata += ` channel=${this.sha(msg.channel)}`;
+      metadata += ` channel_type=${msg.channel[0]}`;
+    }
+    if (context) {
+      metadata += ` slash=${context.isSlashCommand()}`;
+    }
+    return metadata;
+  }
+
+  private sha(text) {
     let shasum = crypto.createHash("sha1");
     shasum.update(text);
     return shasum.digest("hex");
   }
+
 }
