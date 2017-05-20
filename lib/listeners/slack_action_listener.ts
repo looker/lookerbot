@@ -24,7 +24,7 @@ export default class SlackActionListener extends Listener {
 
       // Make this look like a botkit message
       const message: any = {};
-      for (const key in payload) {
+      for (const key of Object.keys(payload)) {
         message[key] = payload[key];
       }
       message.user = message.user_id;
@@ -76,15 +76,15 @@ export default class SlackActionListener extends Listener {
         }
 
         this.bot.replyPrivateDelayed(message, {
-          response_type: "ephemeral",
           replace_original: false,
+          response_type: "ephemeral",
           text,
         });
 
       } catch (error) {
         this.bot.replyPrivateDelayed(message, {
-          response_type: "ephemeral",
           replace_original: false,
+          response_type: "ephemeral",
           text: `:warning: Couldn't perform action due to an error: \`${JSON.stringify(error)}\``,
         });
       }

@@ -14,88 +14,91 @@ export type LookerRequestConfig = {
 
 export default class LookerAPIClient {
 
-  options: {
+  private options: {
     baseUrl: string,
     clientId: string,
     clientSecret: string,
     afterConnect?: () => void,
   };
-  token?: string;
-  tokenError?: string;
+  private token?: string;
+  private tokenError?: string;
 
   constructor(options) {
     this.options = options;
     this.fetchAccessToken();
   }
 
-  reachable() {
-    return (this.token != null);
-  }
-
-  request(
+  public request(
     requestConfig: LookerRequestConfig,
     successCallback?: any,
     errorCallback?: any,
     replyContext?: ReplyContext,
-  ) : void {
+  ) {
 
     if (!this.reachable()) {
       errorCallback({error: `Looker ${this.options.baseUrl} not reachable.\n${this.tokenError || ""}`});
       return;
     }
 
+    if (!errorCallback) {
+      errorCallback = () => { return; };
+    }
+    if (!successCallback) {
+      successCallback = () => { return; };
+    }
+
     const newConfig = {
-      method: requestConfig.method,
-      url: `${this.options.baseUrl}/${requestConfig.path}`,
       body: requestConfig.body,
       headers: {
         "Authorization": `token ${this.token}`,
         "User-Agent": `looker-slackbot/${config.npmPackage.version}${replyContext ? this.buildMetadata(replyContext) : ""}`,
       },
+      method: requestConfig.method,
+      url: `${this.options.baseUrl}/${requestConfig.path}`,
     };
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {});
 
     request(newConfig, (error, response, body) => {
       if (error) {
-        errorCallback && errorCallback(error);
+        errorCallback(error);
       } else if (response.statusCode === 200) {
         if (response.headers["content-type"].indexOf("application/json") !== -1) {
-          successCallback && successCallback(JSON.parse(body));
+          successCallback(JSON.parse(body));
         } else {
-          successCallback && successCallback(body);
+          successCallback(body);
         }
       } else {
         try {
           if (Buffer.isBuffer(body) && (body.length === 0)) {
-            errorCallback && errorCallback({error: "Received empty response from Looker."});
+            errorCallback({error: "Received empty response from Looker."});
           } else {
-            errorCallback && errorCallback(JSON.parse(body));
+            errorCallback(JSON.parse(body));
           }
         } catch (error1) {
           console.error("JSON parse failed:");
           console.error(body);
-          errorCallback && errorCallback({error: "Couldn't parse Looker response. The server may be offline."});
+          errorCallback({error: "Couldn't parse Looker response. The server may be offline."});
         }
       }
     });
 
   }
 
-  requestAsync(
+  public requestAsync(
     requestConfig: LookerRequestConfig,
     replyContext?: ReplyContext,
-  ){
+  ) {
     return new Promise((resolve, reject) => {
       this.request(requestConfig, resolve, reject, replyContext);
     });
   }
 
-  get(path: string, successCallback?: any, errorCallback?: any, options?: any, replyContext?: ReplyContext) {
+  public get(path: string, successCallback?: any, errorCallback?: any, options?: any, replyContext?: ReplyContext) {
     this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
   }
 
-  getAsync(
+  public getAsync(
     path: string,
     options?: any,
     replyContext?: ReplyContext,
@@ -105,15 +108,15 @@ export default class LookerAPIClient {
     });
   }
 
-  post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
+  public post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
     this.request(
       {
-        method: "POST",
-        path,
         body: JSON.stringify(body),
         headers: {
           "content-type": "application/json",
         },
+        method: "POST",
+        path,
       },
       successCallback,
       errorCallback,
@@ -121,7 +124,7 @@ export default class LookerAPIClient {
     );
   }
 
-  postAsync(
+  public postAsync(
     path: string,
     body: any,
     options?: any,
@@ -132,15 +135,15 @@ export default class LookerAPIClient {
     });
   }
 
-  fetchAccessToken() {
+  public fetchAccessToken() {
 
     const options = {
-      method: "POST",
-      url: `${this.options.baseUrl}/login`,
       form: {
         client_id: this.options.clientId,
         client_secret: this.options.clientSecret,
       },
+      method: "POST",
+      url: `${this.options.baseUrl}/login`,
     };
 
     request(options, (error, response, body) => {
@@ -163,6 +166,10 @@ export default class LookerAPIClient {
       }
 
     });
+  }
+
+  private reachable() {
+    return (this.token != null);
   }
 
   private buildMetadata(context: ReplyContext) {

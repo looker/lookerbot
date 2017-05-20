@@ -1,7 +1,7 @@
 import LookerAPIClient from "./looker_client";
 import blobStores from "./stores/index";
 
-export interface CustomCommand {
+export interface ICustomCommand {
   name: string;
   description: string;
   dashboard: any;
@@ -13,34 +13,34 @@ export interface CustomCommand {
 
 export default class Looker {
 
-  static all: Looker[];
-  static customCommands: {[key: string]: CustomCommand} = {};
+  public static all: Looker[];
+  public static customCommands: {[key: string]: ICustomCommand} = {};
 
-  static customCommandList() {
+  public static customCommandList() {
     return Object.keys(Looker.customCommands).map((key) => Looker.customCommands[key]);
   }
 
-  static loadAll() {
+  public static loadAll() {
     const configs = process.env.LOOKERS ?
       (console.log("Using Looker information specified in LOOKERS environment variable."),
       JSON.parse(process.env.LOOKERS))
     :
       (console.log("Using Looker information specified in individual environment variables."),
       [{
-        url: process.env.LOOKER_URL,
         apiBaseUrl: process.env.LOOKER_API_BASE_URL,
         clientId: process.env.LOOKER_API_3_CLIENT_ID,
         clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET,
         customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID,
+        url: process.env.LOOKER_URL,
         webhookToken: process.env.LOOKER_WEBHOOK_TOKEN,
       }]);
     return this.all = configs.map((config) => new Looker(config));
   }
 
-  url: string;
-  customCommandSpaceId: string;
-  webhookToken: string;
-  client: LookerAPIClient;
+  public url: string;
+  public customCommandSpaceId: string;
+  public webhookToken: string;
+  public client: LookerAPIClient;
 
   constructor(options) {
 
@@ -49,20 +49,20 @@ export default class Looker {
     this.webhookToken = options.webhookToken;
 
     this.client = new LookerAPIClient({
-      baseUrl: options.apiBaseUrl,
-      clientId: options.clientId,
-      clientSecret: options.clientSecret,
       afterConnect: () => {
         return this.refreshCommands();
       },
+      baseUrl: options.apiBaseUrl,
+      clientId: options.clientId,
+      clientSecret: options.clientSecret,
     });
   }
 
-  storeBlob(blob, success, error) {
+  public storeBlob(blob, success, error) {
     return blobStores.current.storeBlob(blob, success, error);
   }
 
-  refreshCommands() {
+  public refreshCommands() {
     if (!this.customCommandSpaceId) {
       console.log(`No commands specified for ${this.url}...`);
       return;
@@ -80,26 +80,26 @@ export default class Looker {
     console.log);
   }
 
-  addCommandsForSpace(space, category: string) {
+  private addCommandsForSpace(space, category: string) {
     space.dashboards.forEach((partialDashboard) =>
       this.client.get(`dashboards/${partialDashboard.id}`, (dashboard) => {
 
-        const command: CustomCommand = {
-          name: dashboard.title.toLowerCase().trim(),
-          description: dashboard.description,
-          dashboard,
-          looker: this,
+        const command: ICustomCommand = {
           category,
+          dashboard,
+          description: dashboard.description,
           hidden: false,
+          looker: this,
+          name: dashboard.title.toLowerCase().trim(),
         };
 
         command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1);
 
         command.helptext = "";
 
-        const dashboard_filters = dashboard.dashboard_filters || dashboard.filters;
-        if ((dashboard_filters != null ? dashboard_filters.length : undefined) > 0) {
-          command.helptext = `<${dashboard_filters[0].title.toLowerCase()}>`;
+        const dashboardFilters = dashboard.dashboard_filters || dashboard.filters;
+        if ((dashboardFilters != null ? dashboardFilters.length : undefined) > 0) {
+          command.helptext = `<${dashboardFilters[0].title.toLowerCase()}>`;
         }
 
         Looker.customCommands[command.name] = command;

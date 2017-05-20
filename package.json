@@ -9,6 +9,7 @@
     "test": "yarn test-ts && yarn lint",
     "test-ts": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/test.ts",
     "lint": "./node_modules/.bin/tslint -c tslint.json 'lib/**/*.ts'",
+    "lint-dev": "./node_modules/.bin/nodemon --exec yarn lint",
     "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'lib/**/*.ts'"
   },
   "dependencies": {

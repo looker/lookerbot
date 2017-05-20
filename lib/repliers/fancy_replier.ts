@@ -48,14 +48,14 @@ const sassyMessages = [
 
 export default abstract class FancyReplier {
 
-  replyContext: ReplyContext;
-  loadingMessage: any;
+  public replyContext: ReplyContext;
+  private loadingMessage: any;
 
   constructor(replyContext) {
     this.replyContext = replyContext;
   }
 
-  reply(obj, cb?: any) {
+  public reply(obj, cb?: any) {
     if (this.loadingMessage) {
 
       // Hacky stealth update of message to preserve chat order
@@ -109,7 +109,7 @@ export default abstract class FancyReplier {
     });
   }
 
-  start() {
+  public start() {
     if (process.env.LOOKER_SLACKBOT_LOADING_MESSAGES !== "false") {
       this.startLoading(() => {
         this.performWork();
@@ -126,7 +126,7 @@ export default abstract class FancyReplier {
     }
   }
 
-  replyError(response) {
+  protected replyError(response) {
     console.error(response);
     if ((response != null ? response.error : undefined)) {
       return this.reply(`:warning: ${response.error}`);
@@ -137,6 +137,6 @@ export default abstract class FancyReplier {
     }
   }
 
-  abstract async work();
+  protected abstract async work();
 
 }

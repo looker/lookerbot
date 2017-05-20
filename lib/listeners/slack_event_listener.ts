@@ -1,15 +1,13 @@
-// TODO: This file was created by bulk-decaffeinate.
-// Sanity-check the conversion and remove this comment.
 import SlackUtils from "../slack_utils";
 import Listener from "./listener";
 
-class SlackEventListener extends Listener {
+export default class SlackEventListener extends Listener {
 
-  type() {
+  public type() {
     return "slack event listener";
   }
 
-  listen() {
+  public listen() {
 
     return this.server.post("/slack/event", (req, res) => {
 
@@ -31,10 +29,9 @@ class SlackEventListener extends Listener {
     });
   }
 
-  fail(res) {
+  private fail(res) {
     res.status(400);
     return res.send("");
   }
-}
 
-export default SlackEventListener;
+}
