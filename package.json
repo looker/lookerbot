@@ -21,12 +21,11 @@
     "aws-sdk": "^2.54.0",
     "azure-storage": "~0.10.0",
     "botkit": "0.0.15",
+    "chai": "^3.5.0",
     "dotenv": "^4.0.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^5.0.0",
-    "jsonfile": "^3.0.0",
     "request": "^2.66.0",
-    "request-promise-native": "^1.0.4",
     "semver": "^5.1.0",
     "stream-buffers": "^3.0.1",
     "ts-node": "^3.0.2",
@@ -35,7 +34,9 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "mocha": "^2.4.5",
+    "@types/chai": "^3.5.2",
+    "@types/mocha": "^2.2.41",
+    "mocha": "^3.4.1",
     "nodemon": "^1.11.0",
     "ts-lint": "^4.5.1"
   },
