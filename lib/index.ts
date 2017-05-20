@@ -30,7 +30,6 @@ state.commander = new Commander({
     require("./listeners/slack_event_listener").default,
   ],
   commands: [
-    require("./commands/cli_command").default,
     require("./commands/search_command").default,
     require("./commands/custom_command").default,
     require("./commands/help_command").default,

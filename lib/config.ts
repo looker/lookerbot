@@ -4,7 +4,6 @@ import * as jsonfile from "jsonfile";
 dotenv.config();
 
 let config = {
-  enableQueryCli: process.env.LOOKER_EXPERIMENTAL_QUERY_CLI === "true",
   enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS === "true",
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
   slackApiKey: process.env.SLACK_API_KEY,
