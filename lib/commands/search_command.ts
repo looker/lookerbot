@@ -11,7 +11,7 @@ export default class SearchCommand extends Command {
 
   public attempt(context: ReplyContext) {
 
-    const match context.sourceMessage.text.match(FIND_REGEX);
+    const match = context.sourceMessage.text.match(FIND_REGEX);
     if (match) {
 
       let [, type, query] = match;

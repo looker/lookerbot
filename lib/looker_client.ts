@@ -99,7 +99,7 @@ export default class LookerAPIClient {
     path: string,
     options?: any,
     replyContext?: ReplyContext,
-  ){
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.get(path, resolve, reject, options, replyContext);
     });
@@ -126,7 +126,7 @@ export default class LookerAPIClient {
     body: any,
     options?: any,
     replyContext?: ReplyContext,
-  ){
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(path, body, resolve, reject, replyContext);
     });

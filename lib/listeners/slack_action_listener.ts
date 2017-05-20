@@ -81,7 +81,7 @@ export default class SlackActionListener extends Listener {
           text,
         });
 
-      } catch(error) {
+      } catch (error) {
         this.bot.replyPrivateDelayed(message, {
           response_type: "ephemeral",
           replace_original: false,

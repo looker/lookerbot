@@ -39,13 +39,9 @@ export default class HelpCommand extends Command {
       }
     }
 
-    let defaultText = `\
+    const defaultText = `\
 • *find* <look search term> — _Shows the top five Looks matching the search._\
 `;
-
-    if (config.enableQueryCli) {
-      defaultText += "• *q* <model_name>/<view_name>/<field>[<filter>] — _Runs a custom query._\n";
-    }
 
     helpAttachments.push({
       color: "#64518A",
