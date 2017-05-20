@@ -5,7 +5,7 @@
     "jsRules": {},
     "rules": {
       "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
-      "prefer-const": true,
+      "prefer-const": [true, {"destructuring": "all"}],
       "max-line-length": false,
       "no-console": false
     },

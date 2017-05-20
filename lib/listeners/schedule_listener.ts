@@ -5,16 +5,16 @@ import Listener from "./listener";
 
 export default class ScheduleListener extends Listener {
 
-  type() {
+  public type() {
     return "schedule listener";
   }
 
-  listen() {
+  public listen() {
     this.server.post("/slack/post/:post_type/:channel_name", this.handleRequest);
     return this.server.post("/slack/post_from_query_action", this.handleRequest);
   }
 
-  handleRequest(req, res) : void {
+  private handleRequest(req, res) {
 
     let channelName = req.params.channel_name || (req.form_params != null ? req.form_params.channel : undefined);
     const channelType = req.params.post_type;

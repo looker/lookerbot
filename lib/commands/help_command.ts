@@ -1,13 +1,16 @@
 import * as _ from "underscore";
+
+import Command from "./command";
+
 import config from "../config";
 import Looker from "../looker";
 import DashboardQueryRunner from "../repliers/dashboard_query_runner";
+import ReplyContext from "../reply_context";
 import VersionChecker from "../version_checker";
-import Command from "./command";
 
 export default class HelpCommand extends Command {
 
-  attempt(context) {
+  public attempt(context: ReplyContext) {
     const helpAttachments: any = [];
 
     const groups = _.groupBy(Looker.customCommandList(), "category");
@@ -28,10 +31,10 @@ export default class HelpCommand extends Command {
 
       if (groupText) {
         helpAttachments.push({
-          title: groupName,
-          text: groupText,
           color: "#64518A",
           mrkdwn_in: ["text"],
+          text: groupText,
+          title: groupName,
         });
       }
     }
@@ -45,28 +48,28 @@ export default class HelpCommand extends Command {
     }
 
     helpAttachments.push({
-      title: "Built-in Commands",
-      text: defaultText,
       color: "#64518A",
       mrkdwn_in: ["text"],
+      text: defaultText,
+      title: "Built-in Commands",
     });
 
     const spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
-      `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`;
+      return `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`;
     }).join(" or ");
 
     if (spaces) {
       helpAttachments.push({
-        text: `\n_To add your own commands, add a dashboard to ${spaces}._`,
         mrkdwn_in: ["text"],
+        text: `\n_To add your own commands, add a dashboard to ${spaces}._`,
       });
     }
 
     if (VersionChecker.newVersion) {
       helpAttachments.push({
-        text: `\n\n:scream: *<${VersionChecker.newVersion.url}|Lookerbot is out of date! Version ${VersionChecker.newVersion.number} is now available.>* :scream:`,
         color: "warning",
         mrkdwn_in: ["text"],
+        text: `\n\n:scream: *<${VersionChecker.newVersion.url}|Lookerbot is out of date! Version ${VersionChecker.newVersion.number} is now available.>* :scream:`,
       });
     }
 

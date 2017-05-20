@@ -5,11 +5,11 @@ import Listener from "./listener";
 
 export default class DataActionListener extends Listener {
 
-  type() {
+  public type() {
     return "data action listener";
   }
 
-  listen() {
+  public listen() {
 
     let label;
     this.server.post("/", (req, res) => {
@@ -27,12 +27,12 @@ export default class DataActionListener extends Listener {
       const out = {
         label,
         destinations: [{
-          name: "lookerbot",
-          label: "Slack",
           description: "Send data to Slack as the bot user configured for Lookerbot.",
-          url: `${baseUrl}/slack/post_from_query_action`,
           form_url: `${baseUrl}/data_actions/form`,
+          label: "Slack",
+          name: "lookerbot",
           supported_action_types: ["query"],
+          url: `${baseUrl}/slack/post_from_query_action`,
         }],
       };
 
@@ -54,12 +54,12 @@ export default class DataActionListener extends Listener {
           channels = _.sortBy(channels, "name");
 
           response = [{
-            name: "channel",
-            label: "Slack Channel",
             description: "The bot user must be a member of the channel.",
+            label: "Slack Channel",
+            name: "channel",
+            options: channels.map((channel) => ({name: channel.id, label: `#${channel.name}`})),
             required: true,
             type: "select",
-            options: channels.map((channel) => ({name: channel.id, label: `#${channel.name}`})),
           }];
 
           this.reply(res, response);

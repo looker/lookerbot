@@ -3,11 +3,11 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 const config = {
-  enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS === "true",
-  unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
-  slackApiKey: process.env.SLACK_API_KEY,
   debugMode: process.env.DEBUG_MODE === "true",
+  enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS === "true",
   npmPackage: require("./../package.json"),
+  slackApiKey: process.env.SLACK_API_KEY,
+  unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
 };
 
 if (config.unsafeLocalDev) {

@@ -1,18 +1,20 @@
+import Command from "./command";
+
 import config from "../config";
 import Looker from "../looker";
 import LookFinder from "../repliers/look_finder";
-import Command from "./command";
+import ReplyContext from "../reply_context";
 
 const FIND_REGEX = new RegExp("find (dashboard|look )? ?(.+)");
 
 export default class SearchCommand extends Command {
 
-  attempt(context) {
+  public attempt(context: ReplyContext) {
 
-    let match;
-    if (match = context.sourceMessage.text.match(FIND_REGEX)) {
+    const match context.sourceMessage.text.match(FIND_REGEX);
+    if (match) {
 
-      let [__, type, query] = match;
+      let [, type, query] = match;
 
       const firstWord = query.split(" ")[0];
       const foundLooker = Looker.all.filter((l) => l.url.indexOf(firstWord) !== -1)[0];
@@ -23,8 +25,7 @@ export default class SearchCommand extends Command {
       }
       context.looker = foundLooker || Looker.all[0];
 
-      const runner = new LookFinder(context, type, query);
-      runner.start();
+      new LookFinder(context, type, query).start();
 
       return true;
     } else {

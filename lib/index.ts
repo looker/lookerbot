@@ -22,16 +22,16 @@ setInterval(() =>
 
 // Set up the commander and its listeners
 state.commander = new Commander({
+  commands: [
+    require("./commands/search_command").default,
+    require("./commands/custom_command").default,
+    require("./commands/help_command").default,
+  ],
   listeners: [
     require("./listeners/data_action_listener").default,
     require("./listeners/health_check_listener").default,
     require("./listeners/schedule_listener").default,
     require("./listeners/slack_action_listener").default,
     require("./listeners/slack_event_listener").default,
-  ],
-  commands: [
-    require("./commands/search_command").default,
-    require("./commands/custom_command").default,
-    require("./commands/help_command").default,
   ],
 });
