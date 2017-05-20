@@ -9,19 +9,19 @@ export default class GoogleCloudStore extends Store {
   }
 
   storeBlob(blob, success, error) {
-    let blobStream = new streamBuffers.ReadableStreamBuffer();
+    const blobStream = new streamBuffers.ReadableStreamBuffer();
     blobStream.put(blob);
     blobStream.stop();
 
-    let storage = gcs({
+    const storage = gcs({
       projectId: process.env.GOOGLE_CLOUD_PROJECT,
       credentials: process.env.GOOGLE_CLOUD_CREDENTIALS_JSON ? JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) : undefined,
     });
 
-    let bucketName = process.env.GOOGLE_CLOUD_BUCKET;
-    let bucket = storage.bucket(bucketName);
-    let key = this.randomPath();
-    let file = bucket.file(key);
+    const bucketName = process.env.GOOGLE_CLOUD_BUCKET;
+    const bucket = storage.bucket(bucketName);
+    const key = this.randomPath();
+    const file = bucket.file(key);
 
     blobStream.pipe(file.createWriteStream({
       public: true,

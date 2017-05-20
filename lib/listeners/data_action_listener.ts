@@ -22,9 +22,9 @@ export default class DataActionListener extends Listener {
       :
         "Lookerbot";
 
-      let baseUrl = req.protocol + "://" + req.get("host");
+      const baseUrl = req.protocol + "://" + req.get("host");
 
-      let out = {
+      const out = {
         label,
         destinations: [{
           name: "lookerbot",
@@ -74,19 +74,19 @@ export default class DataActionListener extends Listener {
 
     return this.server.post("/data_actions", (req, res) => {
 
-      let getParam = (name) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
+      const getParam = (name) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
 
       if (!this.validateToken(req, res)) { return; }
 
-      let msg = getParam("message");
-      let channel = getParam("channel");
+      const msg = getParam("message");
+      const channel = getParam("channel");
 
       if (typeof(channel) !== "string") {
         this.reply(res, {looker: {success: false, message: "Channel must be a string."}});
         return;
       }
 
-      let context = new ReplyContext(this.bot, this.bot, {
+      const context = new ReplyContext(this.bot, this.bot, {
         channel,
       });
       context.dataAction = true;

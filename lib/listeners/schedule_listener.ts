@@ -17,7 +17,7 @@ export default class ScheduleListener extends Listener {
   handleRequest(req, res) : void {
 
     let channelName = req.params.channel_name || (req.form_params != null ? req.form_params.channel : undefined);
-    let channelType = req.params.post_type;
+    const channelType = req.params.post_type;
 
     if (!channelName) {
       this.reply(res, {success: false, reason: "Channel not specified."});
@@ -27,8 +27,8 @@ export default class ScheduleListener extends Listener {
     if (req.body.scheduled_plan) {
       if (req.body.scheduled_plan.type === "Look") {
 
-        let qid = req.body.scheduled_plan.query_id;
-        let lookId = __guard__(req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/), (x) => x[1]);
+        const qid = req.body.scheduled_plan.query_id;
+        const lookId = __guard__(req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/), (x) => x[1]);
 
         if (qid || lookId) {
 
@@ -38,22 +38,22 @@ export default class ScheduleListener extends Listener {
             channelName = `#${channelName}`;
           }
 
-          for (let looker of this.lookers) {
+          for (const looker of this.lookers) {
             if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
               if (this.validateTokenForLooker(req, res, looker)) {
 
-                let context = new ReplyContext(this.bot, this.bot, {
+                const context = new ReplyContext(this.bot, this.bot, {
                   channel: channelName,
                 });
                 context.looker = looker;
                 context.scheduled = true;
 
                 if (lookId) {
-                  let runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
+                  const runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
                   runner.start();
                   this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
                 } else {
-                  let runner = new QueryRunner(context, {id: qid});
+                  const runner = new QueryRunner(context, {id: qid});
                   runner.start();
                   this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
                 }

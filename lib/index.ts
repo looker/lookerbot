@@ -4,7 +4,7 @@ import Commander from "./commander";
 import Looker from "./looker";
 import VersionChecker from "./version_checker";
 
-let state: any = {
+const state: any = {
   VersionChecker: new VersionChecker(),
 };
 

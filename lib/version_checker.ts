@@ -28,7 +28,7 @@ export default class VersionChecker {
           console.error(`Could not check version at ${url}`);
           return this.checked(null);
         } else if (response.statusCode === 200) {
-          let json = JSON.parse(body);
+          const json = JSON.parse(body);
           if (semver.gt(json.tag_name, config.npmPackage.version)) {
             console.log(`Found update: ${json.tag_name} is newer than ${config.npmPackage.version}`);
             return this.checked(json);

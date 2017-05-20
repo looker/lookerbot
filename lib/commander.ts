@@ -62,7 +62,7 @@ export default class Commander {
     const matches = url.match(/\/looks\/([0-9]+)$/);
     if (matches) {
       console.log(`Expanding Look URL ${url}`);
-      let runner = new LookQueryRunner(context, matches[1]);
+      const runner = new LookQueryRunner(context, matches[1]);
       runner.start();
     }
   }
@@ -71,7 +71,7 @@ export default class Commander {
     const matches = url.match(/\/x\/([A-Za-z0-9]+)$/);
     if (matches) {
       console.log(`Expanding Share URL ${url}`);
-      let runner = new QueryRunner(context, {slug: matches[1]});
+      const runner = new QueryRunner(context, {slug: matches[1]});
       runner.start();
     }
   }

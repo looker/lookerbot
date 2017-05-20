@@ -8,14 +8,14 @@ export default class AmazonS3Store extends Store {
   }
 
   storeBlob(blob, success, error) {
-    let key = this.randomPath();
-    let region = process.env.SLACKBOT_S3_BUCKET_REGION;
-    let domain = region && (region !== "us-east-1") ?
+    const key = this.randomPath();
+    const region = process.env.SLACKBOT_S3_BUCKET_REGION;
+    const domain = region && (region !== "us-east-1") ?
       `s3-${process.env.SLACKBOT_S3_BUCKET_REGION}.amazonaws.com`
     :
       "s3.amazonaws.com";
 
-    let params = {
+    const params = {
       Bucket: process.env.SLACKBOT_S3_BUCKET,
       Key: key,
       Body: blob,
@@ -23,7 +23,7 @@ export default class AmazonS3Store extends Store {
       ContentType: "image/png",
     };
 
-    let s3 = new AWS.S3({
+    const s3 = new AWS.S3({
       endpoint: new AWS.Endpoint(domain) as any,
     });
     s3.putObject(params, function(err, data) {

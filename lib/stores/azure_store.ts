@@ -8,16 +8,16 @@ export default class AzureStore extends Store {
   }
 
   storeBlob(blob, success, error) {
-    let key = this.randomPath();
-    let container = process.env.SLACKBOT_AZURE_CONTAINER;
-    let options =
+    const key = this.randomPath();
+    const container = process.env.SLACKBOT_AZURE_CONTAINER;
+    const options =
       {ContentType: "image/png"};
-    let wasb = new AzureStorage.createBlobService();
+    const wasb = new AzureStorage.createBlobService();
     wasb.createBlockBlobFromText(container, key, blob, options, function(err, result, response) {
       if (err) {
         return error(err, "Azure Error");
       } else {
-        let storageAccount = process.env.AZURE_STORAGE_ACCOUNT;
+        const storageAccount = process.env.AZURE_STORAGE_ACCOUNT;
         return success(`https://${storageAccount}.blob.core.windows.net/${container}/${key}`);
       }
     });

@@ -30,7 +30,7 @@ export default class Listener {
       this.reply(res, {looker: {success: false}, reason: "No x-looker-webhook-token token provided."});
       return false;
     }
-    let value = req.headers["x-looker-webhook-token"] === looker.webhookToken;
+    const value = req.headers["x-looker-webhook-token"] === looker.webhookToken;
     if (!value) {
       this.reply(res, {looker: {success: false}, reason: "Invalid x-looker-webhook-token."});
     }

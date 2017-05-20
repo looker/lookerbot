@@ -21,7 +21,7 @@ export default class Looker {
   }
 
   static loadAll() {
-    let configs = process.env.LOOKERS ?
+    const configs = process.env.LOOKERS ?
       (console.log("Using Looker information specified in LOOKERS environment variable."),
       JSON.parse(process.env.LOOKERS))
     :
@@ -84,7 +84,7 @@ export default class Looker {
     space.dashboards.forEach((partialDashboard) =>
       this.client.get(`dashboards/${partialDashboard.id}`, (dashboard) => {
 
-        let command: CustomCommand = {
+        const command: CustomCommand = {
           name: dashboard.title.toLowerCase().trim(),
           description: dashboard.description,
           dashboard,
@@ -97,7 +97,7 @@ export default class Looker {
 
         command.helptext = "";
 
-        let dashboard_filters = dashboard.dashboard_filters || dashboard.filters;
+        const dashboard_filters = dashboard.dashboard_filters || dashboard.filters;
         if ((dashboard_filters != null ? dashboard_filters.length : undefined) > 0) {
           command.helptext = `<${dashboard_filters[0].title.toLowerCase()}>`;
         }

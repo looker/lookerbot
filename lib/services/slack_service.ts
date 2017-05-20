@@ -63,7 +63,7 @@ export default class SlackService {
 
     // Listen to the various events
 
-    let processCommand = (bot, message, isDM = false) => {
+    const processCommand = (bot, message, isDM = false) => {
       context = new ReplyContext(this.defaultBot, bot, message);
       context.isDM = isDM;
       return this.ensureUserAuthorized(context, () => {
@@ -102,7 +102,7 @@ export default class SlackService {
 
       return this.ensureUserAuthorized(context, () => {
         // URL Expansion
-        let urls = getUrls(message.text).map((url) => url.replace("%3E", ""));
+        const urls = getUrls(message.text).map((url) => url.replace("%3E", ""));
         urls.forEach((url) => {
           this.urlHandler(context, url);
         });
@@ -114,7 +114,7 @@ export default class SlackService {
 
   ensureUserAuthorized(context: ReplyContext, callback, options: {silent: boolean} = {silent: false}) {
 
-    let reply = (text: string) => {
+    const reply = (text: string) => {
       if (!options.silent) {
         context.replyPrivate({text});
       }
@@ -124,7 +124,7 @@ export default class SlackService {
       if (error || !response.user) {
         reply(`Could not fetch your user info from Slack. ${error || ""}`);
       } else {
-        let user = response.user;
+        const user = response.user;
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`);
         } else if (user.is_bot) {

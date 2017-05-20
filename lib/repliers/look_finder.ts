@@ -14,27 +14,27 @@ export default class LookFinder extends QueryRunner {
   }
 
   async matchLooks(query) {
-    let looks = await this.replyContext.looker.client.getAsync(
+    const looks = await this.replyContext.looker.client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
       {},
       this.replyContext,
     );
 
-    let fuzzySearch = new FuzzySearch(looks, {termPath: "title"});
+    const fuzzySearch = new FuzzySearch(looks, {termPath: "title"});
     fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}));
-    let results = fuzzySearch.search(query);
+    const results = fuzzySearch.search(query);
 
     return results;
   }
 
   async work() {
-    let results = await this.matchLooks(this.query);
+    const results = await this.matchLooks(this.query);
     if (results) {
-      let shortResults = results.slice(0, 5);
+      const shortResults = results.slice(0, 5);
       return this.reply({
         text: "Matching Looks:",
         attachments: shortResults.map((v) => {
-          let look = v.value;
+          const look = v.value;
           return {
             title: look.title,
             title_link: `${this.replyContext.looker.url}${look.short_url}`,

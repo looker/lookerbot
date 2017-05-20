@@ -41,8 +41,8 @@ const sassyMessages = [
   ["in", "कृपया एक क्षण के लिए"],
 
 ].map(function(param ) {
-  let [country, message] = param;
-  let translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`;
+  const [country, message] = param;
+  const translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`;
   return `<${translate}|:flag-${country}:> _${message}..._`;
 });
 
@@ -64,9 +64,9 @@ export default abstract class FancyReplier {
         obj = {text: obj, channel: this.replyContext.sourceMessage.channel};
       }
 
-      let params = {ts: this.loadingMessage.ts, channel: this.replyContext.sourceMessage.channel};
+      const params = {ts: this.loadingMessage.ts, channel: this.replyContext.sourceMessage.channel};
 
-      let update = _.extend(params, obj);
+      const update = _.extend(params, obj);
       update.attachments = update.attachments ? JSON.stringify(update.attachments) : null;
       update.text = update.text || " ";
       update.parse = "none";
@@ -95,7 +95,7 @@ export default abstract class FancyReplier {
       sass = `[DEVELOPMENT] ${sass}`;
     }
 
-    let params = {
+    const params = {
       text: sass,
       as_user: true,
       attachments: [], // Override some Botkit stuff
@@ -120,7 +120,7 @@ export default abstract class FancyReplier {
   }
 
   private performWork() {
-    let promise = this.work();
+    const promise = this.work();
     if (promise) {
       promise.catch((err) => this.replyError(err));
     }

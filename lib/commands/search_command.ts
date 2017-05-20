@@ -3,7 +3,7 @@ import Looker from "../looker";
 import LookFinder from "../repliers/look_finder";
 import Command from "./command";
 
-let FIND_REGEX = new RegExp("find (dashboard|look )? ?(.+)");
+const FIND_REGEX = new RegExp("find (dashboard|look )? ?(.+)");
 
 export default class SearchCommand extends Command {
 
@@ -14,16 +14,16 @@ export default class SearchCommand extends Command {
 
       let [__, type, query] = match;
 
-      let firstWord = query.split(" ")[0];
-      let foundLooker = Looker.all.filter((l) => l.url.indexOf(firstWord) !== -1)[0];
+      const firstWord = query.split(" ")[0];
+      const foundLooker = Looker.all.filter((l) => l.url.indexOf(firstWord) !== -1)[0];
       if (foundLooker) {
-        let words = query.split(" ");
+        const words = query.split(" ");
         words.shift();
         query = words.join(" ");
       }
       context.looker = foundLooker || Looker.all[0];
 
-      let runner = new LookFinder(context, type, query);
+      const runner = new LookFinder(context, type, query);
       runner.start();
 
       return true;

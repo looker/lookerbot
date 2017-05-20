@@ -4,7 +4,10 @@
     ],
     "jsRules": {},
     "rules": {
-      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"]
+      "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+      "prefer-const": true,
+      "max-line-length": false,
+      "no-console": false
     },
     "rulesDirectory": []
 }

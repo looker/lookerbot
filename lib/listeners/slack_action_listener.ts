@@ -24,8 +24,8 @@ export default class SlackActionListener extends Listener {
       }
 
       // Make this look like a botkit message
-      let message: any = {};
-      for (let key in payload) {
+      const message: any = {};
+      for (const key in payload) {
         message[key] = payload[key];
       }
       message.user = message.user_id;
@@ -36,7 +36,7 @@ export default class SlackActionListener extends Listener {
 
       if (SlackUtils.checkToken(this.bot, message)) {
 
-        for (let action of message.actions) {
+        for (const action of message.actions) {
 
           let text;
           try {
@@ -48,14 +48,14 @@ export default class SlackActionListener extends Listener {
             return;
           }
 
-          let looker = this.lookers.filter((l) => l.url === payload.lookerUrl)[0];
+          const looker = this.lookers.filter((l) => l.url === payload.lookerUrl)[0];
           if (!looker) {
             res.status(400);
             this.reply(res, {error: "Unknown looker"});
             return;
           }
 
-          let success = (actionResult) => {
+          const success = (actionResult) => {
             if (actionResult.success) {
               text = `:white_check_mark: ${actionResult.message || "Done"}!`;
             } else if (actionResult.validation_errors) {

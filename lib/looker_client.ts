@@ -44,7 +44,7 @@ export default class LookerAPIClient {
       return;
     }
 
-    let newConfig = {
+    const newConfig = {
       method: requestConfig.method,
       url: `${this.options.baseUrl}/${requestConfig.path}`,
       body: requestConfig.body,
@@ -134,7 +134,7 @@ export default class LookerAPIClient {
 
   fetchAccessToken() {
 
-    let options = {
+    const options = {
       method: "POST",
       url: `${this.options.baseUrl}/login`,
       form: {
@@ -150,7 +150,7 @@ export default class LookerAPIClient {
         this.tokenError = error;
         this.token = undefined;
       } else if (response.statusCode === 200) {
-        let json = JSON.parse(body);
+        const json = JSON.parse(body);
         this.token = json.access_token;
         console.log(`Updated API token for ${this.options.baseUrl}`);
       } else {
@@ -166,7 +166,7 @@ export default class LookerAPIClient {
   }
 
   private buildMetadata(context: ReplyContext) {
-    let msg = context.sourceMessage;
+    const msg = context.sourceMessage;
     let metadata = "";
     if (msg.user) {
       metadata += ` user=${this.sha(msg.user)}`;
@@ -185,7 +185,7 @@ export default class LookerAPIClient {
   }
 
   private sha(text) {
-    let shasum = crypto.createHash("sha1");
+    const shasum = crypto.createHash("sha1");
     shasum.update(text);
     return shasum.digest("hex");
   }

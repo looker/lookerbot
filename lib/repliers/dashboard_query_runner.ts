@@ -16,7 +16,7 @@ export default class DashboardQueryRunner extends QueryRunner {
 
   work() {
 
-    let elements = this.dashboard.dashboard_elements || this.dashboard.elements;
+    const elements = this.dashboard.dashboard_elements || this.dashboard.elements;
 
     if (elements.length > 1) {
       this.reply("Dashboards with more than one element aren't currently supported for Slack commands.");
@@ -27,10 +27,10 @@ export default class DashboardQueryRunner extends QueryRunner {
       this.replyContext.looker.client.get(
         `looks/${element.look_id}`,
         (look) => {
-          let queryDef = look.query;
+          const queryDef = look.query;
 
-          for (let dashFilterName in element.listen) {
-            let fieldName = element.listen[dashFilterName];
+          for (const dashFilterName in element.listen) {
+            const fieldName = element.listen[dashFilterName];
             if (this.filters[dashFilterName]) {
               if (!queryDef.filters) { queryDef.filters = {}; }
               queryDef.filters[fieldName] = this.filters[dashFilterName];

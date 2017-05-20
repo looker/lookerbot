@@ -8,16 +8,16 @@ import Command from "./command";
 export default class HelpCommand extends Command {
 
   attempt(context) {
-    let helpAttachments: any = [];
+    const helpAttachments: any = [];
 
-    let groups = _.groupBy(Looker.customCommandList(), "category");
+    const groups = _.groupBy(Looker.customCommandList(), "category");
 
-    for (let groupName of Object.keys(groups)) {
-      let groupCommmands = groups[groupName];
+    for (const groupName of Object.keys(groups)) {
+      const groupCommmands = groups[groupName];
       let groupText = "";
-      for (let command of _.sortBy(_.values(groupCommmands), "name")) {
+      for (const command of _.sortBy(_.values(groupCommmands), "name")) {
         if (!command.hidden) {
-          const url = `${command.looker.url}/dashboards/${command.dashboard.id}`
+          const url = `${command.looker.url}/dashboards/${command.dashboard.id}`;
           groupText += `• *<${url}|${command.name}>* ${command.helptext}`;
           if (command.description) {
             groupText += ` — _${command.description}_`;
@@ -51,8 +51,8 @@ export default class HelpCommand extends Command {
       mrkdwn_in: ["text"],
     });
 
-    let spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
-      `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`
+    const spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
+      `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`;
     }).join(" or ");
 
     if (spaces) {
@@ -76,7 +76,7 @@ export default class HelpCommand extends Command {
       context.replyPrivate({attachments: helpAttachments});
     }
 
-    for (let looker of Array.from(Looker.all)) {
+    for (const looker of Array.from(Looker.all)) {
       looker.refreshCommands();
     }
 

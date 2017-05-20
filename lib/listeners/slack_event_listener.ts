@@ -13,7 +13,7 @@ class SlackEventListener extends Listener {
 
     return this.server.post("/slack/event", (req, res) => {
 
-      let payload = req.body;
+      const payload = req.body;
 
       if (SlackUtils.checkToken(null, payload)) {
         if (payload.challenge) {

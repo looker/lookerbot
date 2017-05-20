@@ -35,7 +35,7 @@ export default class QueryRunner extends FancyReplier {
   postImage(query, imageData, options = {}) {
     if (this.replyContext.looker.storeBlob) {
 
-      let success = (url) => {
+      const success = (url) => {
         return this.reply({
           attachments: [
             _.extend({}, options, {
@@ -49,7 +49,7 @@ export default class QueryRunner extends FancyReplier {
         });
       };
 
-      let error = (error, context) => {
+      const error = (error, context) => {
         return this.reply(`:warning: *${context}* ${error}`);
       };
 
@@ -69,29 +69,29 @@ export default class QueryRunner extends FancyReplier {
     // Handle hidden fields
     let attachment, d, rendered, text;
 
-    let hiddenFields = (query.vis_config != null ? query.vis_config.hidden_fields : undefined) || [];
+    const hiddenFields = (query.vis_config != null ? query.vis_config.hidden_fields : undefined) || [];
     if ((hiddenFields != null ? hiddenFields.length : undefined) > 0) {
-      for (let k in result.fields) {
-        let v = result.fields[k];
+      for (const k in result.fields) {
+        const v = result.fields[k];
         result.fields[k] = v.filter((field) => hiddenFields.indexOf(field.name) === -1);
       }
     }
 
-    let calcs = result.fields.table_calculations || [];
-    let dimensions = result.fields.dimensions || [];
-    let measures = result.fields.measures || [];
-    let measure_like = measures.concat(calcs.filter((c) => c.is_measure));
-    let dimension_like = dimensions.concat(calcs.filter((c) => !c.is_measure));
+    const calcs = result.fields.table_calculations || [];
+    const dimensions = result.fields.dimensions || [];
+    const measures = result.fields.measures || [];
+    const measure_like = measures.concat(calcs.filter((c) => c.is_measure));
+    const dimension_like = dimensions.concat(calcs.filter((c) => !c.is_measure));
 
-    let renderableFields = dimension_like.concat(measure_like);
+    const renderableFields = dimension_like.concat(measure_like);
 
-    let shareUrl = this.shareUrlContent(query.share_url);
+    const shareUrl = this.shareUrlContent(query.share_url);
 
-    let addSlackButtons = (f, row, attachment) => {
+    const addSlackButtons = (f, row, attachment) => {
       if (!SlackUtils.slackButtonsEnabled) { return; }
       d = row[f.name];
       if (!d.links) { return; }
-      let usableActions = d.links.filter((l) => (l.type === "action") && !l.form && !l.form_url);
+      const usableActions = d.links.filter((l) => (l.type === "action") && !l.form && !l.form_url);
       if (!(usableActions.length > 0)) { return; }
       attachment.actions = usableActions.map((link) => {
         return {
@@ -104,11 +104,11 @@ export default class QueryRunner extends FancyReplier {
       return attachment.callback_id = uuid();
     };
 
-    let renderString = (d) => d.rendered || d.value;
+    const renderString = (d) => d.rendered || d.value;
 
-    let renderField = (f, row) => {
+    const renderField = (f, row) => {
       d = row[f.name];
-      let drill = d.links != null ? d.links[0] : undefined;
+      const drill = d.links != null ? d.links[0] : undefined;
       if (drill && (drill.type === "measure_default")) {
         return `<${this.replyContext.looker.url}${drill.url}|${renderString(d)}>`;
       } else if ((d != null) && (d.value !== null)) {
@@ -118,7 +118,7 @@ export default class QueryRunner extends FancyReplier {
       }
     };
 
-    let renderFieldLabel = function(field) {
+    const renderFieldLabel = function(field) {
       if (((query.vis_config != null ? query.vis_config.show_view_names : undefined) != null) && !query.vis_config.show_view_names) {
         return field.label_short || field.label;
       } else {
@@ -131,16 +131,16 @@ export default class QueryRunner extends FancyReplier {
 
     } else if (result.data.length === 0) {
       if ((result.errors != null ? result.errors.length : undefined)) {
-        let txt = result.errors.map((e) => `${e.message}\`\`\`${e.message_details}\`\`\``).join("\n");
+        const txt = result.errors.map((e) => `${e.message}\`\`\`${e.message_details}\`\`\``).join("\n");
         return this.reply(`:warning: ${shareUrl}\n${txt}`);
       } else {
         return this.reply(`${shareUrl}\nNo results.`);
       }
 
     } else if ((query.vis_config != null ? query.vis_config.type : undefined) === "single_value") {
-      let field = measure_like[0] || dimension_like[0];
-      let share = this.showShareUrl() ? `\n${shareUrl}` : "";
-      let datum = result.data[0];
+      const field = measure_like[0] || dimension_like[0];
+      const share = this.showShareUrl() ? `\n${shareUrl}` : "";
+      const datum = result.data[0];
       rendered = renderField(field, datum);
       text = `*${rendered}*${share}`;
       attachment = {text, fallback: rendered, color: "#64518A", mrkdwn_in: ["text"]};
@@ -192,7 +192,7 @@ export default class QueryRunner extends FancyReplier {
   }
 
   runQuery(query, options = {}) {
-    let type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
+    const type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
       return this.replyContext.looker.client.get(
         `queries/${query.id}/run/unified`,

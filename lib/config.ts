@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-let config = {
+const config = {
   enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS === "true",
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
   slackApiKey: process.env.SLACK_API_KEY,
