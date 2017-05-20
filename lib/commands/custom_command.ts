@@ -1,12 +1,13 @@
 import * as _ from "underscore";
-import config from "../config";
-import Looker from "../looker";
-import DashboardQueryRunner from "../repliers/dashboard_query_runner";
 import Command from "./command";
+import config from "../config";
+import DashboardQueryRunner from "../repliers/dashboard_query_runner";
+import Looker from "../looker";
+import ReplyContext from "../reply_context";
 
 export default class CustomCommand extends Command {
 
-  attempt(context) {
+  public attempt(context: ReplyContext) {
     let normalizedText = context.sourceMessage.text.toLowerCase();
     let shortCommands = _.sortBy(_.values(Looker.customCommands), (c) => -c.name.length);
     let matchedCommand = __guard__(shortCommands.filter((c) => normalizedText.indexOf(c.name) === 0), (x) => x[0]);
@@ -19,8 +20,8 @@ export default class CustomCommand extends Command {
       context.looker = matchedCommand.looker;
 
       let filters = {};
-      let dashboard_filters = dashboard.dashboard_filters || dashboard.filters;
-      for (let filter of dashboard_filters) {
+      let dashboardFilters = dashboard.dashboard_filters || dashboard.filters;
+      for (let filter of dashboardFilters) {
         filters[filter.name] = query;
       }
       let runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters);

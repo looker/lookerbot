@@ -1,5 +1,4 @@
 import * as dotenv from "dotenv";
-import * as jsonfile from "jsonfile";
 
 dotenv.config();
 

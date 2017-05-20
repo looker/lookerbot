@@ -7,8 +7,8 @@ import SlackService from "./services/slack_service";
 
 export default class Commander {
 
-  service: SlackService;
-  commands: Command[];
+  private service: SlackService;
+  private commands: Command[];
 
   constructor(opts: {listeners: Array<typeof Listener>, commands: Array<typeof Command>}) {
     this.service = new SlackService({
@@ -25,14 +25,14 @@ export default class Commander {
     this.commands = opts.commands.map((c) => new c());
   }
 
-  handleMessage(context) {
+  private handleMessage(context) {
 
-    let message = context.sourceMessage;
+    const message = context.sourceMessage;
 
     message.text = message.text.split("“").join('"');
     message.text = message.text.split("”").join('"');
 
-    for (let command of Array.from(this.commands)) {
+    for (const command of this.commands) {
       if (command.attempt(context)) {
         break;
       }
@@ -46,8 +46,8 @@ export default class Commander {
 
   }
 
-  handleUrlExpansion(context, url) {
-    for (let looker of Array.from(Looker.all)) {
+  private handleUrlExpansion(context, url) {
+    for (const looker of Looker.all) {
       // Starts with Looker base URL?
       if (url.lastIndexOf(looker.url, 0) === 0) {
         context.looker = looker;
@@ -58,19 +58,18 @@ export default class Commander {
 
   }
 
-  annotateLook(context, url) {
-    let matches;
-    if (matches = url.match(/\/looks\/([0-9]+)$/)) {
+  private annotateLook(context, url) {
+    const matches = url.match(/\/looks\/([0-9]+)$/);
+    if (matches) {
       console.log(`Expanding Look URL ${url}`);
       let runner = new LookQueryRunner(context, matches[1]);
       runner.start();
     }
-
   }
 
-  annotateShareUrl(context, url) {
-    let matches;
-    if (matches = url.match(/\/x\/([A-Za-z0-9]+)$/)) {
+  private annotateShareUrl(context, url) {
+    const matches = url.match(/\/x\/([A-Za-z0-9]+)$/);
+    if (matches) {
       console.log(`Expanding Share URL ${url}`);
       let runner = new QueryRunner(context, {slug: matches[1]});
       runner.start();

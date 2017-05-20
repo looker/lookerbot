@@ -12,12 +12,13 @@ export default class HelpCommand extends Command {
 
     let groups = _.groupBy(Looker.customCommandList(), "category");
 
-    for (let groupName in groups) {
+    for (let groupName of Object.keys(groups)) {
       let groupCommmands = groups[groupName];
       let groupText = "";
       for (let command of _.sortBy(_.values(groupCommmands), "name")) {
         if (!command.hidden) {
-          groupText += `• *<${command.looker.url}/dashboards/${command.dashboard.id}|${command.name}>* ${command.helptext}`;
+          const url = `${command.looker.url}/dashboards/${command.dashboard.id}`
+          groupText += `• *<${url}|${command.name}>* ${command.helptext}`;
           if (command.description) {
             groupText += ` — _${command.description}_`;
           }
@@ -50,7 +51,10 @@ export default class HelpCommand extends Command {
       mrkdwn_in: ["text"],
     });
 
-    let spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`).join(" or ");
+    let spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
+      `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`
+    }).join(" or ");
+
     if (spaces) {
       helpAttachments.push({
         text: `\n_To add your own commands, add a dashboard to ${spaces}._`,
