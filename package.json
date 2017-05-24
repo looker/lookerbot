@@ -1,11 +1,11 @@
 {
   "name": "looker-slackbot",
-  "version": "0.0.9",
+  "version": "0.0.12",
   "description": "Slackbot for Looker integration",
-  "main": "index.js",
   "scripts": {
-    "start": "coffee lib/bot.coffee",
-    "test": "mocha --compilers coffee:coffee-script/register"
+    "start": "./node_modules/.bin/coffee lib/index.coffee",
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register",
+    "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/coffee lib/index.coffee"
   },
   "dependencies": {
     "@google-cloud/storage": "^0.8.0",
@@ -13,18 +13,21 @@
     "azure-storage": "~0.10.0",
     "botkit": "0.0.15",
     "coffee-script": "^1.10.0",
+    "dotenv": "^4.0.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^5.0.0",
     "request": "^2.66.0",
     "semver": "^5.1.0",
     "stream-buffers": "^3.0.1",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "nodemon": "^1.11.0"
   },
   "engines": {
-    "node": "^4.2.6"
+    "node": "^6.10.3"
   },
   "repository": {
     "type": "git",
