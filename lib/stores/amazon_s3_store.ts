@@ -7,7 +7,7 @@ export default class AmazonS3Store extends Store {
     return !!process.env.SLACKBOT_S3_BUCKET;
   }
 
-  public storeBlob(blob): Promise<string> {
+  public storeImage(buffer: Buffer): Promise<string> {
     const key = this.randomPath();
     const region = process.env.SLACKBOT_S3_BUCKET_REGION;
     const domain = region && (region !== "us-east-1") ?
@@ -17,7 +17,7 @@ export default class AmazonS3Store extends Store {
 
     const params = {
       ACL: "public-read",
-      Body: blob,
+      Body: buffer,
       Bucket: process.env.SLACKBOT_S3_BUCKET,
       ContentType: "image/png",
       Key: key,

@@ -94,12 +94,14 @@ export abstract class FancyReplier {
     }
   }
 
-  protected replyError(response) {
+  protected replyError(response: {error: string} | {message: string} | string | any) {
     console.error(response);
-    if ((response != null ? response.error : undefined)) {
+    if (response.error) {
       this.reply(`:warning: ${response.error}`);
-    } else if ((response != null ? response.message : undefined)) {
+    } else if (response.message) {
       this.reply(`:warning: ${response.message}`);
+    } else if (typeof response === "string") {
+      this.reply(`:warning: ${response}`);
     } else {
       this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
     }

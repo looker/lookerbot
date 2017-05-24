@@ -10,7 +10,7 @@ const stores: Store[] = [
   new GoogleCloudStore(),
 ];
 
-let currentStore;
+let currentStore: Store | undefined;
 
 for (const store of stores) {
   if (store.configured()) {

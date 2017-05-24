@@ -33,7 +33,7 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected async postImage(query, imageData) {
+  protected async postImage(query, imageData: Buffer) {
     if (!blobStores.current) {
       this.reply(":warning: No storage is configured for visualization images in the bot configuration.");
       return;
@@ -45,8 +45,7 @@ export default class QueryRunner extends FancyReplier {
     }
 
     try {
-      const url = await blobStores.current.storeBlob(imageData);
-      console.log("Got that hot url: " + url);
+      const url = await blobStores.current.storeImage(imageData);
       this.reply({
         attachments: [
           {
@@ -96,7 +95,7 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected runQuery(query) {
+  protected async runQuery(query) {
     const type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
       this.replyContext.looker.client.get(
@@ -107,19 +106,19 @@ export default class QueryRunner extends FancyReplier {
         this.replyContext,
       );
     } else {
-      this.replyContext.looker.client.get(
-        `queries/${query.id}/run/png`,
-        (result) => this.postImage(query, result),
-        (r) => {
-          if ((r != null ? r.error : undefined) === "Received empty response from Looker.") {
-            this.replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."});
-          } else {
-            this.replyError(r);
-          }
-        },
-        {encoding: null},
-        this.replyContext,
-      );
+      try {
+        const imageData = await this.replyContext.looker.client.getBinaryAsync(
+          `queries/${query.id}/run/png`,
+          this.replyContext,
+        );
+        this.postImage(query, imageData);
+      } catch (e) {
+        if (e.error && e.error === "Received empty response from Looker.") {
+          this.replyError("Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images.");
+        } else {
+          this.replyError(e);
+        }
+      }
     }
   }
 

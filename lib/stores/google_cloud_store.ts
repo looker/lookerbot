@@ -1,5 +1,6 @@
 import * as gcs from "@google-cloud/storage";
-import * as streamBuffers from "stream-buffers";
+import * as fs from "fs";
+import { ReadableStreamBuffer } from "stream-buffers";
 import Store from "./store";
 
 export default class GoogleCloudStore extends Store {
@@ -8,9 +9,10 @@ export default class GoogleCloudStore extends Store {
     return !!process.env.GOOGLE_CLOUD_BUCKET;
   }
 
-  public storeBlob(blob): Promise<string> {
-    const blobStream = new streamBuffers.ReadableStreamBuffer();
-    blobStream.put(blob);
+  public storeImage(buffer: Buffer): Promise<string> {
+
+    const blobStream = new ReadableStreamBuffer();
+    blobStream.put(buffer);
     blobStream.stop();
 
     const storage = gcs({
@@ -24,9 +26,9 @@ export default class GoogleCloudStore extends Store {
     const file = bucket.file(key);
 
     return new Promise<string>((resolve, reject) => {
-      blobStream.pipe(file.createWriteStream({
-        public: true,
-      })).on("error", (err) => {
+      blobStream
+      .pipe(file.createWriteStream({public: true}))
+      .on("error", (err) => {
         reject(`Google Cloud Storage Error: ${JSON.stringify(err)}`);
       }).on("finish", () => {
         resolve(`https://storage.googleapis.com/${bucketName}/${key}`);

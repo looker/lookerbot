@@ -101,6 +101,12 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
+"@types/stream-buffers@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@types/stream-buffers/-/stream-buffers-3.0.2.tgz#b73bfcceae39ecb259750b44ef38a36cfc20e370"
+  dependencies:
+    "@types/node" "*"
+
 "@types/underscore@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.0.tgz#7a22ef584d6fe59af2e407bae079e2b7f8a5102f"

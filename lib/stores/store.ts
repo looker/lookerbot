@@ -6,7 +6,7 @@ export default class Store {
     throw new Error("subclass");
   }
 
-  public storeBlob(blob, success, error): Promise<string> {
+  public storeImage(buffer: Buffer): Promise<string> {
     throw new Error("subclass");
   }
 

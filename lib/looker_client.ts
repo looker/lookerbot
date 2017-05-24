@@ -7,9 +7,12 @@ import ReplyContext from "./reply_context";
 export interface ILookerRequestConfig {
   method: string;
   path: string;
-  replyContext?: ReplyContext;
   headers?: request.Headers;
   body?: any;
+}
+
+export interface ILookerRequestOptions {
+  encoding?: string | null;
 }
 
 export default class LookerAPIClient {
@@ -29,7 +32,7 @@ export default class LookerAPIClient {
   }
 
   public request(
-    requestConfig: ILookerRequestConfig,
+    requestConfig: ILookerRequestConfig & ILookerRequestOptions,
     successCallback?: any,
     errorCallback?: any,
     replyContext?: ReplyContext,
@@ -47,7 +50,7 @@ export default class LookerAPIClient {
       successCallback = () => { return; };
     }
 
-    const newConfig = {
+    const newConfig: request.CoreOptions & request.UrlOptions = {
       body: requestConfig.body,
       headers: {
         "Authorization": `token ${this.token}`,
@@ -56,6 +59,10 @@ export default class LookerAPIClient {
       method: requestConfig.method,
       url: `${this.options.baseUrl}/${requestConfig.path}`,
     };
+
+    if (typeof requestConfig.encoding !== "undefined") {
+      newConfig.encoding = requestConfig.encoding;
+    }
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {});
 
@@ -94,18 +101,25 @@ export default class LookerAPIClient {
     });
   }
 
-  public get(path: string, successCallback?: any, errorCallback?: any, options?: any, replyContext?: ReplyContext) {
+  public get(path: string, successCallback?: any, errorCallback?: any, options?: ILookerRequestOptions, replyContext?: ReplyContext) {
     this.request(_.extend({method: "GET", path}, options || {}), successCallback, errorCallback, replyContext);
   }
 
   public getAsync(
     path: string,
-    options?: any,
+    options?: ILookerRequestOptions,
     replyContext?: ReplyContext,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.get(path, resolve, reject, options, replyContext);
     });
+  }
+
+  public getBinaryAsync(
+    path: string,
+    replyContext?: ReplyContext,
+  ): Promise<Buffer> {
+    return this.getAsync(path, {encoding: null}, replyContext);
   }
 
   public post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
