@@ -1,5 +1,5 @@
 import * as Botkit from "botkit";
-import getUrls from "get-urls";
+import * as getUrls from "get-urls";
 import config from "../config";
 import Looker from "../looker";
 import ReplyContext from "../reply_context";
@@ -102,9 +102,8 @@ export default class SlackService {
 
       this.ensureUserAuthorized(context, () => {
         // URL Expansion
-        const urls = getUrls(message.text).map((url) => url.replace("%3E", ""));
-        urls.forEach((url) => {
-          this.urlHandler(context, url);
+        getUrls(message.text).forEach((url) => {
+          this.urlHandler(context, url.replace("%3E", ""));
         });
       }
       , {silent: true});

@@ -25,7 +25,7 @@
     "chai": "^3.5.0",
     "dotenv": "^4.0.0",
     "fuzzysearch-js": "^0.2.0",
-    "get-urls": "^5.0.0",
+    "get-urls": "^7.0.0",
     "request": "^2.66.0",
     "semver": "^5.1.0",
     "stream-buffers": "^3.0.1",
