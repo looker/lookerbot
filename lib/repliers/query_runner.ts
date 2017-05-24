@@ -2,6 +2,7 @@ import * as _ from "underscore";
 import SlackUtils from "../slack_utils";
 import { FancyReplier } from "./fancy_replier";
 import SlackTableFormatter from "./slack_table_formatter";
+import blobStores from "../stores/index";
 
 export default class QueryRunner extends FancyReplier {
 
@@ -32,36 +33,35 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected postImage(query, imageData) {
-    if (this.replyContext.looker.storeBlob) {
-
-      const success = (url) => {
-        this.reply({
-          attachments: [
-            {
-              color: "#64518A",
-              image_url: url,
-              title: this.showShareUrl() ? this.linkText(query.share_url) : "",
-              title_link: this.showShareUrl() ? this.linkUrl(query.share_url) : "",
-            },
-          ],
-          text: "",
-        });
-      };
-
-      const error = (msg, context) => {
-        this.reply(`:warning: *${context}* ${msg}`);
-      };
-
-      if (imageData.length) {
-        this.replyContext.looker.storeBlob(imageData, success, error);
-      } else {
-        error("No image data returned for query.", "Looker Render Error");
-      }
-
-    } else {
+  protected async postImage(query, imageData) {
+    if (!blobStores.current) {
       this.reply(":warning: No storage is configured for visualization images in the bot configuration.");
+      return;
     }
+
+    if (!imageData.length) {
+      this.reply(`:warning: Looker Render Error: No image data returned for query.`);
+      return;
+    }
+
+    try {
+      const url = await blobStores.current.storeBlob(imageData);
+      console.log("Got that hot url: " + url);
+      this.reply({
+        attachments: [
+          {
+            color: "#64518A",
+            image_url: url,
+            title: this.showShareUrl() ? this.linkText(query.share_url) : "",
+            title_link: this.showShareUrl() ? this.linkUrl(query.share_url) : "",
+          },
+        ],
+        text: "",
+      });
+    } catch (e) {
+      this.reply(`:warning: ${e}`);
+    }
+
   }
 
   protected postResult(query, result) {
@@ -99,7 +99,7 @@ export default class QueryRunner extends FancyReplier {
   protected runQuery(query) {
     const type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
-      return this.replyContext.looker.client.get(
+      this.replyContext.looker.client.get(
         `queries/${query.id}/run/unified`,
         (result) => this.postResult(query, result),
         (r) => this.replyError(r),
@@ -107,14 +107,14 @@ export default class QueryRunner extends FancyReplier {
         this.replyContext,
       );
     } else {
-      return this.replyContext.looker.client.get(
+      this.replyContext.looker.client.get(
         `queries/${query.id}/run/png`,
         (result) => this.postImage(query, result),
         (r) => {
           if ((r != null ? r.error : undefined) === "Received empty response from Looker.") {
-            return this.replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."});
+            this.replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."});
           } else {
-            return this.replyError(r);
+            this.replyError(r);
           }
         },
         {encoding: null},

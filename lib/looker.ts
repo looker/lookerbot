@@ -1,5 +1,4 @@
 import LookerAPIClient from "./looker_client";
-import blobStores from "./stores/index";
 
 export interface ICustomCommand {
   name: string;
@@ -56,10 +55,6 @@ export default class Looker {
       clientId: options.clientId,
       clientSecret: options.clientSecret,
     });
-  }
-
-  public storeBlob(blob, success, error) {
-    return blobStores.current.storeBlob(blob, success, error);
   }
 
   public refreshCommands() {

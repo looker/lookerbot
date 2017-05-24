@@ -8,7 +8,7 @@ export default class GoogleCloudStore extends Store {
     return !!process.env.GOOGLE_CLOUD_BUCKET;
   }
 
-  public storeBlob(blob, success, error) {
+  public storeBlob(blob) : Promise<string> {
     const blobStream = new streamBuffers.ReadableStreamBuffer();
     blobStream.put(blob);
     blobStream.stop();
@@ -23,9 +23,15 @@ export default class GoogleCloudStore extends Store {
     const key = this.randomPath();
     const file = bucket.file(key);
 
-    blobStream.pipe(file.createWriteStream({
-      public: true,
-    })).on("error", (err) => error(`\`\`\`\n${JSON.stringify(err)}\n\`\`\``, "Google Cloud Storage Error")).on("finish", () => success(`https://storage.googleapis.com/${bucketName}/${key}`));
+    return new Promise<string>((resolve, reject) => {
+      blobStream.pipe(file.createWriteStream({
+        public: true,
+      })).on("error", (err) => {
+        reject(`Google Cloud Storage Error: ${JSON.stringify(err)}`)
+      }).on("finish", () => {
+        resolve(`https://storage.googleapis.com/${bucketName}/${key}`)
+      });
+    });
 
   }
 

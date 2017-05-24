@@ -7,7 +7,7 @@ export default class AmazonS3Store extends Store {
     return !!process.env.SLACKBOT_S3_BUCKET;
   }
 
-  public storeBlob(blob, success, error) {
+  public storeBlob(blob) : Promise<string> {
     const key = this.randomPath();
     const region = process.env.SLACKBOT_S3_BUCKET_REGION;
     const domain = region && (region !== "us-east-1") ?
@@ -26,12 +26,15 @@ export default class AmazonS3Store extends Store {
     const s3 = new AWS.S3({
       endpoint: new AWS.Endpoint(domain) as any,
     });
-    s3.putObject(params, (err, data) => {
-      if (err) {
-        return error(err, "S3 Error");
-      } else {
-        return success(`https://${domain}/${params.Bucket}/${key}`);
-      }
+
+    return new Promise<string>((resolve, reject) => {
+      s3.putObject(params, (err, data) => {
+        if (err) {
+          reject(`S3 Error: ${err.message}`);
+        } else {
+          resolve(`https://${domain}/${params.Bucket}/${key}`);
+        }
+      });
     });
 
   }
