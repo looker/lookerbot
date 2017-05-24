@@ -2,9 +2,9 @@ import QueryRunner from "./query_runner";
 
 export default class LookQueryRunner extends QueryRunner {
 
-  lookId: number;
-  filterInfo?: any;
-  loadedLook: any;
+  private lookId: number;
+  private filterInfo?: any;
+  private loadedLook: any;
 
   constructor(replyContext, lookId, filterInfo?: any) {
     super(replyContext);
@@ -12,9 +12,9 @@ export default class LookQueryRunner extends QueryRunner {
     this.filterInfo = filterInfo;
   }
 
-  showShareUrl() { return true; }
+  protected showShareUrl() { return true; }
 
-  linkText(shareUrl) {
+  protected linkText(shareUrl) {
     if (this.loadedLook) {
       return this.loadedLook.title;
     } else {
@@ -22,7 +22,7 @@ export default class LookQueryRunner extends QueryRunner {
     }
   }
 
-  linkUrl(shareUrl) {
+  protected linkUrl(shareUrl) {
     if (this.loadedLook) {
       if (this.isFilteredLook()) {
         return this.filterInfo.url;
@@ -34,11 +34,7 @@ export default class LookQueryRunner extends QueryRunner {
     }
   }
 
-  isFilteredLook() {
-    return (this.filterInfo != null) && (this.loadedLook.query.id !== this.filterInfo.queryId);
-  }
-
-  work() {
+  protected work() {
     return this.replyContext.looker.client.get(`looks/${this.lookId}`, (look) => {
 
       this.loadedLook = look;
@@ -53,6 +49,10 @@ export default class LookQueryRunner extends QueryRunner {
 
     },
     (r) => this.replyError(r));
+  }
+
+  private isFilteredLook() {
+    return (this.filterInfo != null) && (this.loadedLook.query.id !== this.filterInfo.queryId);
   }
 
 }

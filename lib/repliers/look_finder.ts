@@ -4,8 +4,8 @@ import QueryRunner from "./query_runner";
 
 export default class LookFinder extends QueryRunner {
 
-  type: string;
-  query: string;
+  private type: string;
+  private query: string;
 
   constructor(replyContext, type, query) {
     super(replyContext);
@@ -13,7 +13,27 @@ export default class LookFinder extends QueryRunner {
     this.query = query;
   }
 
-  async matchLooks(query) {
+  protected async work() {
+    const results = await this.matchLooks(this.query);
+    if (results) {
+      const shortResults = results.slice(0, 5);
+      this.reply({
+        attachments: shortResults.map((v) => {
+          const look = v.value;
+          return {
+            text: `in ${look.space.name}`,
+            title: look.title,
+            title_link: `${this.replyContext.looker.url}${look.short_url}`,
+          };
+        }),
+        text: "Matching Looks:",
+      });
+    } else {
+      this.reply(`No Looks match \"${this.query}\".`);
+    }
+  }
+
+  private async matchLooks(query) {
     const looks = await this.replyContext.looker.client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
       {},
@@ -25,26 +45,6 @@ export default class LookFinder extends QueryRunner {
     const results = fuzzySearch.search(query);
 
     return results;
-  }
-
-  async work() {
-    const results = await this.matchLooks(this.query);
-    if (results) {
-      const shortResults = results.slice(0, 5);
-      return this.reply({
-        text: "Matching Looks:",
-        attachments: shortResults.map((v) => {
-          const look = v.value;
-          return {
-            title: look.title,
-            title_link: `${this.replyContext.looker.url}${look.short_url}`,
-            text: `in ${look.space.name}`,
-          };
-        }),
-      });
-    } else {
-      return this.reply(`No Looks match \"${this.query}\".`);
-    }
   }
 
 }

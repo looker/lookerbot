@@ -4,37 +4,39 @@ export type Message = FormattedMessage | IRichMessage;
 
 export type SentMessage = IRichMessage & {
   channel: string;
-  user: string;
   team: string;
   text: FormattedMessage;
+  user: string;
 };
 
 export interface IRichMessage {
-  text?: FormattedMessage;
   attachments?: IAttachment[];
-};
+  text?: FormattedMessage;
+}
 
 export interface IAttachment {
-  callback_id?: string;
   actions?: IAttachmentAction[];
+  callback_id?: string;
+  color?: string;
+  fallback?: string;
   fields?: IAttachmentField[];
-  text?: FormattedMessage
-  fallback?: string,
-  color?: string
-  title?: string
-  mrkdwn_in?: string[]
+  image_url?: string;
+  mrkdwn_in?: string[];
+  text?: FormattedMessage;
+  title?: string;
+  title_link?: string;
 }
 
 export interface IAttachmentField {
-  title: FormattedMessage;
-  value: FormattedMessage;
   fallback: string;
   short: boolean;
+  title: FormattedMessage;
+  value: FormattedMessage;
 }
 
 export interface IAttachmentAction {
-  name: string,
-  text: string,
-  type: "button",
-  value: string,
+  name: string;
+  text: string;
+  type: "button";
+  value: string;
 }

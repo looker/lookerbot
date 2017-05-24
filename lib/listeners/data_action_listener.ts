@@ -25,7 +25,6 @@ export default class DataActionListener extends Listener {
       const baseUrl = req.protocol + "://" + req.get("host");
 
       const out = {
-        label,
         destinations: [{
           description: "Send data to Slack as the bot user configured for Lookerbot.",
           form_url: `${baseUrl}/data_actions/form`,
@@ -34,6 +33,7 @@ export default class DataActionListener extends Listener {
           supported_action_types: ["query"],
           url: `${baseUrl}/slack/post_from_query_action`,
         }],
+        label,
       };
 
       return res.json(out);

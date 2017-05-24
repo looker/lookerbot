@@ -1,7 +1,7 @@
 import * as _ from "underscore";
 import config from "../config";
+import { IRichMessage, Message } from "../message";
 import ReplyContext from "../reply_context";
-import { Message, IRichMessage } from "../message";
 
 const sassyMessages = [
 
@@ -41,7 +41,7 @@ const sassyMessages = [
   ["ne", "कृपया पर्खनुहोस्"],
   ["in", "कृपया एक क्षण के लिए"],
 
-].map(function(param ) {
+].map((param) => {
   const [country, message] = param;
   const translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`;
   return `<${translate}|:flag-${country}:> _${message}..._`;
@@ -56,7 +56,19 @@ export abstract class FancyReplier {
     this.replyContext = replyContext;
   }
 
-  public reply(obj: Message, cb?: any) {
+  public start() {
+    if (process.env.LOOKER_SLACKBOT_LOADING_MESSAGES !== "false") {
+      this.startLoading(() => {
+        this.performWork();
+      });
+    } else {
+      this.performWork();
+    }
+  }
+
+  protected abstract async work();
+
+  protected reply(obj: Message, cb?: any) {
     let sendableMsg: IRichMessage;
 
     if (typeof(obj) === "string") {
@@ -82,6 +94,17 @@ export abstract class FancyReplier {
     }
   }
 
+  protected replyError(response) {
+    console.error(response);
+    if ((response != null ? response.error : undefined)) {
+      this.reply(`:warning: ${response.error}`);
+    } else if ((response != null ? response.message : undefined)) {
+      this.reply(`:warning: ${response.message}`);
+    } else {
+      this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
+    }
+  }
+
   private startLoading(cb) {
 
     // Scheduled messages don't have a loading indicator, why distract everything?
@@ -100,9 +123,9 @@ export abstract class FancyReplier {
     }
 
     const params = {
-      text: sass,
       as_user: true,
       attachments: [], // Override some Botkit stuff
+      text: sass,
       unfurl_links: false,
       unfurl_media: false,
     };
@@ -113,34 +136,11 @@ export abstract class FancyReplier {
     });
   }
 
-  public start() {
-    if (process.env.LOOKER_SLACKBOT_LOADING_MESSAGES !== "false") {
-      this.startLoading(() => {
-        this.performWork();
-      });
-    } else {
-      this.performWork();
-    }
-  }
-
   private performWork() {
     const promise = this.work();
     if (promise) {
       promise.catch((err) => this.replyError(err));
     }
   }
-
-  protected replyError(response) {
-    console.error(response);
-    if ((response != null ? response.error : undefined)) {
-      this.reply(`:warning: ${response.error}`);
-    } else if ((response != null ? response.message : undefined)) {
-      this.reply(`:warning: ${response.message}`);
-    } else {
-      this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
-    }
-  }
-
-  protected abstract async work();
 
 }

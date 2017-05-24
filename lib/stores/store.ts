@@ -3,11 +3,11 @@ import * as crypto from "crypto";
 export default class Store {
 
   public configured(): boolean {
-    throw "subclass";
+    throw new Error("subclass");
   }
 
   public storeBlob(blob, success, error) {
-    throw "subclass";
+    throw new Error("subclass");
   }
 
   protected randomPath(extension = "png") {

@@ -13,8 +13,8 @@ export default class Listener {
     this.lookers = lookers;
   }
 
-  public type(): string { throw "implement"; };
-  public listen() { throw "implement"; };
+  public type(): string { throw new Error("implement"); }
+  public listen() { throw new Error("implement"); }
 
   protected validateToken(req, res) {
     if (!req.headers["x-looker-webhook-token"]) {

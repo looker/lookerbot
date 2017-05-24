@@ -2,8 +2,8 @@ import QueryRunner from "./query_runner";
 
 export default class DashboardQueryRunner extends QueryRunner {
 
-  dashboard: any;
-  filters: any;
+  private dashboard: any;
+  private filters: any;
 
   constructor(replyContext, dashboard, filters) {
     if (filters == null) { filters = {}; }
@@ -12,9 +12,9 @@ export default class DashboardQueryRunner extends QueryRunner {
     this.filters = filters;
   }
 
-  showShareUrl() { return true; }
+  protected showShareUrl() { return true; }
 
-  work() {
+  protected work() {
 
     const elements = this.dashboard.dashboard_elements || this.dashboard.elements;
 
@@ -29,7 +29,7 @@ export default class DashboardQueryRunner extends QueryRunner {
         (look) => {
           const queryDef = look.query;
 
-          for (const dashFilterName in element.listen) {
+          for (const dashFilterName of Object.keys(element.listen)) {
             const fieldName = element.listen[dashFilterName];
             if (this.filters[dashFilterName]) {
               if (!queryDef.filters) { queryDef.filters = {}; }

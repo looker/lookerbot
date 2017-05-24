@@ -1,18 +1,18 @@
-import { Message, IAttachment, IAttachmentAction } from "../message";
-import uuid from "uuid/v4";
-import SlackUtils from "../slack_utils";
 import * as _ from "underscore";
+import uuid from "uuid/v4";
+import { IAttachment, IAttachmentAction, Message } from "../message";
+import SlackUtils from "../slack_utils";
 
 export default class SlackTableFormatter {
 
-  private dimensionLike: Array<any>;
-  private measureLike: Array<any>;
-  private fields: Array<any>;
+  private dimensionLike: any[];
+  private measureLike: any[];
+  private fields: any[];
   private query: any;
   private result: any;
 
   constructor(
-    private options: {query: any, result: any, baseUrl: string, shareUrl: string}
+    private options: {query: any, result: any, baseUrl: string, shareUrl: string},
   ) {
 
     this.query = options.query;
@@ -76,9 +76,9 @@ export default class SlackTableFormatter {
 
     } else {
       const attachment: IAttachment = {
-        title: this.fields.map((f) => this.renderFieldLabel(f)).join(" – "),
-        text: result.data.map((d) => this.fields.map((f) => this.renderField(f, d)).join(" – ")).join("\n"),
         fallback: shareUrl,
+        text: result.data.map((d) => this.fields.map((f) => this.renderField(f, d)).join(" – ")).join("\n"),
+        title: this.fields.map((f) => this.renderFieldLabel(f)).join(" – "),
       };
       attachment.color = "#64518A";
       return({attachments: [attachment], text: shareUrl ? shareUrl : ""});
@@ -86,7 +86,7 @@ export default class SlackTableFormatter {
 
   }
 
-  private addSlackButtons (f, row, attachment: IAttachment) {
+  private addSlackButtons(f, row, attachment: IAttachment) {
 
     if (!SlackUtils.slackButtonsEnabled) { return; }
 
@@ -106,7 +106,7 @@ export default class SlackTableFormatter {
     });
     attachment.callback_id = uuid();
 
-  };
+  }
 
   private renderFieldLabel(field): string {
     if (this.query.vis_config == null ? true : this.query.vis_config.show_view_names) {
@@ -114,14 +114,14 @@ export default class SlackTableFormatter {
     } else {
       return field.label;
     }
-  };
+  }
 
-  private renderString (d): string {
+  private renderString(d): string {
      return d.rendered || d.value;
   }
 
-  private renderField (f, row): string {
-    let d = row[f.name];
+  private renderField(f, row): string {
+    const d = row[f.name];
     const drill = d.links != null ? d.links[0] : undefined;
     if (drill && (drill.type === "measure_default")) {
       return `<${this.options.baseUrl}${drill.url}|${this.renderString(d)}>`;
@@ -130,6 +130,6 @@ export default class SlackTableFormatter {
     } else {
       return "∅";
     }
-  };
+  }
 
 }

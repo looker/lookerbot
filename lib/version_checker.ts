@@ -29,8 +29,8 @@ export default class VersionChecker {
   private checkRepo(repoUrl: string) {
     const url = `${repoUrl.split("github.com").join("api.github.com/repos")}/releases/latest`;
     const params = {
-      url,
       headers: {"User-Agent": config.npmPackage.repository.url},
+      url,
     };
     request(params, (error, response, body) => {
       if (error) {

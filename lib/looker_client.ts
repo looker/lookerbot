@@ -4,13 +4,13 @@ import * as _ from "underscore";
 import config from "./config";
 import ReplyContext from "./reply_context";
 
-export type LookerRequestConfig = {
-  method: string,
-  path: string,
-  replyContext?: ReplyContext,
-  headers?: request.Headers,
-  body?: any,
-};
+export interface ILookerRequestConfig {
+  method: string;
+  path: string;
+  replyContext?: ReplyContext;
+  headers?: request.Headers;
+  body?: any;
+}
 
 export default class LookerAPIClient {
 
@@ -29,7 +29,7 @@ export default class LookerAPIClient {
   }
 
   public request(
-    requestConfig: LookerRequestConfig,
+    requestConfig: ILookerRequestConfig,
     successCallback?: any,
     errorCallback?: any,
     replyContext?: ReplyContext,
@@ -86,7 +86,7 @@ export default class LookerAPIClient {
   }
 
   public requestAsync(
-    requestConfig: LookerRequestConfig,
+    requestConfig: ILookerRequestConfig,
     replyContext?: ReplyContext,
   ) {
     return new Promise((resolve, reject) => {

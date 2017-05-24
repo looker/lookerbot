@@ -1,7 +1,7 @@
 import * as _ from "underscore";
 import SlackUtils from "../slack_utils";
 import { FancyReplier } from "./fancy_replier";
-import SlackTableFormatter from "./slack_table_formatter"
+import SlackTableFormatter from "./slack_table_formatter";
 
 export default class QueryRunner extends FancyReplier {
 
@@ -32,18 +32,18 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected postImage(query, imageData, options = {}) {
+  protected postImage(query, imageData) {
     if (this.replyContext.looker.storeBlob) {
 
       const success = (url) => {
         this.reply({
           attachments: [
-            _.extend({}, options, {
+            {
+              color: "#64518A",
               image_url: url,
               title: this.showShareUrl() ? this.linkText(query.share_url) : "",
               title_link: this.showShareUrl() ? this.linkUrl(query.share_url) : "",
-              color: "#64518A",
-            }),
+            },
           ],
           text: "",
         });
@@ -66,9 +66,9 @@ export default class QueryRunner extends FancyReplier {
 
   protected postResult(query, result) {
     const formatter = new SlackTableFormatter({
+      baseUrl: this.replyContext.looker.url,
       query,
       result,
-      baseUrl: this.replyContext.looker.url,
       shareUrl: this.shareUrlContent(query.share_url),
     });
     this.reply(formatter.format());
@@ -92,7 +92,7 @@ export default class QueryRunner extends FancyReplier {
         this.replyContext,
       );
     } else {
-      throw "Must set slug or id when creating QueryRunner, or override work";
+      throw new Error("Must set slug or id when creating QueryRunner, or override work");
     }
   }
 
