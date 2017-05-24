@@ -1,12 +1,12 @@
 import * as _ from "underscore";
-import uuid from "uuid/v4";
 import SlackUtils from "../slack_utils";
-import FancyReplier from "./fancy_replier";
+import { FancyReplier } from "./fancy_replier";
+import SlackTableFormatter from "./slack_table_formatter"
 
 export default class QueryRunner extends FancyReplier {
 
-  querySlug?: string;
-  queryId?: number;
+  protected querySlug?: string;
+  protected queryId?: number;
 
   constructor(replyContext, queryParam: {slug?: string, id?: number} = {}) {
     super(replyContext);
@@ -14,17 +14,17 @@ export default class QueryRunner extends FancyReplier {
     this.queryId = queryParam.id;
   }
 
-  showShareUrl() { return false; }
+  protected showShareUrl() { return false; }
 
-  linkText(shareUrl) {
+  protected linkText(shareUrl) {
     return shareUrl;
   }
 
-  linkUrl(shareUrl) {
+  protected linkUrl(shareUrl) {
     return shareUrl;
   }
 
-  shareUrlContent(shareUrl) {
+  protected shareUrlContent(shareUrl) {
     if (this.linkText(shareUrl) === this.linkUrl(shareUrl)) {
       return `<${this.linkUrl(shareUrl)}>`;
     } else {
@@ -32,11 +32,11 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  postImage(query, imageData, options = {}) {
+  protected postImage(query, imageData, options = {}) {
     if (this.replyContext.looker.storeBlob) {
 
       const success = (url) => {
-        return this.reply({
+        this.reply({
           attachments: [
             _.extend({}, options, {
               image_url: url,
@@ -49,127 +49,32 @@ export default class QueryRunner extends FancyReplier {
         });
       };
 
-      const error = (error, context) => {
-        return this.reply(`:warning: *${context}* ${error}`);
+      const error = (msg, context) => {
+        this.reply(`:warning: *${context}* ${msg}`);
       };
 
       if (imageData.length) {
-        return this.replyContext.looker.storeBlob(imageData, success, error);
+        this.replyContext.looker.storeBlob(imageData, success, error);
       } else {
-        return error("No image data returned for query.", "Looker Render Error");
+        error("No image data returned for query.", "Looker Render Error");
       }
 
     } else {
-      return this.reply(":warning: No storage is configured for visualization images in the bot configuration.");
+      this.reply(":warning: No storage is configured for visualization images in the bot configuration.");
     }
   }
 
-  postResult(query, result, options = {}) {
-
-    // Handle hidden fields
-    let attachment, d, rendered, text;
-
-    const hiddenFields = (query.vis_config != null ? query.vis_config.hidden_fields : undefined) || [];
-    if ((hiddenFields != null ? hiddenFields.length : undefined) > 0) {
-      for (const k in result.fields) {
-        const v = result.fields[k];
-        result.fields[k] = v.filter((field) => hiddenFields.indexOf(field.name) === -1);
-      }
-    }
-
-    const calcs = result.fields.table_calculations || [];
-    const dimensions = result.fields.dimensions || [];
-    const measures = result.fields.measures || [];
-    const measure_like = measures.concat(calcs.filter((c) => c.is_measure));
-    const dimension_like = dimensions.concat(calcs.filter((c) => !c.is_measure));
-
-    const renderableFields = dimension_like.concat(measure_like);
-
-    const shareUrl = this.shareUrlContent(query.share_url);
-
-    const addSlackButtons = (f, row, attachment) => {
-      if (!SlackUtils.slackButtonsEnabled) { return; }
-      d = row[f.name];
-      if (!d.links) { return; }
-      const usableActions = d.links.filter((l) => (l.type === "action") && !l.form && !l.form_url);
-      if (!(usableActions.length > 0)) { return; }
-      attachment.actions = usableActions.map((link) => {
-        return {
-          name: "data_action",
-          text: link.label,
-          type: "button",
-          value: JSON.stringify({lookerUrl: this.replyContext.looker.url, action: link}),
-        };
-      });
-      return attachment.callback_id = uuid();
-    };
-
-    const renderString = (d) => d.rendered || d.value;
-
-    const renderField = (f, row) => {
-      d = row[f.name];
-      const drill = d.links != null ? d.links[0] : undefined;
-      if (drill && (drill.type === "measure_default")) {
-        return `<${this.replyContext.looker.url}${drill.url}|${renderString(d)}>`;
-      } else if ((d != null) && (d.value !== null)) {
-        return renderString(d);
-      } else {
-        return "∅";
-      }
-    };
-
-    const renderFieldLabel = function(field) {
-      if (((query.vis_config != null ? query.vis_config.show_view_names : undefined) != null) && !query.vis_config.show_view_names) {
-        return field.label_short || field.label;
-      } else {
-        return field.label;
-      }
-    };
-
-    if (result.pivots) {
-      return this.reply(`${shareUrl}\n _Can't currently display tables with pivots in Slack._`);
-
-    } else if (result.data.length === 0) {
-      if ((result.errors != null ? result.errors.length : undefined)) {
-        const txt = result.errors.map((e) => `${e.message}\`\`\`${e.message_details}\`\`\``).join("\n");
-        return this.reply(`:warning: ${shareUrl}\n${txt}`);
-      } else {
-        return this.reply(`${shareUrl}\nNo results.`);
-      }
-
-    } else if ((query.vis_config != null ? query.vis_config.type : undefined) === "single_value") {
-      const field = measure_like[0] || dimension_like[0];
-      const share = this.showShareUrl() ? `\n${shareUrl}` : "";
-      const datum = result.data[0];
-      rendered = renderField(field, datum);
-      text = `*${rendered}*${share}`;
-      attachment = {text, fallback: rendered, color: "#64518A", mrkdwn_in: ["text"]};
-      addSlackButtons(field, datum, attachment);
-      return this.reply({attachments: [attachment]});
-
-    } else if ((result.data.length === 1) || ((query.vis_config != null ? query.vis_config.type : undefined) === "looker_single_record")) {
-      attachment = _.extend({}, options, {
-        color: "#64518A",
-        fallback: shareUrl,
-        fields: renderableFields.map(function(m) {
-          rendered = renderField(m, result.data[0]);
-          return {title: renderFieldLabel(m), value: rendered, fallback: rendered, short: true};
-        }),
-      });
-      attachment.text = this.showShareUrl() ? shareUrl : "";
-      return this.reply({attachments: [attachment]});
-
-    } else {
-      attachment = _.extend({color: "#64518A"}, options, {
-        title: renderableFields.map((f) => renderFieldLabel(f)).join(" – "),
-        text: result.data.map((d) => renderableFields.map((f) => renderField(f, d)).join(" – ")).join("\n"),
-        fallback: shareUrl,
-      });
-      return this.reply({attachments: [attachment], text: this.showShareUrl() ? shareUrl : ""});
-    }
+  protected postResult(query, result) {
+    const formatter = new SlackTableFormatter({
+      query,
+      result,
+      baseUrl: this.replyContext.looker.url,
+      shareUrl: this.shareUrlContent(query.share_url),
+    });
+    this.reply(formatter.format());
   }
 
-  work() {
+  protected work() {
     if (this.querySlug) {
       this.replyContext.looker.client.get(
         `queries/slug/${this.querySlug}`,
@@ -191,12 +96,12 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  runQuery(query, options = {}) {
+  protected runQuery(query) {
     const type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
     if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
       return this.replyContext.looker.client.get(
         `queries/${query.id}/run/unified`,
-        (result) => this.postResult(query, result, options),
+        (result) => this.postResult(query, result),
         (r) => this.replyError(r),
         {},
         this.replyContext,
@@ -204,7 +109,7 @@ export default class QueryRunner extends FancyReplier {
     } else {
       return this.replyContext.looker.client.get(
         `queries/${query.id}/run/png`,
-        (result) => this.postImage(query, result, options),
+        (result) => this.postImage(query, result),
         (r) => {
           if ((r != null ? r.error : undefined) === "Received empty response from Looker.") {
             return this.replyError({error: "Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images."});

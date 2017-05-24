@@ -38,11 +38,7 @@ export default class Commander {
       }
     }
 
-    if (context.isSlashCommand() && !context.hasRepliedPrivately) {
-      // Return 200 immediately for slash commands
-      context.messageBot.res.setHeader("Content-Type", "application/json");
-      context.messageBot.res.send(JSON.stringify({response_type: "in_channel"}));
-    }
+    context.completeSlashCommand();
 
   }
 

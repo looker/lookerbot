@@ -4,18 +4,18 @@ import Store from "./store";
 
 export default class GoogleCloudStore extends Store {
 
-  configured() {
+  public configured() {
     return !!process.env.GOOGLE_CLOUD_BUCKET;
   }
 
-  storeBlob(blob, success, error) {
+  public storeBlob(blob, success, error) {
     const blobStream = new streamBuffers.ReadableStreamBuffer();
     blobStream.put(blob);
     blobStream.stop();
 
     const storage = gcs({
-      projectId: process.env.GOOGLE_CLOUD_PROJECT,
       credentials: process.env.GOOGLE_CLOUD_CREDENTIALS_JSON ? JSON.parse(process.env.GOOGLE_CLOUD_CREDENTIALS_JSON) : undefined,
+      projectId: process.env.GOOGLE_CLOUD_PROJECT,
     });
 
     const bucketName = process.env.GOOGLE_CLOUD_BUCKET;

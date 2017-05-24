@@ -3,11 +3,11 @@ import Store from "./store";
 
 export default class AmazonS3Store extends Store {
 
-  configured() {
+  public configured() {
     return !!process.env.SLACKBOT_S3_BUCKET;
   }
 
-  storeBlob(blob, success, error) {
+  public storeBlob(blob, success, error) {
     const key = this.randomPath();
     const region = process.env.SLACKBOT_S3_BUCKET_REGION;
     const domain = region && (region !== "us-east-1") ?
@@ -16,17 +16,17 @@ export default class AmazonS3Store extends Store {
       "s3.amazonaws.com";
 
     const params = {
-      Bucket: process.env.SLACKBOT_S3_BUCKET,
-      Key: key,
-      Body: blob,
       ACL: "public-read",
+      Body: blob,
+      Bucket: process.env.SLACKBOT_S3_BUCKET,
       ContentType: "image/png",
+      Key: key,
     };
 
     const s3 = new AWS.S3({
       endpoint: new AWS.Endpoint(domain) as any,
     });
-    s3.putObject(params, function(err, data) {
+    s3.putObject(params, (err, data) => {
       if (err) {
         return error(err, "S3 Error");
       } else {

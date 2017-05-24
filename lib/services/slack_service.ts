@@ -9,12 +9,12 @@ import Listener from "../listeners/listener";
 
 export default class SlackService {
 
-  listeners: Array<typeof Listener>;
-  runningListeners: Listener[];
-  messageHandler: (context: ReplyContext) => void;
-  urlHandler: (context: ReplyContext, url: string) => void;
-  controller: any;
-  defaultBot: any;
+  private listeners: Array<typeof Listener>;
+  private runningListeners: Listener[];
+  private messageHandler: (context: ReplyContext) => void;
+  private urlHandler: (context: ReplyContext, url: string) => void;
+  private controller: any;
+  private defaultBot: any;
 
   constructor(opts) {
     this.listeners = opts.listeners;
@@ -22,7 +22,7 @@ export default class SlackService {
     this.urlHandler = opts.urlHandler;
   }
 
-  begin() {
+  public begin() {
 
     let context;
     this.controller = Botkit.slackbot({
@@ -30,8 +30,8 @@ export default class SlackService {
     });
 
     this.defaultBot = this.controller.spawn({
-      token: config.slackApiKey,
       retry: 10,
+      token: config.slackApiKey,
     }).startRTM();
 
     // This is a workaround to how Botkit handles teams, but this server manages only a single team.
@@ -112,7 +112,11 @@ export default class SlackService {
 
   }
 
-  ensureUserAuthorized(context: ReplyContext, callback, options: {silent: boolean} = {silent: false}) {
+  private ensureUserAuthorized(
+    context: ReplyContext,
+    callback,
+    options: {silent: boolean} = {silent: false},
+  ) {
 
     const reply = (text: string) => {
       if (!options.silent) {
@@ -120,7 +124,7 @@ export default class SlackService {
       }
     };
 
-    this.defaultBot.api.users.info({user: context.sourceMessage.user}, function(error, response) {
+    this.defaultBot.api.users.info({user: context.sourceMessage.user}, (error, response) => {
       if (error || !response.user) {
         reply(`Could not fetch your user info from Slack. ${error || ""}`);
       } else {

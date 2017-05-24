@@ -1,16 +1,18 @@
 import * as _ from "underscore";
 import Looker from "./looker";
+import { Message, SentMessage } from "./message";
 
 export default class ReplyContext {
 
-  looker: Looker;
-  defaultBot: any;
-  messageBot: any;
-  sourceMessage: any;
-  isDM = false;
-  scheduled = false;
-  dataAction = false;
-  hasRepliedPrivately = false;
+  public looker: Looker;
+  public sourceMessage: SentMessage;
+  public isDM = false;
+  public scheduled = false;
+  public dataAction = false;
+
+  private defaultBot: any;
+  private messageBot: any;
+  private hasRepliedPrivately = false;
 
   constructor(defaultBot, messageBot, sourceMessage) {
     this.defaultBot = defaultBot;
@@ -18,12 +20,12 @@ export default class ReplyContext {
     this.sourceMessage = sourceMessage;
   }
 
-  isSlashCommand() {
+  public isSlashCommand() {
     return !!this.messageBot.res;
   }
 
-  replyPrivate(message, cb?: any) {
-    message = this._rtmOptOut(message);
+  public replyPrivate(message: Message, cb?: any) {
+    message = this.rtmOptOut(message);
     if (this.isSlashCommand()) {
       if (this.hasRepliedPrivately) {
         return this.messageBot.replyPrivateDelayed(this.sourceMessage, message, cb);
@@ -36,8 +38,8 @@ export default class ReplyContext {
     }
   }
 
-  replyPublic(message, cb?: any) {
-    message = this._rtmOptOut(message);
+  public replyPublic(message: Message, cb?: any) {
+    message = this.rtmOptOut(message);
     if (this.isSlashCommand()) {
       return this.messageBot.replyPublicDelayed(this.sourceMessage, message, cb);
     } else {
@@ -45,7 +47,7 @@ export default class ReplyContext {
     }
   }
 
-  startTyping() {
+  public startTyping() {
     if (this.isSlashCommand()) {
       return this.messageBot.replyPublicDelayed(this.sourceMessage, { type: "typing" });
     } else {
@@ -53,9 +55,21 @@ export default class ReplyContext {
     }
   }
 
+  public completeSlashCommand() {
+    if (this.isSlashCommand() && !this.hasRepliedPrivately) {
+      // Return 200 immediately for slash commands
+      this.messageBot.res.setHeader("Content-Type", "application/json");
+      this.messageBot.res.send(JSON.stringify({response_type: "in_channel"}));
+    }
+  }
+
+  public updateMessage(updatedMessage: SentMessage) {
+    this.defaultBot.api.chat.update(updatedMessage);
+  }
+
   // The Slack RTM API seems to be unreliable at delivering messages, or has formatting differences.
   // Setting the attachments to [] hints to botkit to skip the RTM API and use the REST one.
-  _rtmOptOut(message) {
+  private rtmOptOut(message) {
     if (typeof(message) === "string") {
       return {text: message, attachments: []};
     } else {

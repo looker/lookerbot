@@ -1,6 +1,7 @@
 import * as _ from "underscore";
 import config from "../config";
 import ReplyContext from "../reply_context";
+import { Message, IRichMessage } from "../message";
 
 const sassyMessages = [
 
@@ -46,35 +47,38 @@ const sassyMessages = [
   return `<${translate}|:flag-${country}:> _${message}..._`;
 });
 
-export default abstract class FancyReplier {
+export abstract class FancyReplier {
 
   public replyContext: ReplyContext;
   private loadingMessage: any;
 
-  constructor(replyContext) {
+  constructor(replyContext: ReplyContext) {
     this.replyContext = replyContext;
   }
 
-  public reply(obj, cb?: any) {
+  public reply(obj: Message, cb?: any) {
+    let sendableMsg: IRichMessage;
+
+    if (typeof(obj) === "string") {
+      sendableMsg = {text: obj};
+    } else {
+      sendableMsg = obj;
+    }
+
     if (this.loadingMessage) {
 
       // Hacky stealth update of message to preserve chat order
-
-      if (typeof(obj) === "string") {
-        obj = {text: obj, channel: this.replyContext.sourceMessage.channel};
-      }
-
       const params = {ts: this.loadingMessage.ts, channel: this.replyContext.sourceMessage.channel};
 
-      const update = _.extend(params, obj);
+      const update = _.extend(params, sendableMsg);
       update.attachments = update.attachments ? JSON.stringify(update.attachments) : null;
       update.text = update.text || " ";
       update.parse = "none";
 
-      return this.replyContext.defaultBot.api.chat.update(update);
+      this.replyContext.updateMessage(update);
 
     } else {
-      return this.replyContext.replyPublic(obj, cb);
+      this.replyContext.replyPublic(sendableMsg, cb);
     }
   }
 
@@ -103,9 +107,9 @@ export default abstract class FancyReplier {
       unfurl_media: false,
     };
 
-    return this.replyContext.replyPublic(params, (error, response) => {
+    this.replyContext.replyPublic(params, (error, response) => {
       this.loadingMessage = response;
-      return cb();
+      cb();
     });
   }
 
@@ -129,11 +133,11 @@ export default abstract class FancyReplier {
   protected replyError(response) {
     console.error(response);
     if ((response != null ? response.error : undefined)) {
-      return this.reply(`:warning: ${response.error}`);
+      this.reply(`:warning: ${response.error}`);
     } else if ((response != null ? response.message : undefined)) {
-      return this.reply(`:warning: ${response.message}`);
+      this.reply(`:warning: ${response.message}`);
     } else {
-      return this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
+      this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
     }
   }
 

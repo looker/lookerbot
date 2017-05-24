@@ -1,12 +1,12 @@
 export default class SlackUtils {
 
-  static slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
+  public static slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
 
-  static stripMessageText(text: string) {
+  public static stripMessageText(text: string) {
     return text.split("&gt;").join(">").split("&lt;").join("<");
   }
 
-  static checkToken(bot, message) {
+  public static checkToken(bot, message) {
     if (process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && (process.env.SLACK_SLASH_COMMAND_TOKEN === message.token)) {
       return true;
     } else {
