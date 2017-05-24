@@ -96,15 +96,18 @@ export default class QueryRunner extends FancyReplier {
   }
 
   protected async runQuery(query) {
-    const type = (query.vis_config != null ? query.vis_config.type : undefined) || "table";
-    if ((type === "table") || (type === "looker_single_record") || (type === "single_value")) {
-      this.replyContext.looker.client.get(
-        `queries/${query.id}/run/unified`,
-        (result) => this.postResult(query, result),
-        (r) => this.replyError(r),
-        {},
-        this.replyContext,
-      );
+    const visType: string = query.vis_config && query.vis_config.type ? query.vis_config.type : "table";
+
+    if (visType === "table" || visType === "looker_single_record" || visType === "single_value") {
+      try {
+        const result = await this.replyContext.looker.client.getAsync(
+          `queries/${query.id}/run/unified`,
+          this.replyContext
+        );
+        this.postResult(query, result);
+      } catch (e) {
+        this.replyError(e);
+      }
     } else {
       try {
         const imageData = await this.replyContext.looker.client.getBinaryAsync(

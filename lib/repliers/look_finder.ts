@@ -36,7 +36,6 @@ export default class LookFinder extends QueryRunner {
   private async matchLooks(query) {
     const looks = await this.replyContext.looker.client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
-      {},
       this.replyContext,
     );
 

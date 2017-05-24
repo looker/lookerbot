@@ -107,8 +107,8 @@ export default class LookerAPIClient {
 
   public getAsync(
     path: string,
-    options?: ILookerRequestOptions,
     replyContext?: ReplyContext,
+    options?: ILookerRequestOptions,
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.get(path, resolve, reject, options, replyContext);
@@ -119,7 +119,7 @@ export default class LookerAPIClient {
     path: string,
     replyContext?: ReplyContext,
   ): Promise<Buffer> {
-    return this.getAsync(path, {encoding: null}, replyContext);
+    return this.getAsync(path, replyContext, {encoding: null});
   }
 
   public post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
