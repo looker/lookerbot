@@ -102,7 +102,7 @@ export default class QueryRunner extends FancyReplier {
       try {
         const result = await this.replyContext.looker.client.getAsync(
           `queries/${query.id}/run/unified`,
-          this.replyContext
+          this.replyContext,
         );
         this.postResult(query, result);
       } catch (e) {

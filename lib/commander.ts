@@ -1,5 +1,5 @@
 import Command from "./commands/command";
-import Listener from "./listeners/listener";
+import { Listener } from "./listeners/listener";
 import Looker from "./looker";
 import LookQueryRunner from "./repliers/look_query_runner";
 import QueryRunner from "./repliers/query_runner";

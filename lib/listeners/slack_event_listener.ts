@@ -1,5 +1,5 @@
 import SlackUtils from "../slack_utils";
-import Listener from "./listener";
+import { Listener } from "./listener";
 
 export default class SlackEventListener extends Listener {
 

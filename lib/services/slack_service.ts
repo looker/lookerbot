@@ -5,7 +5,7 @@ import Looker from "../looker";
 import ReplyContext from "../reply_context";
 import SlackUtils from "../slack_utils";
 
-import Listener from "../listeners/listener";
+import { Listener } from "../listeners/listener";
 
 export default class SlackService {
 

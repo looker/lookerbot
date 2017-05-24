@@ -1,7 +1,8 @@
+import * as express from "express";
 import LookQueryRunner from "../repliers/look_query_runner";
 import QueryRunner from "../repliers/query_runner";
 import ReplyContext from "../reply_context";
-import Listener from "./listener";
+import { Listener } from "./listener";
 
 export default class ScheduleListener extends Listener {
 
@@ -10,13 +11,13 @@ export default class ScheduleListener extends Listener {
   }
 
   public listen() {
-    this.server.post("/slack/post/:post_type/:channel_name", this.handleRequest);
-    return this.server.post("/slack/post_from_query_action", this.handleRequest);
+    this.server.post("/slack/post/:post_type/:channel_name", (req, res) => this.handleRequest(req, res));
+    return this.server.post("/slack/post_from_query_action", (req, res) => this.handleRequest(req, res));
   }
 
-  private handleRequest(req, res) {
+  private handleRequest(req: express.Request, res: express.Response) {
 
-    let channelName = req.params.channel_name || (req.form_params != null ? req.form_params.channel : undefined);
+    let channelName = req.params.channel_name || (req.body.form_params != null ? req.body.form_params.channel : undefined);
     const channelType = req.params.post_type;
 
     if (!channelName) {

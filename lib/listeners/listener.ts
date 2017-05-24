@@ -1,13 +1,13 @@
 import * as express from "express";
 import Looker from "../looker";
 
-export default class Listener {
+export class Listener {
 
   protected server: express.Application;
   protected bot: any;
   protected lookers: Looker[];
 
-  constructor(server, bot, lookers) {
+  constructor(server: express.Application, bot, lookers: Looker[]) {
     this.server = server;
     this.bot = bot;
     this.lookers = lookers;
@@ -16,7 +16,7 @@ export default class Listener {
   public type(): string { throw new Error("implement"); }
   public listen() { throw new Error("implement"); }
 
-  protected validateToken(req, res) {
+  protected validateToken(req: express.Request, res: express.Response) {
     if (!req.headers["x-looker-webhook-token"]) {
       this.reply(res, {looker: {success: false}, reason: "No x-looker-webhook-token token provided."});
       return false;
@@ -28,7 +28,7 @@ export default class Listener {
     return true;
   }
 
-  protected validateTokenForLooker(req, res, looker) {
+  protected validateTokenForLooker(req: express.Request, res: express.Response, looker) {
     if (!req.headers["x-looker-webhook-token"]) {
       this.reply(res, {looker: {success: false}, reason: "No x-looker-webhook-token token provided."});
       return false;
@@ -40,7 +40,7 @@ export default class Listener {
     return value;
   }
 
-  protected reply(res, json) {
+  protected reply(res: express.Response, json) {
     res.json(json);
     console.log(`Replied to ${this.type()}.`, json);
   }
