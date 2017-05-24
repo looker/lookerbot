@@ -20,6 +20,7 @@
     "@types/request-promise-native": "^1.0.5",
     "@types/stream-buffers": "^3.0.2",
     "@types/underscore": "^1.8.0",
+    "@types/uuid": "^2.0.29",
     "aws-sdk": "^2.54.0",
     "azure-storage": "~0.10.0",
     "botkit": "0.0.15",

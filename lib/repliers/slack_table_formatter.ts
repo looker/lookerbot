@@ -1,5 +1,5 @@
 import * as _ from "underscore";
-import uuid from "uuid/v4";
+import * as uuid from "uuid";
 import { IAttachment, IAttachmentAction, Message } from "../message";
 import SlackUtils from "../slack_utils";
 
