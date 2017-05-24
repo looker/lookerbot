@@ -1,8 +1,8 @@
 import * as _ from "underscore";
 import SlackUtils from "../slack_utils";
+import blobStores from "../stores/index";
 import { FancyReplier } from "./fancy_replier";
 import SlackTableFormatter from "./slack_table_formatter";
-import blobStores from "../stores/index";
 
 export default class QueryRunner extends FancyReplier {
 

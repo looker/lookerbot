@@ -7,7 +7,7 @@ export default class AmazonS3Store extends Store {
     return !!process.env.SLACKBOT_S3_BUCKET;
   }
 
-  public storeBlob(blob) : Promise<string> {
+  public storeBlob(blob): Promise<string> {
     const key = this.randomPath();
     const region = process.env.SLACKBOT_S3_BUCKET_REGION;
     const domain = region && (region !== "us-east-1") ?

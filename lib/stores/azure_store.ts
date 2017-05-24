@@ -7,7 +7,7 @@ export default class AzureStore extends Store {
     return !!process.env.SLACKBOT_AZURE_CONTAINER;
   }
 
-  public storeBlob(blob) : Promise<string> {
+  public storeBlob(blob): Promise<string> {
     const key = this.randomPath();
     const container = process.env.SLACKBOT_AZURE_CONTAINER;
     const options = {ContentType: "image/png"};
