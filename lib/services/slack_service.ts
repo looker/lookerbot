@@ -51,14 +51,14 @@ export default class SlackService {
     this.runningListeners = [];
 
     this.controller.setupWebserver(process.env.PORT || 3333, (err, expressWebserver) => {
-      let instance;
       this.controller.createWebhookEndpoints(expressWebserver);
 
-      return Array.from(this.listeners).map((listener) =>
-        ((instance = new listener(expressWebserver, this.defaultBot, Looker.all)),
-        instance.listen(),
+      for (const listener of this.listeners) {
+        const instance = new listener(expressWebserver, this.defaultBot, Looker.all);
+        instance.listen();
+        this.runningListeners.push(instance);
+      }
 
-        this.runningListeners.push(instance)));
     });
 
     // Listen to the various events
@@ -66,8 +66,8 @@ export default class SlackService {
     const processCommand = (bot, message, isDM = false) => {
       context = new ReplyContext(this.defaultBot, bot, message);
       context.isDM = isDM;
-      return this.ensureUserAuthorized(context, () => {
-        return this.messageHandler(context);
+      this.ensureUserAuthorized(context, () => {
+        this.messageHandler(context);
       });
     };
 
@@ -77,18 +77,18 @@ export default class SlackService {
 
     this.controller.on("slash_command", (bot, message) => {
       if (!SlackUtils.checkToken(bot, message)) { return; }
-      return processCommand(bot, message);
+      processCommand(bot, message);
     });
 
     this.controller.on("direct_mention", (bot, message) => {
       message.text = SlackUtils.stripMessageText(message.text);
-      return processCommand(bot, message);
+      processCommand(bot, message);
     });
 
     this.controller.on("direct_message", (bot, message) => {
       if (message.text.indexOf("/") !== 0) {
         message.text = SlackUtils.stripMessageText(message.text);
-        return processCommand(bot, message, true);
+        processCommand(bot, message, true);
       }
     });
 
@@ -100,7 +100,7 @@ export default class SlackService {
 
       context = new ReplyContext(this.defaultBot, bot, message);
 
-      return this.ensureUserAuthorized(context, () => {
+      this.ensureUserAuthorized(context, () => {
         // URL Expansion
         const urls = getUrls(message.text).map((url) => url.replace("%3E", ""));
         urls.forEach((url) => {
