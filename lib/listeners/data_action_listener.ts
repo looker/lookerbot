@@ -27,6 +27,7 @@ export class DataActionListener extends Listener {
         integrations: [{
           description: "Send data to Slack. The data will be posted as the Lookerbot user.",
           form_url: `${baseUrl}/data_actions/form`,
+          icon_data_uri: slackIcon,
           label: "Slack",
           name: "post",
           supported_action_types: ["query"],
