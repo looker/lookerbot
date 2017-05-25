@@ -2,6 +2,7 @@ import * as _ from "underscore";
 import { LookQueryRunner } from "../repliers/look_query_runner";
 import { ReplyContext } from "../reply_context";
 import { Listener } from "./listener";
+import config from "../config";
 
 export class DataActionListener extends Listener {
 
@@ -11,18 +12,12 @@ export class DataActionListener extends Listener {
 
   public listen() {
 
-    let label;
     this.server.post("/", (req, res) => {
 
-      let sass;
       if (!this.validateToken(req, res)) { return; }
 
-      label = process.env.DEV === "true" ?
-        (sass = "[DEVELOPMENT] Lookerbot")
-      :
-        "Lookerbot";
-
-      const baseUrl = "https://" + req.get("host");
+      const label = config.unsafeLocalDev ? "[DEVELOPMENT] Lookerbot" : "Lookerbot";
+      const baseUrl = `https://${req.get("host")}`;
 
       const out = {
         integrations: [{
@@ -57,8 +52,8 @@ export class DataActionListener extends Listener {
           channels = _.sortBy(channels, "name");
 
           response = [{
-            description: "The bot user must be a member of the channel.",
-            label: "Slack Channel",
+            description: "The Lookerbot user must be a member of the channel.",
+            label: "Channel",
             name: "channel",
             options: channels.map((channel: any) => ({name: channel.id, label: `#${channel.name}`})),
             required: true,
