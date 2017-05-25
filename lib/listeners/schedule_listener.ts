@@ -43,7 +43,7 @@ export class ScheduleListener extends Listener {
           const planUrl = req.body.scheduled_plan.url;
           const looker = this.lookers.filter(l => planUrl.lastIndexOf(l.url, 0) === 0)[0];
 
-          if (this.validateTokenForLooker(req, res, looker)) {
+          if (looker && this.validateTokenForLooker(req, res, looker)) {
 
             const context = ReplyContext.forChannel(this.bot, channelName);
             context.looker = looker;
