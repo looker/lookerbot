@@ -40,30 +40,28 @@ export class ScheduleListener extends Listener {
             channelName = `#${channelName}`;
           }
 
-          for (const looker of this.lookers) {
-            if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
-              if (this.validateTokenForLooker(req, res, looker)) {
+          const planUrl = req.body.scheduled_plan.url;
+          const looker = this.lookers.filter(l => planUrl.lastIndexOf(l.url, 0) === 0)[0];
 
-                const context = ReplyContext.forChannel(this.bot, channelName);
-                context.looker = looker;
-                context.scheduled = true;
+          if (this.validateTokenForLooker(req, res, looker)) {
 
-                if (lookId) {
-                  const runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
-                  runner.start();
-                  this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
-                } else {
-                  const runner = new QueryRunner(context, {id: qid});
-                  runner.start();
-                  this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
-                }
+            const context = ReplyContext.forChannel(this.bot, channelName);
+            context.looker = looker;
+            context.scheduled = true;
 
-              } else {
-                this.reply(res, {success: false, reason: "Invalid webhook token."});
-              }
+            if (lookId) {
+              const runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
+              runner.start();
+              this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
+            } else {
+              const runner = new QueryRunner(context, {id: qid});
+              runner.start();
+              this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
             }
+
+          } else {
+            this.reply(res, {success: false, reason: "Requested data is from an unknown Looker."});
           }
-          return;
 
         } else {
           this.reply(res, {success: false, reason: "Scheduled plan does not have a query_id or a parsable Look URL."});
