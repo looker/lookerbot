@@ -22,7 +22,7 @@ export class DataActionListener extends Listener {
       :
         "Lookerbot";
 
-      const baseUrl = req.protocol + "://" + req.get("host");
+      const baseUrl = "https://" + req.get("host");
 
       const out = {
         integrations: [{
