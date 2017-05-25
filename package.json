@@ -1,7 +1,7 @@
 {
-  "name": "looker-slackbot",
+  "name": "lookerbot",
   "version": "0.0.12",
-  "description": "Lookerbot for Slack",
+  "description": "Lookerbot",
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/ts-node ./lib/index.ts",
@@ -50,7 +50,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/looker/looker-slackbot"
+    "url": "https://github.com/looker/lookerbot"
   },
   "license": "MIT"
 }
