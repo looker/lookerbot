@@ -17,16 +17,15 @@ export interface ILookerRequestOptions {
 
 export default class LookerAPIClient {
 
-  private options: {
+  private token?: string;
+  private tokenError?: string;
+
+  constructor(private options: {
     baseUrl: string,
     clientId: string,
     clientSecret: string,
     afterConnect?: () => void,
-  };
-  private token?: string;
-  private tokenError?: string;
-
-  constructor(options) {
+  }) {
     this.options = options;
     this.fetchAccessToken();
   }
@@ -66,12 +65,12 @@ export default class LookerAPIClient {
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {});
 
-    request(newConfig, (error, response, body) => {
+    request(newConfig, (error, response, body: string | Buffer) => {
       if (error) {
         errorCallback(error);
       } else if (response.statusCode === 200) {
         if (response.headers["content-type"].indexOf("application/json") !== -1) {
-          successCallback(JSON.parse(body));
+          successCallback(JSON.parse(body as string));
         } else {
           successCallback(body);
         }
@@ -80,7 +79,7 @@ export default class LookerAPIClient {
           if (Buffer.isBuffer(body) && (body.length === 0)) {
             errorCallback({error: "Received empty response from Looker."});
           } else {
-            errorCallback(JSON.parse(body));
+            errorCallback(JSON.parse(body as string));
           }
         } catch (error1) {
           console.error("JSON parse failed:");
@@ -122,7 +121,7 @@ export default class LookerAPIClient {
     return this.getAsync(path, replyContext, {encoding: null});
   }
 
-  public post(path: string, body, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
+  public post(path: string, body: any, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
     this.request(
       {
         body: JSON.stringify(body),
@@ -205,7 +204,7 @@ export default class LookerAPIClient {
     return metadata;
   }
 
-  private sha(text) {
+  private sha(text: string) {
     const shasum = crypto.createHash("sha1");
     shasum.update(text);
     return shasum.digest("hex");

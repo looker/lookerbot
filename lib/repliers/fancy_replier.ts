@@ -1,6 +1,6 @@
 import * as _ from "underscore";
 import config from "../config";
-import { IRichMessage, Message } from "../message";
+import { IRichMessage, Message, SentMessage } from "../message";
 import ReplyContext from "../reply_context";
 
 const sassyMessages = [
@@ -50,7 +50,7 @@ const sassyMessages = [
 export abstract class FancyReplier {
 
   public replyContext: ReplyContext;
-  private loadingMessage: any;
+  private loadingMessage: SentMessage;
 
   constructor(replyContext: ReplyContext) {
     this.replyContext = replyContext;
@@ -66,7 +66,7 @@ export abstract class FancyReplier {
     }
   }
 
-  protected abstract async work();
+  protected abstract work(): Promise<void>;
 
   protected reply(obj: Message, cb?: any) {
     let sendableMsg: IRichMessage;
@@ -107,7 +107,7 @@ export abstract class FancyReplier {
     }
   }
 
-  private startLoading(cb) {
+  private startLoading(cb: () => void) {
 
     // Scheduled messages don't have a loading indicator, why distract everything?
     if (this.replyContext.scheduled) {
@@ -132,7 +132,7 @@ export abstract class FancyReplier {
       unfurl_media: false,
     };
 
-    this.replyContext.replyPublic(params, (error, response) => {
+    this.replyContext.replyPublic(params, (error: any, response: SentMessage) => {
       this.loadingMessage = response;
       cb();
     });

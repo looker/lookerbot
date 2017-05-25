@@ -2,7 +2,8 @@ import Command from "./commands/command";
 import { Listener } from "./listeners/listener";
 import Looker from "./looker";
 import LookQueryRunner from "./repliers/look_query_runner";
-import QueryRunner from "./repliers/query_runner";
+import { QueryRunner } from "./repliers/query_runner";
+import ReplyContext from "./reply_context";
 import SlackService from "./services/slack_service";
 
 export default class Commander {
@@ -13,10 +14,10 @@ export default class Commander {
   constructor(opts: {listeners: Array<typeof Listener>, commands: Array<typeof Command>}) {
     this.service = new SlackService({
       listeners: opts.listeners,
-      messageHandler: (context) => {
+      messageHandler: (context: ReplyContext) => {
         return this.handleMessage(context);
       },
-      urlHandler: (context, url) => {
+      urlHandler: (context: ReplyContext, url: string) => {
         return this.handleUrlExpansion(context, url);
       },
     });
@@ -25,7 +26,7 @@ export default class Commander {
     this.commands = opts.commands.map((c) => new c());
   }
 
-  private handleMessage(context) {
+  private handleMessage(context: ReplyContext) {
 
     const message = context.sourceMessage;
 
@@ -42,7 +43,7 @@ export default class Commander {
 
   }
 
-  private handleUrlExpansion(context, url) {
+  private handleUrlExpansion(context: ReplyContext, url: string) {
     for (const looker of Looker.all) {
       // Starts with Looker base URL?
       if (url.lastIndexOf(looker.url, 0) === 0) {
@@ -54,7 +55,7 @@ export default class Commander {
 
   }
 
-  private annotateLook(context, url) {
+  private annotateLook(context: ReplyContext, url: string) {
     const matches = url.match(/\/looks\/([0-9]+)$/);
     if (matches) {
       console.log(`Expanding Look URL ${url}`);
@@ -63,7 +64,7 @@ export default class Commander {
     }
   }
 
-  private annotateShareUrl(context, url) {
+  private annotateShareUrl(context: ReplyContext, url: string) {
     const matches = url.match(/\/x\/([A-Za-z0-9]+)$/);
     if (matches) {
       console.log(`Expanding Share URL ${url}`);

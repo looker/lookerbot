@@ -10,7 +10,7 @@ export default class CustomCommand extends Command {
   public attempt(context: ReplyContext) {
     const normalizedText = context.sourceMessage.text.toLowerCase();
     const shortCommands = _.sortBy(_.values(Looker.customCommands), (c) => -c.name.length);
-    const matchedCommand = __guard__(shortCommands.filter((c) => normalizedText.indexOf(c.name) === 0), (x) => x[0]);
+    const matchedCommand = shortCommands.filter((c) => normalizedText.indexOf(c.name) === 0)[0];
     if (matchedCommand) {
 
       const { dashboard } = matchedCommand;
@@ -19,7 +19,7 @@ export default class CustomCommand extends Command {
 
       context.looker = matchedCommand.looker;
 
-      const filters = {};
+      const filters: {[key: string]: string} = {};
       const dashboardFilters = dashboard.dashboard_filters || dashboard.filters;
       for (const filter of dashboardFilters) {
         filters[filter.name] = query;
@@ -33,8 +33,4 @@ export default class CustomCommand extends Command {
     }
   }
 
-}
-
-function __guard__(value, transform) {
-  return (typeof value !== "undefined" && value !== null) ? transform(value) : undefined;
 }

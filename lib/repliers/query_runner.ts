@@ -1,15 +1,17 @@
 import * as _ from "underscore";
+import { IQuery, IQueryResponse } from "../looker_api_types";
+import ReplyContext from "../reply_context";
 import SlackUtils from "../slack_utils";
 import blobStores from "../stores/index";
 import { FancyReplier } from "./fancy_replier";
 import SlackTableFormatter from "./slack_table_formatter";
 
-export default class QueryRunner extends FancyReplier {
+export class QueryRunner extends FancyReplier {
 
   protected querySlug?: string;
   protected queryId?: number;
 
-  constructor(replyContext, queryParam: {slug?: string, id?: number} = {}) {
+  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: number} = {}) {
     super(replyContext);
     this.querySlug = queryParam.slug;
     this.queryId = queryParam.id;
@@ -17,15 +19,15 @@ export default class QueryRunner extends FancyReplier {
 
   protected showShareUrl() { return false; }
 
-  protected linkText(shareUrl) {
+  protected linkText(shareUrl: string) {
     return shareUrl;
   }
 
-  protected linkUrl(shareUrl) {
+  protected linkUrl(shareUrl: string) {
     return shareUrl;
   }
 
-  protected shareUrlContent(shareUrl) {
+  protected shareUrlContent(shareUrl: string) {
     if (this.linkText(shareUrl) === this.linkUrl(shareUrl)) {
       return `<${this.linkUrl(shareUrl)}>`;
     } else {
@@ -33,7 +35,7 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected async postImage(query, imageData: Buffer) {
+  protected async postImage(query: IQuery, imageData: Buffer) {
     if (!blobStores.current) {
       this.reply(":warning: No storage is configured for visualization images in the bot configuration.");
       return;
@@ -63,7 +65,7 @@ export default class QueryRunner extends FancyReplier {
 
   }
 
-  protected postResult(query, result) {
+  protected postResult(query: IQuery, result: IQueryResponse) {
     const formatter = new SlackTableFormatter({
       baseUrl: this.replyContext.looker.url,
       query,
@@ -73,20 +75,20 @@ export default class QueryRunner extends FancyReplier {
     this.reply(formatter.format());
   }
 
-  protected work() {
+  protected async work() {
     if (this.querySlug) {
       this.replyContext.looker.client.get(
         `queries/slug/${this.querySlug}`,
-        (query) => this.runQuery(query),
-        (r) => this.replyError(r),
+        (query: IQuery) => this.runQuery(query),
+        (r: any) => this.replyError(r),
         {},
         this.replyContext,
       );
     } else if (this.queryId) {
       this.replyContext.looker.client.get(
         `queries/${this.queryId}`,
-        (query) => this.runQuery(query),
-        (r) => this.replyError(r),
+        (query: IQuery) => this.runQuery(query),
+        (r: any) => this.replyError(r),
         {},
         this.replyContext,
       );
@@ -95,7 +97,7 @@ export default class QueryRunner extends FancyReplier {
     }
   }
 
-  protected async runQuery(query) {
+  protected async runQuery(query: IQuery) {
     const visType: string = query.vis_config && query.vis_config.type ? query.vis_config.type : "table";
 
     if (visType === "table" || visType === "looker_single_record" || visType === "single_value") {

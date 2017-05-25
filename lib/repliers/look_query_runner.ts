@@ -1,12 +1,16 @@
-import QueryRunner from "./query_runner";
+import { ILook } from "../looker_api_types";
+import ReplyContext from "../reply_context";
+import { QueryRunner } from "./query_runner";
 
 export default class LookQueryRunner extends QueryRunner {
 
-  private lookId: number;
-  private filterInfo?: any;
   private loadedLook: any;
 
-  constructor(replyContext, lookId, filterInfo?: any) {
+  constructor(
+    replyContext: ReplyContext,
+    private lookId: number | string,
+    private filterInfo?: {queryId: number, url: string},
+   ) {
     super(replyContext);
     this.lookId = lookId;
     this.filterInfo = filterInfo;
@@ -14,7 +18,7 @@ export default class LookQueryRunner extends QueryRunner {
 
   protected showShareUrl() { return true; }
 
-  protected linkText(shareUrl) {
+  protected linkText(shareUrl: string) {
     if (this.loadedLook) {
       return this.loadedLook.title;
     } else {
@@ -22,9 +26,9 @@ export default class LookQueryRunner extends QueryRunner {
     }
   }
 
-  protected linkUrl(shareUrl) {
+  protected linkUrl(shareUrl: string) {
     if (this.loadedLook) {
-      if (this.isFilteredLook()) {
+      if (this.filterInfo && this.isFilteredLook()) {
         return this.filterInfo.url;
       } else {
         return `${this.replyContext.looker.url}${this.loadedLook.short_url}`;
@@ -34,12 +38,12 @@ export default class LookQueryRunner extends QueryRunner {
     }
   }
 
-  protected work() {
-    return this.replyContext.looker.client.get(`looks/${this.lookId}`, (look) => {
+  protected async work() {
+    this.replyContext.looker.client.get(`looks/${this.lookId}`, (look: ILook) => {
 
       this.loadedLook = look;
 
-      if (this.isFilteredLook()) {
+      if (this.filterInfo && this.isFilteredLook()) {
         this.queryId = this.filterInfo.queryId;
       } else {
         this.querySlug = look.query.slug;
@@ -48,11 +52,11 @@ export default class LookQueryRunner extends QueryRunner {
       super.work();
 
     },
-    (r) => this.replyError(r));
+    (r: any) => this.replyError(r));
   }
 
-  private isFilteredLook() {
-    return (this.filterInfo != null) && (this.loadedLook.query.id !== this.filterInfo.queryId);
+  private isFilteredLook()  {
+    return this.filterInfo && this.loadedLook.query.id !== this.filterInfo.queryId;
   }
 
 }

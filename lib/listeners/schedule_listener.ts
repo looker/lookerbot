@@ -1,6 +1,6 @@
 import * as express from "express";
 import LookQueryRunner from "../repliers/look_query_runner";
-import QueryRunner from "../repliers/query_runner";
+import { QueryRunner } from "../repliers/query_runner";
 import ReplyContext from "../reply_context";
 import { Listener } from "./listener";
 
@@ -29,7 +29,8 @@ export default class ScheduleListener extends Listener {
       if (req.body.scheduled_plan.type === "Look") {
 
         const qid = req.body.scheduled_plan.query_id;
-        const lookId = __guard__(req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/), (x) => x[1]);
+        const lookMatches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/);
+        const lookId = lookMatches ? lookMatches[1] : undefined;
 
         if (qid || lookId) {
 
@@ -43,9 +44,7 @@ export default class ScheduleListener extends Listener {
             if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
               if (this.validateTokenForLooker(req, res, looker)) {
 
-                const context = new ReplyContext(this.bot, this.bot, {
-                  channel: channelName,
-                });
+                const context = ReplyContext.forChannel(this.bot, channelName);
                 context.looker = looker;
                 context.scheduled = true;
 
@@ -76,8 +75,4 @@ export default class ScheduleListener extends Listener {
       this.reply(res, {success: false, reason: "No scheduled plan in payload."});
     }
   }
-}
-
-function __guard__(value, transform) {
-  return (typeof value !== "undefined" && value !== null) ? transform(value) : undefined;
 }

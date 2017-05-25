@@ -13,7 +13,7 @@ export default class SlackActionListener extends Listener {
 
     this.server.post("/slack/action", async (req, res) => {
 
-      let payload;
+      let payload: any;
       try {
         payload = JSON.parse(req.body.payload);
       } catch (e) {
@@ -70,7 +70,7 @@ export default class SlackActionListener extends Listener {
         if (actionResult.success) {
           text = `:white_check_mark: ${actionResult.message || "Done"}!`;
         } else if (actionResult.validation_errors) {
-          text = actionResult.validation_errors.errors.map((e) => `:x: ${e.message}`).join("\n");
+          text = actionResult.validation_errors.errors.map((e: any) => `:x: ${e.message}`).join("\n");
         } else {
           text = `:x: ${actionResult.message || "Something went wrong performing the action."}.`;
         }

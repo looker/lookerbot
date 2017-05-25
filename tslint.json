@@ -7,7 +7,8 @@
       "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
       "prefer-const": [true, {"destructuring": "all"}],
       "max-line-length": false,
-      "no-console": false
+      "no-console": false,
+      "no-var-requires": false
     },
     "rulesDirectory": []
 }

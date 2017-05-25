@@ -4,17 +4,19 @@ import { Message, SentMessage } from "./message";
 
 export default class ReplyContext {
 
+  public static forChannel(bot: any, channel: string) {
+    return new ReplyContext(bot, bot, {channel} as SentMessage);
+  }
+
   public looker: Looker;
   public sourceMessage: SentMessage;
   public isDM = false;
   public scheduled = false;
   public dataAction = false;
 
-  private defaultBot: any;
-  private messageBot: any;
   private hasRepliedPrivately = false;
 
-  constructor(defaultBot, messageBot, sourceMessage) {
+  constructor(private defaultBot: any, private messageBot: any, sourceMessage: SentMessage) {
     this.defaultBot = defaultBot;
     this.messageBot = messageBot;
     this.sourceMessage = sourceMessage;
@@ -69,7 +71,7 @@ export default class ReplyContext {
 
   // The Slack RTM API seems to be unreliable at delivering messages, or has formatting differences.
   // Setting the attachments to [] hints to botkit to skip the RTM API and use the REST one.
-  private rtmOptOut(message) {
+  private rtmOptOut(message: Message) {
     if (typeof(message) === "string") {
       return {text: message, attachments: []};
     } else {

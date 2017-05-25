@@ -3,11 +3,11 @@ import Looker from "../looker";
 
 export class Listener {
 
-  protected server: express.Application;
-  protected bot: any;
-  protected lookers: Looker[];
-
-  constructor(server: express.Application, bot, lookers: Looker[]) {
+  constructor(
+    protected server: express.Application,
+    protected bot: any,
+    protected lookers: Looker[],
+  ) {
     this.server = server;
     this.bot = bot;
     this.lookers = lookers;
@@ -28,7 +28,7 @@ export class Listener {
     return true;
   }
 
-  protected validateTokenForLooker(req: express.Request, res: express.Response, looker) {
+  protected validateTokenForLooker(req: express.Request, res: express.Response, looker: Looker) {
     if (!req.headers["x-looker-webhook-token"]) {
       this.reply(res, {looker: {success: false}, reason: "No x-looker-webhook-token token provided."});
       return false;
@@ -40,7 +40,7 @@ export class Listener {
     return value;
   }
 
-  protected reply(res: express.Response, json) {
+  protected reply(res: express.Response, json: any) {
     res.json(json);
     console.log(`Replied to ${this.type()}.`, json);
   }

@@ -11,6 +11,11 @@ export default class SlackEventListener extends Listener {
 
     return this.server.post("/slack/event", (req, res) => {
 
+      const fail = () => {
+        res.status(400);
+        return res.send("");
+      };
+
       const payload = req.body;
 
       if (SlackUtils.checkToken(null, payload)) {
@@ -19,19 +24,14 @@ export default class SlackEventListener extends Listener {
           return console.log(`Replied to challenge ${payload.challenge}`);
         } else {
           console.log(`Unknown event type ${JSON.stringify(payload)}`);
-          return this.fail(res);
+          return fail();
         }
       } else {
         console.log(`Payload had invalid format ${JSON.stringify(payload)}`);
-        return this.fail(res);
+        return fail();
       }
 
     });
-  }
-
-  private fail(res) {
-    res.status(400);
-    return res.send("");
   }
 
 }

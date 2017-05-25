@@ -1,3 +1,5 @@
+import { SentMessage } from "./message";
+
 export default class SlackUtils {
 
   public static slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
@@ -6,7 +8,7 @@ export default class SlackUtils {
     return text.split("&gt;").join(">").split("&lt;").join("<");
   }
 
-  public static checkToken(bot, message) {
+  public static checkToken(bot: any, message: SentMessage) {
     if (process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && (process.env.SLACK_SLASH_COMMAND_TOKEN === message.token)) {
       return true;
     } else {

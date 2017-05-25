@@ -5,7 +5,7 @@
       "outDir": "lib",
       "sourceMap": false,
       "target": "ES6",
-      "strictNullChecks": true,
+      "strict": true,
       "types": ["node"]
     }
 }

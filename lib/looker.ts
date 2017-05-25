@@ -1,3 +1,4 @@
+import { IDashboard, ISpace } from "./looker_api_types";
 import LookerAPIClient from "./looker_client";
 
 export interface ICustomCommand {
@@ -10,6 +11,15 @@ export interface ICustomCommand {
   hidden: boolean;
 }
 
+interface ILookerOptions {
+  apiBaseUrl: string;
+  clientId: string;
+  clientSecret: string;
+  customCommandSpaceId: string;
+  url: string;
+  webhookToken: string;
+}
+
 export default class Looker {
 
   public static all: Looker[];
@@ -20,7 +30,7 @@ export default class Looker {
   }
 
   public static loadAll() {
-    const configs = process.env.LOOKERS ?
+    const configs: ILookerOptions[] = process.env.LOOKERS ?
       (console.log("Using Looker information specified in LOOKERS environment variable."),
       JSON.parse(process.env.LOOKERS))
     :
@@ -41,7 +51,7 @@ export default class Looker {
   public webhookToken: string;
   public client: LookerAPIClient;
 
-  constructor(options) {
+  constructor(options: ILookerOptions) {
 
     this.url = options.url;
     this.customCommandSpaceId = options.customCommandSpaceId;
@@ -64,9 +74,9 @@ export default class Looker {
     }
     console.log(`Refreshing custom commands for ${this.url}...`);
 
-    this.client.get(`spaces/${this.customCommandSpaceId}`, (space) => {
+    this.client.get(`spaces/${this.customCommandSpaceId}`, (space: ISpace) => {
       this.addCommandsForSpace(space, "Shortcuts");
-      this.client.get(`spaces/${this.customCommandSpaceId}/children`, (children) => {
+      this.client.get(`spaces/${this.customCommandSpaceId}/children`, (children: ISpace[]) => {
         children.map((child) =>
           this.addCommandsForSpace(child, child.name));
       },
@@ -75,9 +85,9 @@ export default class Looker {
     console.log);
   }
 
-  private addCommandsForSpace(space, category: string) {
+  private addCommandsForSpace(space: ISpace, category: string) {
     space.dashboards.forEach((partialDashboard) =>
-      this.client.get(`dashboards/${partialDashboard.id}`, (dashboard) => {
+      this.client.get(`dashboards/${partialDashboard.id}`, (dashboard: IDashboard) => {
 
         const command: ICustomCommand = {
           category,
@@ -93,7 +103,7 @@ export default class Looker {
         command.helptext = "";
 
         const dashboardFilters = dashboard.dashboard_filters || dashboard.filters;
-        if ((dashboardFilters != null ? dashboardFilters.length : undefined) > 0) {
+        if (dashboardFilters && dashboardFilters.length > 0) {
           command.helptext = `<${dashboardFilters[0].title.toLowerCase()}>`;
         }
 

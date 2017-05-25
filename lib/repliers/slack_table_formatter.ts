@@ -1,5 +1,6 @@
 import * as _ from "underscore";
 import * as uuid from "uuid";
+import { IDatum, IQuery, IQueryResponse, IQueryResponseField, IQueryResponseRow} from "../looker_api_types";
 import { IAttachment, IAttachmentAction, Message } from "../message";
 import SlackUtils from "../slack_utils";
 
@@ -8,11 +9,11 @@ export default class SlackTableFormatter {
   private dimensionLike: any[];
   private measureLike: any[];
   private fields: any[];
-  private query: any;
-  private result: any;
+  private query: IQuery;
+  private result: IQueryResponse;
 
   constructor(
-    private options: {query: any, result: any, baseUrl: string, shareUrl: string},
+    private options: {query: IQuery, result: IQueryResponse, baseUrl: string, shareUrl: string},
   ) {
 
     this.query = options.query;
@@ -30,8 +31,8 @@ export default class SlackTableFormatter {
     const calcs = this.result.fields.table_calculations || [];
     const dimensions = this.result.fields.dimensions || [];
     const measures = this.result.fields.measures || [];
-    this.measureLike = measures.concat(calcs.filter((c) => c.is_measure));
-    this.dimensionLike = dimensions.concat(calcs.filter((c) => !c.is_measure));
+    this.measureLike = measures.concat(calcs.filter((c) => typeof c.measure === "undefined" ? c.is_measure : c.is_measure));
+    this.dimensionLike = dimensions.concat(calcs.filter((c) => typeof c.measure === "undefined" ? !c.is_measure : !c.measure));
     this.fields = this.measureLike.concat(this.dimensionLike);
 
   }
@@ -86,7 +87,7 @@ export default class SlackTableFormatter {
 
   }
 
-  private addSlackButtons(f, row, attachment: IAttachment) {
+  private addSlackButtons(f: IQueryResponseField, row: IQueryResponseRow, attachment: IAttachment) {
 
     if (!SlackUtils.slackButtonsEnabled) { return; }
 
@@ -108,7 +109,7 @@ export default class SlackTableFormatter {
 
   }
 
-  private renderFieldLabel(field): string {
+  private renderFieldLabel(field: IQueryResponseField): string {
     if (this.query.vis_config == null ? true : this.query.vis_config.show_view_names) {
       return field.label_short || field.label;
     } else {
@@ -116,11 +117,11 @@ export default class SlackTableFormatter {
     }
   }
 
-  private renderString(d): string {
+  private renderString(d: IDatum): string {
      return d.rendered || d.value;
   }
 
-  private renderField(f, row): string {
+  private renderField(f: IQueryResponseField, row: IQueryResponseRow): string {
     const d = row[f.name];
     const drill = d.links != null ? d.links[0] : undefined;
     if (drill && (drill.type === "measure_default")) {
