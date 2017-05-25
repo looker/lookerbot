@@ -27,6 +27,7 @@
     "azure-storage": "^2.1.0",
     "botkit": "0.0.15",
     "chai": "^3.5.0",
+    "datauri": "^1.0.5",
     "dotenv": "^4.0.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^7.0.0",

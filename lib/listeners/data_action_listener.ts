@@ -1,8 +1,12 @@
+import * as path from "path";
 import * as _ from "underscore";
+import config from "../config";
 import { LookQueryRunner } from "../repliers/look_query_runner";
 import { ReplyContext } from "../reply_context";
 import { Listener } from "./listener";
-import config from "../config";
+
+const datauri = require("datauri");
+const slackIcon = new datauri(path.resolve(__dirname, "..", "..", "images", "slack.svg")).content;
 
 export class DataActionListener extends Listener {
 

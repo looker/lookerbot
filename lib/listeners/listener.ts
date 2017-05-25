@@ -22,7 +22,7 @@ export class Listener {
   protected validateToken(req: express.Request, res: express.Response) {
     if (this.usesNewTokenAuth(req)) {
       const tokenMatch = req.headers.authorization.match(TOKEN_REGEX);
-      if (tokenMatch && config.lookerbotAuthorizationToken == tokenMatch[1]) {
+      if (tokenMatch && config.lookerbotAuthorizationToken === tokenMatch[1]) {
         return true;
       } else {
         this.replyBadAuth(res);
