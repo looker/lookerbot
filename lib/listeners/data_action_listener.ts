@@ -25,11 +25,11 @@ export class DataActionListener extends Listener {
       const baseUrl = req.protocol + "://" + req.get("host");
 
       const out = {
-        destinations: [{
-          description: "Send data to Slack as the bot user configured for Lookerbot.",
+        integrations: [{
+          description: "Send data to Slack. The data will be posted as the Lookerbot user.",
           form_url: `${baseUrl}/data_actions/form`,
           label: "Slack",
-          name: "lookerbot",
+          name: "post",
           supported_action_types: ["query"],
           url: `${baseUrl}/slack/post_from_query_action`,
         }],
@@ -44,7 +44,10 @@ export class DataActionListener extends Listener {
 
       if (!this.validateToken(req, res)) { return; }
 
-      return this.bot.api.channels.list({exclude_archived: 1}, (err: any, response: any) => {
+      return this.bot.api.channels.list({
+        exclude_archived: 1,
+        exclude_members: 1,
+      }, (err: any, response: any) => {
         if (err) {
           console.error(err);
         }
