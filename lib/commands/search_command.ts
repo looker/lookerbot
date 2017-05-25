@@ -1,13 +1,12 @@
-import Command from "./command";
-
 import config from "../config";
-import Looker from "../looker";
-import LookFinder from "../repliers/look_finder";
-import ReplyContext from "../reply_context";
+import { Looker } from "../looker";
+import { LookFinder } from "../repliers/look_finder";
+import { ReplyContext } from "../reply_context";
+import { Command } from "./command";
 
 const FIND_REGEX = new RegExp("find (dashboard|look )? ?(.+)");
 
-export default class SearchCommand extends Command {
+export class SearchCommand extends Command {
 
   public attempt(context: ReplyContext) {
 

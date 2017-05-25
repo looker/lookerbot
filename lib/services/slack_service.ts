@@ -1,13 +1,15 @@
-import * as Botkit from "botkit";
-import * as getUrls from "get-urls";
+import * as express from "express";
 import config from "../config";
-import Looker from "../looker";
-import ReplyContext from "../reply_context";
-import SlackUtils from "../slack_utils";
-
 import { Listener } from "../listeners/listener";
+import { Looker } from "../looker";
+import { Message, SentMessage } from "../message";
+import { ReplyContext } from "../reply_context";
+import { SlackUtils } from "../slack_utils";
 
-export default class SlackService {
+const botkit = require("botkit");
+const getUrls = require("get-urls");
+
+export class SlackService {
 
   private listeners: Array<typeof Listener>;
   private runningListeners: Listener[];
@@ -16,7 +18,11 @@ export default class SlackService {
   private controller: any;
   private defaultBot: any;
 
-  constructor(opts) {
+  constructor(opts: {
+    listeners: Array<typeof Listener>,
+    messageHandler: (context: ReplyContext) => void,
+    urlHandler: (context: ReplyContext, url: string) => void,
+  }) {
     this.listeners = opts.listeners;
     this.messageHandler = opts.messageHandler;
     this.urlHandler = opts.urlHandler;
@@ -24,8 +30,7 @@ export default class SlackService {
 
   public begin() {
 
-    let context;
-    this.controller = Botkit.slackbot({
+    this.controller = botkit.slackbot({
       debug: config.debugMode,
     });
 
@@ -36,7 +41,7 @@ export default class SlackService {
 
     // This is a workaround to how Botkit handles teams, but this server manages only a single team.
 
-    this.defaultBot.api.team.info({}, (err, response) => {
+    this.defaultBot.api.team.info({}, (err: any, response: any) => {
       if (response != null ? response.ok : undefined) {
         return this.controller.saveTeam(response.team, () => console.log("Saved the team information..."));
       } else {
@@ -50,21 +55,21 @@ export default class SlackService {
 
     this.runningListeners = [];
 
-    this.controller.setupWebserver(process.env.PORT || 3333, (err, expressWebserver) => {
-      this.controller.createWebhookEndpoints(expressWebserver);
+    this.controller.setupWebserver(process.env.PORT || 3333,
+      (err: any, expressWebserver: express.Application) => {
+        this.controller.createWebhookEndpoints(expressWebserver);
 
-      for (const listener of this.listeners) {
-        const instance = new listener(expressWebserver, this.defaultBot, Looker.all);
-        instance.listen();
-        this.runningListeners.push(instance);
-      }
-
+        for (const listener of this.listeners) {
+          const instance = new listener(expressWebserver, this.defaultBot, Looker.all);
+          instance.listen();
+          this.runningListeners.push(instance);
+        }
     });
 
     // Listen to the various events
 
-    const processCommand = (bot, message, isDM = false) => {
-      context = new ReplyContext(this.defaultBot, bot, message);
+    const processCommand = (bot: any, message: SentMessage, isDM = false) => {
+      const context = new ReplyContext(this.defaultBot, bot, message);
       context.isDM = isDM;
       this.ensureUserAuthorized(context, () => {
         this.messageHandler(context);
@@ -75,34 +80,34 @@ export default class SlackService {
       throw new Error("Failed to reconnect to the Slack RTM API.");
     });
 
-    this.controller.on("slash_command", (bot, message) => {
+    this.controller.on("slash_command", (bot: any, message: SentMessage) => {
       if (!SlackUtils.checkToken(bot, message)) { return; }
       processCommand(bot, message);
     });
 
-    this.controller.on("direct_mention", (bot, message) => {
+    this.controller.on("direct_mention", (bot: any, message: SentMessage) => {
       message.text = SlackUtils.stripMessageText(message.text);
       processCommand(bot, message);
     });
 
-    this.controller.on("direct_message", (bot, message) => {
+    this.controller.on("direct_message", (bot: any, message: SentMessage) => {
       if (message.text.indexOf("/") !== 0) {
         message.text = SlackUtils.stripMessageText(message.text);
         processCommand(bot, message, true);
       }
     });
 
-    this.controller.on("ambient", (bot, message) => {
+    this.controller.on("ambient", (bot: any, message: SentMessage) => {
 
       if (!message.text || (message.subtype === "bot_message")) { return; }
 
       if (process.env.LOOKER_SLACKBOT_EXPAND_URLS !== "true") { return; }
 
-      context = new ReplyContext(this.defaultBot, bot, message);
+      const context = new ReplyContext(this.defaultBot, bot, message);
 
       this.ensureUserAuthorized(context, () => {
         // URL Expansion
-        getUrls(message.text).forEach((url) => {
+        getUrls(message.text).forEach((url: string) => {
           this.urlHandler(context, url.replace("%3E", ""));
         });
       }
@@ -113,7 +118,7 @@ export default class SlackService {
 
   private ensureUserAuthorized(
     context: ReplyContext,
-    callback,
+    callback: () => void,
     options: {silent: boolean} = {silent: false},
   ) {
 
@@ -123,7 +128,7 @@ export default class SlackService {
       }
     };
 
-    this.defaultBot.api.users.info({user: context.sourceMessage.user}, (error, response) => {
+    this.defaultBot.api.users.info({user: context.sourceMessage.user}, (error: any, response: any) => {
       if (error || !response.user) {
         reply(`Could not fetch your user info from Slack. ${error || ""}`);
       } else {

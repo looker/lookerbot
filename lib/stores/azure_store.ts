@@ -1,7 +1,7 @@
-import * as AzureStorage from "azure-storage";
-import Store from "./store";
+import * as azure from "azure-storage";
+import { Store } from "./store";
 
-export default class AzureStore extends Store {
+export class AzureStore extends Store {
 
   public configured() {
     return !!process.env.SLACKBOT_AZURE_CONTAINER;
@@ -11,7 +11,7 @@ export default class AzureStore extends Store {
     const key = this.randomPath();
     const container = process.env.SLACKBOT_AZURE_CONTAINER;
     const options = {ContentType: "image/png"};
-    const wasb = new AzureStorage.createBlobService();
+    const wasb = azure.createBlobService();
 
     return new Promise<string>((resolve, reject) => {
       wasb.createBlockBlobFromText(container, key, buffer, options, (err, result, response) => {

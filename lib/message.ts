@@ -4,9 +4,12 @@ export type Message = FormattedMessage | IRichMessage;
 
 export type SentMessage = IRichMessage & {
   channel: string;
+  ts: string;
   team: string;
   text: FormattedMessage;
   user: string;
+  token?: string;
+  subtype?: string;
 };
 
 export interface IRichMessage {
@@ -37,6 +40,6 @@ export interface IAttachmentField {
 export interface IAttachmentAction {
   name: string;
   text: string;
-  type: "button";
+  type: string;
   value: string;
 }

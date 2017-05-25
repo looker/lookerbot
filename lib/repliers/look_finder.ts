@@ -1,24 +1,24 @@
-import FuzzySearch from "fuzzysearch-js";
-import levenshteinFS from "fuzzysearch-js/js/modules/LevenshteinFS";
-import QueryRunner from "./query_runner";
+import { ILook } from "../looker_api_types";
+import { ReplyContext } from "../reply_context";
+import { QueryRunner } from "./query_runner";
 
-export default class LookFinder extends QueryRunner {
+const fuzzySearch = require("fuzzysearch-js");
+const levenshteinFS = require("fuzzysearch-js/js/modules/LevenshteinFS");
 
-  private type: string;
-  private query: string;
+export class LookFinder extends QueryRunner {
 
-  constructor(replyContext, type, query) {
+  constructor(replyContext: ReplyContext, private type: string, private query: string) {
     super(replyContext);
     this.type = type;
     this.query = query;
   }
 
   protected async work() {
-    const results = await this.matchLooks(this.query);
+    const results = await this.matchLooks();
     if (results) {
       const shortResults = results.slice(0, 5);
       this.reply({
-        attachments: shortResults.map((v) => {
+        attachments: shortResults.map((v: any) => {
           const look = v.value;
           return {
             text: `in ${look.space.name}`,
@@ -33,15 +33,15 @@ export default class LookFinder extends QueryRunner {
     }
   }
 
-  private async matchLooks(query) {
+  private async matchLooks() {
     const looks = await this.replyContext.looker.client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
       this.replyContext,
     );
 
-    const fuzzySearch = new FuzzySearch(looks, {termPath: "title"});
-    fuzzySearch.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}));
-    const results = fuzzySearch.search(query);
+    const searcher = new fuzzySearch(looks, {termPath: "title"});
+    searcher.addModule(levenshteinFS({maxDistanceTolerance: 3, factor: 3}));
+    const results = searcher.search(this.query);
 
     return results;
   }

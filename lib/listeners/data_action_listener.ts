@@ -1,9 +1,9 @@
 import * as _ from "underscore";
-import LookQueryRunner from "../repliers/look_query_runner";
-import ReplyContext from "../reply_context";
+import { LookQueryRunner } from "../repliers/look_query_runner";
+import { ReplyContext } from "../reply_context";
 import { Listener } from "./listener";
 
-export default class DataActionListener extends Listener {
+export class DataActionListener extends Listener {
 
   public type() {
     return "data action listener";
@@ -44,20 +44,20 @@ export default class DataActionListener extends Listener {
 
       if (!this.validateToken(req, res)) { return; }
 
-      return this.bot.api.channels.list({exclude_archived: 1}, (err, response) => {
+      return this.bot.api.channels.list({exclude_archived: 1}, (err: any, response: any) => {
         if (err) {
           console.error(err);
         }
         if (response != null ? response.ok : undefined) {
 
-          let channels = response.channels.filter((c) => c.is_member && !c.is_archived);
+          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived);
           channels = _.sortBy(channels, "name");
 
           response = [{
             description: "The bot user must be a member of the channel.",
             label: "Slack Channel",
             name: "channel",
-            options: channels.map((channel) => ({name: channel.id, label: `#${channel.name}`})),
+            options: channels.map((channel: any) => ({name: channel.id, label: `#${channel.name}`})),
             required: true,
             type: "select",
           }];
@@ -74,7 +74,7 @@ export default class DataActionListener extends Listener {
 
     return this.server.post("/data_actions", (req, res) => {
 
-      const getParam = (name) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
+      const getParam = (name: string) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined);
 
       if (!this.validateToken(req, res)) { return; }
 
@@ -86,9 +86,7 @@ export default class DataActionListener extends Listener {
         return;
       }
 
-      const context = new ReplyContext(this.bot, this.bot, {
-        channel,
-      });
+      const context = ReplyContext.forChannel(this.bot, channel);
       context.dataAction = true;
 
       if (typeof(msg) === "string") {

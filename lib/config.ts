@@ -15,4 +15,5 @@ if (config.unsafeLocalDev) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 }
 
+/* tslint:disable:no-default-export */
 export default config;

@@ -7,9 +7,9 @@ const repos = [
   "https://github.com/looker/lookerbot",
 ];
 
-export default class VersionChecker {
+export class VersionChecker {
 
-  public static newVersion;
+  public static newVersion?: {url: string, number: string};
 
   constructor() {
 
@@ -52,11 +52,11 @@ export default class VersionChecker {
     });
   }
 
-  private checked(json) {
-    if (json != null) {
+  private checked(json: any) {
+    if (json) {
       VersionChecker.newVersion = {url: json.html_url, number: json.tag_name};
     } else {
-      VersionChecker.newVersion = null;
+      VersionChecker.newVersion = undefined;
     }
   }
 

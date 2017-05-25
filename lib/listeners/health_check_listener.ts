@@ -1,6 +1,6 @@
 import { Listener } from "./listener";
 
-export default class HealthCheckListener extends Listener {
+export class HealthCheckListener extends Listener {
 
   public type() {
     return "health check listener";

@@ -1,12 +1,14 @@
-import QueryRunner from "./query_runner";
+import { IDashboard, ILook, IQuery } from "../looker_api_types";
+import { ReplyContext } from "../reply_context";
+import { QueryRunner } from "./query_runner";
 
-export default class DashboardQueryRunner extends QueryRunner {
+export class DashboardQueryRunner extends QueryRunner {
 
-  private dashboard: any;
-  private filters: any;
-
-  constructor(replyContext, dashboard, filters) {
-    if (filters == null) { filters = {}; }
+  constructor(
+    replyContext: ReplyContext,
+    private dashboard: IDashboard,
+    private filters: {[key: string]: string} = {},
+  ) {
     super(replyContext);
     this.dashboard = dashboard;
     this.filters = filters;
@@ -14,9 +16,14 @@ export default class DashboardQueryRunner extends QueryRunner {
 
   protected showShareUrl() { return true; }
 
-  protected work() {
+  protected async work() {
 
     const elements = this.dashboard.dashboard_elements || this.dashboard.elements;
+
+    if (!elements || elements.length === 0) {
+      this.reply("Dashboard has no elements.");
+      return;
+    }
 
     if (elements.length > 1) {
       this.reply("Dashboards with more than one element aren't currently supported for Slack commands.");
@@ -26,7 +33,7 @@ export default class DashboardQueryRunner extends QueryRunner {
     elements.map((element) =>
       this.replyContext.looker.client.get(
         `looks/${element.look_id}`,
-        (look) => {
+        (look: ILook) => {
           const queryDef = look.query;
 
           for (const dashFilterName of Object.keys(element.listen)) {
@@ -43,12 +50,12 @@ export default class DashboardQueryRunner extends QueryRunner {
           this.replyContext.looker.client.post(
             "queries",
             queryDef,
-            (query) => this.runQuery(query),
-            (r) => this.replyError(r),
+            (query: IQuery) => this.runQuery(query),
+            (r: any) => this.replyError(r),
             this.replyContext,
           );
         },
-        (r) => this.replyError(r),
+        (r: any) => this.replyError(r),
         {},
         this.replyContext,
       ));
