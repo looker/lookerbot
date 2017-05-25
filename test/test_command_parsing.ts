@@ -1,5 +1,5 @@
 import "mocha";
-import SlackUtils from '../lib/slack_utils';
+import { SlackUtils } from '../lib/slack_utils';
 import { expect } from 'chai';
 
 it("passes through basic text", () => {
