@@ -1,6 +1,6 @@
 import { SentMessage } from "./message";
 
-export default class SlackUtils {
+export class SlackUtils {
 
   public static slackButtonsEnabled = process.env.SLACK_SLASH_COMMAND_TOKEN && (process.env.LOOKERBOT_DATA_ACTIONS_IN_MESSAGES !== "false");
 

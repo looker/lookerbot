@@ -1,8 +1,8 @@
 import { IDashboard, ILook, IQuery } from "../looker_api_types";
-import ReplyContext from "../reply_context";
+import { ReplyContext } from "../reply_context";
 import { QueryRunner } from "./query_runner";
 
-export default class DashboardQueryRunner extends QueryRunner {
+export class DashboardQueryRunner extends QueryRunner {
 
   constructor(
     replyContext: ReplyContext,

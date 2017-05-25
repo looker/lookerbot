@@ -1,8 +1,8 @@
 import * as _ from "underscore";
-import Looker from "./looker";
+import { Looker } from "./looker";
 import { Message, SentMessage } from "./message";
 
-export default class ReplyContext {
+export class ReplyContext {
 
   public static forChannel(bot: any, channel: string) {
     return new ReplyContext(bot, bot, {channel} as SentMessage);

@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
-import Store from "./store";
+import { Store } from "./store";
 
-export default class AmazonS3Store extends Store {
+export class AmazonS3Store extends Store {
 
   public configured() {
     return !!process.env.SLACKBOT_S3_BUCKET;

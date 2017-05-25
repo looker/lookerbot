@@ -1,7 +1,7 @@
 import * as _ from "underscore";
 import config from "../config";
 import { IRichMessage, Message, SentMessage } from "../message";
-import ReplyContext from "../reply_context";
+import { ReplyContext } from "../reply_context";
 
 const sassyMessages = [
 

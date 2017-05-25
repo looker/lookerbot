@@ -1,7 +1,7 @@
-import SlackUtils from "../slack_utils";
+import { SlackUtils } from "../slack_utils";
 import { Listener } from "./listener";
 
-export default class SlackActionListener extends Listener {
+export class SlackActionListener extends Listener {
 
   public type() {
     return "slack action listener";

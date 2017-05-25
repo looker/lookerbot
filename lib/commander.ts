@@ -1,12 +1,12 @@
-import Command from "./commands/command";
+import { Command } from "./commands/command";
 import { Listener } from "./listeners/listener";
-import Looker from "./looker";
-import LookQueryRunner from "./repliers/look_query_runner";
+import { Looker } from "./looker";
+import { LookQueryRunner } from "./repliers/look_query_runner";
 import { QueryRunner } from "./repliers/query_runner";
-import ReplyContext from "./reply_context";
-import SlackService from "./services/slack_service";
+import { ReplyContext } from "./reply_context";
+import { SlackService } from "./services/slack_service";
 
-export default class Commander {
+export class Commander {
 
   private service: SlackService;
   private commands: Command[];

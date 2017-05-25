@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import * as request from "request";
 import * as _ from "underscore";
 import config from "./config";
-import ReplyContext from "./reply_context";
+import { ReplyContext } from "./reply_context";
 
 export interface ILookerRequestConfig {
   method: string;
@@ -15,7 +15,7 @@ export interface ILookerRequestOptions {
   encoding?: string | null;
 }
 
-export default class LookerAPIClient {
+export class LookerAPIClient {
 
   private token?: string;
   private tokenError?: string;

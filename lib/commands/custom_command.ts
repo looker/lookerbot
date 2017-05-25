@@ -1,11 +1,11 @@
 import * as _ from "underscore";
 import config from "../config";
-import Looker from "../looker";
-import DashboardQueryRunner from "../repliers/dashboard_query_runner";
-import ReplyContext from "../reply_context";
-import Command from "./command";
+import { Looker } from "../looker";
+import { DashboardQueryRunner } from "../repliers/dashboard_query_runner";
+import { ReplyContext } from "../reply_context";
+import { Command } from "./command";
 
-export default class CustomCommand extends Command {
+export class CustomCommand extends Command {
 
   public attempt(context: ReplyContext) {
     const normalizedText = context.sourceMessage.text.toLowerCase();

@@ -1,5 +1,5 @@
 import { IDashboard, ISpace } from "./looker_api_types";
-import LookerAPIClient from "./looker_client";
+import { LookerAPIClient } from "./looker_client";
 
 export interface ICustomCommand {
   name: string;
@@ -20,7 +20,7 @@ interface ILookerOptions {
   webhookToken: string;
 }
 
-export default class Looker {
+export class Looker {
 
   public static all: Looker[];
   public static customCommands: {[key: string]: ICustomCommand} = {};

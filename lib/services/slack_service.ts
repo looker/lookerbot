@@ -1,15 +1,15 @@
 import * as express from "express";
 import config from "../config";
 import { Listener } from "../listeners/listener";
-import Looker from "../looker";
+import { Looker } from "../looker";
 import { Message, SentMessage } from "../message";
-import ReplyContext from "../reply_context";
-import SlackUtils from "../slack_utils";
+import { ReplyContext } from "../reply_context";
+import { SlackUtils } from "../slack_utils";
 
 const botkit = require("botkit");
 const getUrls = require("get-urls");
 
-export default class SlackService {
+export class SlackService {
 
   private listeners: Array<typeof Listener>;
   private runningListeners: Listener[];

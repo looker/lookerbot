@@ -8,7 +8,9 @@
       "prefer-const": [true, {"destructuring": "all"}],
       "max-line-length": false,
       "no-console": false,
-      "no-var-requires": false
+      "no-var-requires": false,
+      "no-default-export": true,
+      "import-spacing": true
     },
     "rulesDirectory": []
 }

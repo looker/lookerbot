@@ -1,8 +1,8 @@
 import { ILook } from "../looker_api_types";
-import ReplyContext from "../reply_context";
+import { ReplyContext } from "../reply_context";
 import { QueryRunner } from "./query_runner";
 
-export default class LookQueryRunner extends QueryRunner {
+export class LookQueryRunner extends QueryRunner {
 
   private loadedLook: any;
 

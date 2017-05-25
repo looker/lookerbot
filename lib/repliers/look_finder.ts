@@ -1,11 +1,11 @@
 import { ILook } from "../looker_api_types";
-import ReplyContext from "../reply_context";
+import { ReplyContext } from "../reply_context";
 import { QueryRunner } from "./query_runner";
 
 const fuzzySearch = require("fuzzysearch-js");
 const levenshteinFS = require("fuzzysearch-js/js/modules/LevenshteinFS");
 
-export default class LookFinder extends QueryRunner {
+export class LookFinder extends QueryRunner {
 
   constructor(replyContext: ReplyContext, private type: string, private query: string) {
     super(replyContext);

@@ -1,10 +1,10 @@
 import * as _ from "underscore";
 import { IQuery, IQueryResponse } from "../looker_api_types";
-import ReplyContext from "../reply_context";
-import SlackUtils from "../slack_utils";
+import { ReplyContext } from "../reply_context";
+import { SlackUtils } from "../slack_utils";
 import blobStores from "../stores/index";
 import { FancyReplier } from "./fancy_replier";
-import SlackTableFormatter from "./slack_table_formatter";
+import { SlackTableFormatter } from "./slack_table_formatter";
 
 export class QueryRunner extends FancyReplier {
 

@@ -1,10 +1,10 @@
 import * as express from "express";
-import LookQueryRunner from "../repliers/look_query_runner";
+import { LookQueryRunner } from "../repliers/look_query_runner";
 import { QueryRunner } from "../repliers/query_runner";
-import ReplyContext from "../reply_context";
+import { ReplyContext } from "../reply_context";
 import { Listener } from "./listener";
 
-export default class ScheduleListener extends Listener {
+export class ScheduleListener extends Listener {
 
   public type() {
     return "schedule listener";

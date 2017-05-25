@@ -1,14 +1,12 @@
 import * as _ from "underscore";
-
-import Command from "./command";
-
 import config from "../config";
-import Looker from "../looker";
-import DashboardQueryRunner from "../repliers/dashboard_query_runner";
-import ReplyContext from "../reply_context";
-import VersionChecker from "../version_checker";
+import { Looker } from "../looker";
+import { DashboardQueryRunner } from "../repliers/dashboard_query_runner";
+import { ReplyContext } from "../reply_context";
+import { VersionChecker } from "../version_checker";
+import { Command } from "./command";
 
-export default class HelpCommand extends Command {
+export class HelpCommand extends Command {
 
   public attempt(context: ReplyContext) {
     const helpAttachments: any = [];

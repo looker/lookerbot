@@ -7,7 +7,7 @@ const repos = [
   "https://github.com/looker/lookerbot",
 ];
 
-export default class VersionChecker {
+export class VersionChecker {
 
   public static newVersion?: {url: string, number: string};
 

@@ -1,5 +1,5 @@
 import * as express from "express";
-import Looker from "../looker";
+import { Looker } from "../looker";
 
 export class Listener {
 

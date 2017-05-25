@@ -2,9 +2,9 @@ import * as _ from "underscore";
 import * as uuid from "uuid";
 import { IDatum, IQuery, IQueryResponse, IQueryResponseField, IQueryResponseRow} from "../looker_api_types";
 import { IAttachment, IAttachmentAction, Message } from "../message";
-import SlackUtils from "../slack_utils";
+import { SlackUtils } from "../slack_utils";
 
-export default class SlackTableFormatter {
+export class SlackTableFormatter {
 
   private dimensionLike: any[];
   private measureLike: any[];

@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import { ReadableStreamBuffer } from "stream-buffers";
-import Store from "./store";
+import { Store } from "./store";
 
 const gcs = require("@google-cloud/storage");
 
-export default class GoogleCloudStore extends Store {
+export class GoogleCloudStore extends Store {
 
   public configured() {
     return !!process.env.GOOGLE_CLOUD_BUCKET;

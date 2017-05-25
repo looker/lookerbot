@@ -1,9 +1,9 @@
 import * as _ from "underscore";
-import LookQueryRunner from "../repliers/look_query_runner";
-import ReplyContext from "../reply_context";
+import { LookQueryRunner } from "../repliers/look_query_runner";
+import { ReplyContext } from "../reply_context";
 import { Listener } from "./listener";
 
-export default class DataActionListener extends Listener {
+export class DataActionListener extends Listener {
 
   public type() {
     return "data action listener";

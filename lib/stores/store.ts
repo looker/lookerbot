@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 
-export default class Store {
+export class Store {
 
   public configured(): boolean {
     throw new Error("subclass");

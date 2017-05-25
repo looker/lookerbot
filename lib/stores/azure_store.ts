@@ -1,7 +1,7 @@
 import * as azure from "azure-storage";
-import Store from "./store";
+import { Store } from "./store";
 
-export default class AzureStore extends Store {
+export class AzureStore extends Store {
 
   public configured() {
     return !!process.env.SLACKBOT_AZURE_CONTAINER;
