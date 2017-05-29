@@ -60,7 +60,7 @@ module.exports = class HelpCommand extends Command
       )
 
     if context.isDM && context.sourceMessage.text.toLowerCase() != "help"
-      context.replyPrivate(":crying_cat_face: I couldn't understand that command. You can use `help` to see the list of possible commands.")
+      context.replyPrivate(":crying_cat_face: Não entendi... Tenta escrever `help` para ver a lista de frases disponiveis.")
     else
       context.replyPrivate({attachments: helpAttachments})
 
