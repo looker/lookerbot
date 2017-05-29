@@ -3,21 +3,21 @@ _ = require("underscore")
 sassyMessages = [
 
   # English
-  ["us", "Just a second"]
-  ["us", "Thinking"]
-  ["ca", "On it"]
-  ["us", "Working on it"]
-  ["gb", "Queueing"]
-  ["gb", "Having a think"]
-  ["ca", "One moment please"]
-  ["in", "Give me a minute"]
-  ["pk", "Hold on"]
-  ["ng", "Looking into it"]
-  ["ph", "One sec"]
-  ["ph", "Working it out"]
-  ["us", "Hold please"]
-  ["eg", "Wait a moment"]
-  ["eg", "Hmm"]
+  ["br", "Um minutinho"]
+  ["br", "Já ta chegando..."]
+  ["br", "Coletando os dados"]
+  ["br", "Deixa eu ver..."]
+  ["br", "Um instante"]
+  ["br", "Espere um minuto"]
+  ["br", "Um pouco de paciência"]
+  ["br", "Give me a minute"]
+  ["br", "Vou ver aqui para você"]
+  ["br", "Pesquisando..."]
+  ["br", "Por favor espere, caro Logger"]
+  ["br", "Vamos ver os dados #DataDrivenLoggi"]
+  ["br", "Un moment s'il vous plait"]
+  ["br", "Wait a moment"]
+  ["br", "Hmm"]
 
   # Cooler Languages
   ["es", "Un momento, por favor"]
@@ -110,7 +110,7 @@ module.exports = class FancyReplier
     else if response?.message
       @reply(":warning: #{response.message}")
     else
-      @reply(":warning: Something unexpected went wrong: #{JSON.stringify(response)}")
+      @reply(":Deu ruim: Algo deu errado... Melhor falar com o BI :): #{JSON.stringify(response)}")
 
   work: ->
 
