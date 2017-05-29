@@ -48,7 +48,7 @@ module.exports = class HelpCommand extends Command
     ).join(" or ")
     if spaces
       helpAttachments.push(
-        text: "\n_To add your own commands, add a dashboard to #{spaces}._"
+        text: "\n_Se você quiser adicionar queries aqui, crie um dash aqui: #{spaces}._"
         mrkdwn_in: ["text"]
       )
 
