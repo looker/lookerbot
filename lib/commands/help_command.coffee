@@ -30,7 +30,7 @@ module.exports = class HelpCommand extends Command
         )
 
     defaultText = """
-    • *find* <look search term> — _Shows the top five Looks matching the search._
+    • *find* <look search term> — _Sistema de pesquisa dos looks no Looker._
     """
 
     if config.enableQueryCli
