@@ -1,10 +1,10 @@
-import { SlackUtils } from "../slack_utils";
-import { Listener } from "./listener";
+import { SlackUtils } from "../slack_utils"
+import { Listener } from "./listener"
 
 export class SlackEventListener extends Listener {
 
   public type() {
-    return "slack event listener";
+    return "slack event listener"
   }
 
   public listen() {
@@ -12,26 +12,26 @@ export class SlackEventListener extends Listener {
     return this.server.post("/slack/event", (req, res) => {
 
       const fail = () => {
-        res.status(400);
-        return res.send("");
-      };
+        res.status(400)
+        return res.send("")
+      }
 
-      const payload = req.body;
+      const payload = req.body
 
       if (SlackUtils.checkToken(null, payload)) {
         if (payload.challenge) {
-          res.send(payload.challenge);
-          return console.log(`Replied to challenge ${payload.challenge}`);
+          res.send(payload.challenge)
+          return console.log(`Replied to challenge ${payload.challenge}`)
         } else {
-          console.log(`Unknown event type ${JSON.stringify(payload)}`);
-          return fail();
+          console.log(`Unknown event type ${JSON.stringify(payload)}`)
+          return fail()
         }
       } else {
-        console.log(`Payload had invalid format ${JSON.stringify(payload)}`);
-        return fail();
+        console.log(`Payload had invalid format ${JSON.stringify(payload)}`)
+        return fail()
       }
 
-    });
+    })
   }
 
 }

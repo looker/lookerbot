@@ -1,24 +1,24 @@
-import "./config";
+import "./config"
 
-import { Commander } from "./commander";
-import { Looker } from "./looker";
-import { VersionChecker } from "./version_checker";
+import { Commander } from "./commander"
+import { Looker } from "./looker"
+import { VersionChecker } from "./version_checker"
 
 const state: any = {
   VersionChecker: new VersionChecker(),
-};
+}
 
 // Connect to all the Looker instances
-Looker.loadAll();
+Looker.loadAll()
 
-state.VersionChecker = new VersionChecker();
+state.VersionChecker = new VersionChecker()
 
 // Update access tokens every half hour
 setInterval(() => {
   for (const looker of Looker.all) {
-    looker.client.fetchAccessToken();
+    looker.client.fetchAccessToken()
   }
-}, 30 * 60 * 1000);
+}, 30 * 60 * 1000)
 
 // Set up the commander and its listeners
 state.commander = new Commander({
@@ -34,4 +34,4 @@ state.commander = new Commander({
     require("./listeners/slack_action_listener").SlackActionListener,
     require("./listeners/slack_event_listener").SlackEventListener,
   ],
-});
+})
