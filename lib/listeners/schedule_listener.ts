@@ -1,78 +1,78 @@
-import * as express from "express";
-import { LookQueryRunner } from "../repliers/look_query_runner";
-import { QueryRunner } from "../repliers/query_runner";
-import { ReplyContext } from "../reply_context";
-import { Listener } from "./listener";
+import * as express from "express"
+import { LookQueryRunner } from "../repliers/look_query_runner"
+import { QueryRunner } from "../repliers/query_runner"
+import { ReplyContext } from "../reply_context"
+import { Listener } from "./listener"
 
 export class ScheduleListener extends Listener {
 
   public type() {
-    return "schedule listener";
+    return "schedule listener"
   }
 
   public listen() {
-    this.server.post("/slack/post/:post_type/:channel_name", (req, res) => this.handleRequest(req, res));
-    return this.server.post("/slack/post_from_query_action", (req, res) => this.handleRequest(req, res));
+    this.server.post("/slack/post/:post_type/:channel_name", (req, res) => this.handleRequest(req, res))
+    return this.server.post("/slack/post_from_query_action", (req, res) => this.handleRequest(req, res))
   }
 
   private handleRequest(req: express.Request, res: express.Response) {
 
-    let channelName = req.params.channel_name || (req.body.form_params != null ? req.body.form_params.channel : undefined);
-    const channelType = req.params.post_type;
+    let channelName = req.params.channel_name || (req.body.form_params != null ? req.body.form_params.channel : undefined)
+    const channelType = req.params.post_type
 
     if (!channelName) {
-      this.reply(res, {success: false, reason: "Channel not specified."});
-      return;
+      this.reply(res, {success: false, reason: "Channel not specified."})
+      return
     }
 
     if (req.body.scheduled_plan) {
       if (req.body.scheduled_plan.type === "Look") {
 
-        const qid = req.body.scheduled_plan.query_id;
-        const lookMatches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/);
-        const lookId = lookMatches ? lookMatches[1] : undefined;
+        const qid = req.body.scheduled_plan.query_id
+        const lookMatches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/)
+        const lookId = lookMatches ? lookMatches[1] : undefined
 
         if (qid || lookId) {
 
           if (channelType === "dm") {
-            channelName = `@${channelName}`;
+            channelName = `@${channelName}`
           } else if (channelType === "channel") {
-            channelName = `#${channelName}`;
+            channelName = `#${channelName}`
           }
 
           for (const looker of this.lookers) {
             if (req.body.scheduled_plan.url.lastIndexOf(looker.url, 0) === 0) {
               if (this.validateTokenForLooker(req, res, looker)) {
 
-                const context = ReplyContext.forChannel(this.bot, channelName);
-                context.looker = looker;
-                context.scheduled = true;
+                const context = ReplyContext.forChannel(this.bot, channelName)
+                context.looker = looker
+                context.scheduled = true
 
                 if (lookId) {
-                  const runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url});
-                  runner.start();
-                  this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`});
+                  const runner = new LookQueryRunner(context, lookId, {queryId: qid, url: req.body.scheduled_plan.url})
+                  runner.start()
+                  this.reply(res, {success: true, reason: `Sending Look ${lookId} with query ${qid} to channel ${channelName}.`})
                 } else {
-                  const runner = new QueryRunner(context, {id: qid});
-                  runner.start();
-                  this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`});
+                  const runner = new QueryRunner(context, {id: qid})
+                  runner.start()
+                  this.reply(res, {success: true, reason: `Sending Query ${qid} to channel ${channelName}.`})
                 }
 
               } else {
-                this.reply(res, {success: false, reason: "Invalid webhook token."});
+                this.reply(res, {success: false, reason: "Invalid webhook token."})
               }
             }
           }
-          return;
+          return
 
         } else {
-          this.reply(res, {success: false, reason: "Scheduled plan does not have a query_id or a parsable Look URL."});
+          this.reply(res, {success: false, reason: "Scheduled plan does not have a query_id or a parsable Look URL."})
         }
       } else {
-        this.reply(res, {success: false, reason: `Scheduled plan type ${req.body.scheduled_plan.type} not supported.`});
+        this.reply(res, {success: false, reason: `Scheduled plan type ${req.body.scheduled_plan.type} not supported.`})
       }
     } else {
-      this.reply(res, {success: false, reason: "No scheduled plan in payload."});
+      this.reply(res, {success: false, reason: "No scheduled plan in payload."})
     }
   }
 }

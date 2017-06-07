@@ -1,7 +1,7 @@
-import * as _ from "underscore";
-import config from "../config";
-import { IRichMessage, Message, SentMessage } from "../message";
-import { ReplyContext } from "../reply_context";
+import * as _ from "underscore"
+import config from "../config"
+import { IRichMessage, Message, SentMessage } from "../message"
+import { ReplyContext } from "../reply_context"
 
 const sassyMessages = [
 
@@ -42,68 +42,68 @@ const sassyMessages = [
   ["in", "कृपया एक क्षण के लिए"],
 
 ].map((param) => {
-  const [country, message] = param;
-  const translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`;
-  return `<${translate}|:flag-${country}:> _${message}..._`;
-});
+  const [country, message] = param
+  const translate = `https://translate.google.com/#auto/auto/${encodeURIComponent(message)}`
+  return `<${translate}|:flag-${country}:> _${message}..._`
+})
 
 export abstract class FancyReplier {
 
-  public replyContext: ReplyContext;
-  private loadingMessage: SentMessage;
+  public replyContext: ReplyContext
+  private loadingMessage: SentMessage
 
   constructor(replyContext: ReplyContext) {
-    this.replyContext = replyContext;
+    this.replyContext = replyContext
   }
 
   public start() {
     if (process.env.LOOKER_SLACKBOT_LOADING_MESSAGES !== "false") {
       this.startLoading(() => {
-        this.performWork();
-      });
+        this.performWork()
+      })
     } else {
-      this.performWork();
+      this.performWork()
     }
   }
 
-  protected abstract work(): Promise<void>;
+  protected abstract work(): Promise<void>
 
   protected reply(obj: Message, cb?: any) {
-    let sendableMsg: IRichMessage;
+    let sendableMsg: IRichMessage
 
     if (typeof(obj) === "string") {
-      sendableMsg = {text: obj};
+      sendableMsg = {text: obj}
     } else {
-      sendableMsg = obj;
+      sendableMsg = obj
     }
 
     if (this.loadingMessage) {
 
       // Hacky stealth update of message to preserve chat order
-      const params = {ts: this.loadingMessage.ts, channel: this.replyContext.sourceMessage.channel};
+      const params = {ts: this.loadingMessage.ts, channel: this.replyContext.sourceMessage.channel}
 
-      const update = _.extend(params, sendableMsg);
-      update.attachments = update.attachments ? JSON.stringify(update.attachments) : null;
-      update.text = update.text || " ";
-      update.parse = "none";
+      const update = _.extend(params, sendableMsg)
+      update.attachments = update.attachments ? JSON.stringify(update.attachments) : null
+      update.text = update.text || " "
+      update.parse = "none"
 
-      this.replyContext.updateMessage(update);
+      this.replyContext.updateMessage(update)
 
     } else {
-      this.replyContext.replyPublic(sendableMsg, cb);
+      this.replyContext.replyPublic(sendableMsg, cb)
     }
   }
 
   protected replyError(response: {error: string} | {message: string} | string | any) {
-    console.error(response);
+    console.error(response)
     if (response.error) {
-      this.reply(`:warning: ${response.error}`);
+      this.reply(`:warning: ${response.error}`)
     } else if (response.message) {
-      this.reply(`:warning: ${response.message}`);
+      this.reply(`:warning: ${response.message}`)
     } else if (typeof response === "string") {
-      this.reply(`:warning: ${response}`);
+      this.reply(`:warning: ${response}`)
     } else {
-      this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`);
+      this.reply(`:warning: Something unexpected went wrong: ${JSON.stringify(response)}`)
     }
   }
 
@@ -111,17 +111,17 @@ export abstract class FancyReplier {
 
     // Scheduled messages don't have a loading indicator, why distract everything?
     if (this.replyContext.scheduled) {
-      cb();
-      return;
+      cb()
+      return
     }
 
     let sass = this.replyContext.isSlashCommand() ?
       "…"
     :
-      sassyMessages[Math.floor(Math.random() * sassyMessages.length)];
+      sassyMessages[Math.floor(Math.random() * sassyMessages.length)]
 
     if (config.unsafeLocalDev) {
-      sass = `[DEVELOPMENT] ${sass}`;
+      sass = `[DEVELOPMENT] ${sass}`
     }
 
     const params = {
@@ -130,18 +130,18 @@ export abstract class FancyReplier {
       text: sass,
       unfurl_links: false,
       unfurl_media: false,
-    };
+    }
 
     this.replyContext.replyPublic(params, (error: any, response: SentMessage) => {
-      this.loadingMessage = response;
-      cb();
-    });
+      this.loadingMessage = response
+      cb()
+    })
   }
 
   private performWork() {
-    const promise = this.work();
+    const promise = this.work()
     if (promise) {
-      promise.catch((err) => this.replyError(err));
+      promise.catch((err) => this.replyError(err))
     }
   }
 

@@ -10,7 +10,8 @@
       "no-console": false,
       "no-var-requires": false,
       "no-default-export": true,
-      "import-spacing": true
+      "import-spacing": true,
+      "semicolon": [true, "never"]
     },
     "rulesDirectory": []
 }
