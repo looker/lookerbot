@@ -123,7 +123,7 @@ Otherwise, you can provide credentials directly:
 
 If your Looker instance uses a self-signed certificate, Lookerbot will refuse to connect to it by default.
 
-Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thouroughly evaluated the security implications of this action for your infrastructure before setting this variable.
+Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thoroughly evaluated the security implications of this action for your infrastructure before setting this variable.
 
 This should only impact on-premise deployments of Looker. Do not set this environment variable if Looker hosts your instance.
 
