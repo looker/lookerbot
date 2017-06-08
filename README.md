@@ -173,7 +173,7 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
 4. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
 5. Under settings, choose "Install App" again, then "Reinstall App" and authenticate.
-6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
+6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` environment variable.
 
 ### Scheduling Data to Slack
 
