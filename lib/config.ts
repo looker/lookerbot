@@ -1,6 +1,6 @@
-import * as dotenv from "dotenv";
+import * as dotenv from "dotenv"
 
-dotenv.config();
+dotenv.config()
 
 const config = {
   debugMode: process.env.DEBUG_MODE === "true",
@@ -9,12 +9,12 @@ const config = {
   npmPackage: require("./../package.json"),
   slackApiKey: process.env.SLACK_API_KEY,
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
-};
+}
 
 if (config.unsafeLocalDev) {
   // Allow communicating with Lookers running on localhost with self-signed certificates
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
 }
 
 /* tslint:disable:no-default-export */
-export default config;
+export default config

@@ -11,13 +11,13 @@ export class Listener {
     protected bot: any,
     protected lookers: Looker[],
   ) {
-    this.server = server;
-    this.bot = bot;
-    this.lookers = lookers;
+    this.server = server
+    this.bot = bot
+    this.lookers = lookers
   }
 
-  public type(): string { throw new Error("implement"); }
-  public listen() { throw new Error("implement"); }
+  public type(): string { throw new Error("implement") }
+  public listen() { throw new Error("implement") }
 
   protected validateToken(req: express.Request, res: express.Response) {
     if (this.usesNewTokenAuth(req)) {
@@ -41,11 +41,11 @@ export class Listener {
       this.replyBadAuth(res);
       return false;
     }
-    const value = req.headers["x-looker-webhook-token"] === looker.webhookToken;
+    const value = req.headers["x-looker-webhook-token"] === looker.webhookToken
     if (!value) {
       this.replyBadAuth(res);
     }
-    return value;
+    return value
   }
 
   protected reply(res: express.Response, json: any, code = 200) {
