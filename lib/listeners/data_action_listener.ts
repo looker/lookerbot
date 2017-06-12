@@ -1,12 +1,12 @@
-import * as path from "path";
-import * as _ from "underscore";
-import config from "../config";
-import { LookQueryRunner } from "../repliers/look_query_runner";
-import { ReplyContext } from "../reply_context";
-import { Listener } from "./listener";
+import * as path from "path"
+import * as _ from "underscore"
+import config from "../config"
+import { LookQueryRunner } from "../repliers/look_query_runner"
+import { ReplyContext } from "../reply_context"
+import { Listener } from "./listener"
 
-const datauri = require("datauri");
-const slackIcon = new datauri(path.resolve(__dirname, "..", "..", "images", "slack.svg")).content;
+const datauri = require("datauri")
+const slackIcon = new datauri(path.resolve(__dirname, "..", "..", "images", "slack.svg")).content
 
 export class DataActionListener extends Listener {
 
@@ -18,10 +18,10 @@ export class DataActionListener extends Listener {
 
     this.server.post("/", (req, res) => {
 
-      if (!this.validateToken(req, res)) { return; }
+      if (!this.validateToken(req, res)) { return }
 
-      const label = config.unsafeLocalDev ? "[DEVELOPMENT] Lookerbot" : "Lookerbot";
-      const baseUrl = `https://${req.get("host")}`;
+      const label = config.unsafeLocalDev ? "[DEVELOPMENT] Lookerbot" : "Lookerbot"
+      const baseUrl = `https://${req.get("host")}`
 
       const out = {
         integrations: [{

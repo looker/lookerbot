@@ -1,8 +1,8 @@
-import * as express from "express";
-import config from "../config";
-import { Looker } from "../looker";
+import * as express from "express"
+import config from "../config"
+import { Looker } from "../looker"
 
-const TOKEN_REGEX = new RegExp(/[T|t]oken token="(.*)"/);
+const TOKEN_REGEX = new RegExp(/[T|t]oken token="(.*)"/)
 
 export class Listener {
 
@@ -21,57 +21,57 @@ export class Listener {
 
   protected validateToken(req: express.Request, res: express.Response) {
     if (this.usesNewTokenAuth(req)) {
-      const tokenMatch = req.headers.authorization.match(TOKEN_REGEX);
+      const tokenMatch = req.headers.authorization.match(TOKEN_REGEX)
       if (tokenMatch && config.lookerbotAuthorizationToken === tokenMatch[1]) {
-        return true;
+        return true
       } else {
-        this.replyBadAuth(res);
-        return false;
+        this.replyBadAuth(res)
+        return false
       }
     } else {
-      return this.validateLegacyWebhookToken(req, res);
+      return this.validateLegacyWebhookToken(req, res)
     }
   }
 
   protected validateTokenForLooker(req: express.Request, res: express.Response, looker: Looker) {
     if (this.usesNewTokenAuth(req)) {
-      return this.validateToken(req, res);
+      return this.validateToken(req, res)
     }
     if (!req.headers["x-looker-webhook-token"]) {
-      this.replyBadAuth(res);
-      return false;
+      this.replyBadAuth(res)
+      return false
     }
     const value = req.headers["x-looker-webhook-token"] === looker.webhookToken
     if (!value) {
-      this.replyBadAuth(res);
+      this.replyBadAuth(res)
     }
     return value
   }
 
   protected reply(res: express.Response, json: any, code = 200) {
-    res.status(code);
-    res.json(json);
-    console.log(`Replied to ${this.type()}.`, json);
+    res.status(code)
+    res.json(json)
+    console.log(`Replied to ${this.type()}.`, json)
   }
 
   private usesNewTokenAuth(req: express.Request) {
-    return req.headers.authorization && config.lookerbotAuthorizationToken;
+    return req.headers.authorization && config.lookerbotAuthorizationToken
   }
 
   private replyBadAuth(res: express.Response) {
-    this.reply(res, {looker: {success: false}, reason: "Invalid authorization headers."}, 401);
+    this.reply(res, {looker: {success: false}, reason: "Invalid authorization headers."}, 401)
   }
 
   private validateLegacyWebhookToken(req: express.Request, res: express.Response) {
     if (!req.headers["x-looker-webhook-token"]) {
-      this.replyBadAuth(res);
-      return false;
+      this.replyBadAuth(res)
+      return false
     }
     if (this.lookers.map((l) => l.webhookToken).indexOf(req.headers["x-looker-webhook-token"]) === -1) {
-      this.replyBadAuth(res);
-      return false;
+      this.replyBadAuth(res)
+      return false
     }
-    return true;
+    return true
   }
 
 }
