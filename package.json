@@ -11,6 +11,11 @@
     "lint": "./node_modules/.bin/tslint -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'"
   },
+  "author": {
+    "name": "Looker",
+    "email": "opensource+lookerbot@looker.com",
+    "url": "https://looker.com/"
+  },
   "dependencies": {
     "@google-cloud/storage": "^0.8.0",
     "@types/dotenv": "^4.0.0",
