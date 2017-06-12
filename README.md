@@ -123,7 +123,7 @@ Otherwise, you can provide credentials directly:
 
 If your Looker instance uses a self-signed certificate, Lookerbot will refuse to connect to it by default.
 
-Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thouroughly evaluated the security implications of this action for your infrastructure before setting this variable.
+Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thoroughly evaluated the security implications of this action for your infrastructure before setting this variable.
 
 This should only impact on-premise deployments of Looker. Do not set this environment variable if Looker hosts your instance.
 
@@ -173,7 +173,7 @@ However, Slash commands are a bit friendlier to use and allow Slack to auto-comp
 3. Create a command to use for the Looker bot. We use **/looker** but it's up to you.
 4. Set the URL to wherever you have your bot server hosted (if you used Heroku to set up the server, this will be the unique app name that you chose) . The path to the slash command endpoint is `/slack/receive`, so if your server is at `https://example.com`, the URL would be `https://example.com/slack/receive`.
 5. Under settings, choose "Install App" again, then "Reinstall App" and authenticate.
-6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` evironment variable.
+6. Under "Basic Information", grab the verification token. You'll use this to set the `SLACK_SLASH_COMMAND_TOKEN` environment variable.
 
 ### Scheduling Data to Slack
 
