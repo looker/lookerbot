@@ -1,4 +1,5 @@
 import * as express from "express"
+import * as bodyParser from "body-parser"
 import config from "../config"
 import { Looker } from "../looker"
 
@@ -11,6 +12,9 @@ export class Listener {
     protected bot: any,
     protected lookers: Looker[],
   ) {
+    server.use(bodyParser({limit: "1mb"}))
+    server.use(bodyParser.urlencoded({limit: "1mb", extended: true, parameterLimit: 1000}))
+
     this.server = server
     this.bot = bot
     this.lookers = lookers
