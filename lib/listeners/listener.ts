@@ -12,7 +12,9 @@ export class Listener {
     protected bot: any,
     protected lookers: Looker[],
   ) {
-    server.use(bodyParser.json({limit: "1mb", type: "application/json"}))
+    server.use(bodyParser.json({limit: "10mb"}))
+
+    // server.use(bodyParser.json({limit: "1mb", type: "application/json", extended: true}))
     // server.use(bodyParser.urlencoded({limit: "1mb", extended: true, parameterLimit: 1000}))
 
     this.server = server
