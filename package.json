@@ -18,8 +18,9 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^0.8.0",
+    "@types/body-parser": "^1.16.3",
     "@types/dotenv": "^4.0.0",
-    "@types/express": "^4.0.35",
+    "@types/express": "^4.0.36",
     "@types/node": "^7.0.18",
     "@types/request": "^0.0.43",
     "@types/request-promise-native": "^1.0.5",
