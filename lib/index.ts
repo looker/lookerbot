@@ -28,6 +28,7 @@ state.commander = new Commander({
     require("./commands/help_command").HelpCommand,
   ],
   listeners: [
+    require("./listeners/static_listener").StaticListener,
     require("./listeners/data_action_listener").DataActionListener,
     require("./listeners/health_check_listener").HealthCheckListener,
     require("./listeners/schedule_listener").ScheduleListener,
