@@ -1,7 +1,12 @@
+import * as path from "path"
 import * as _ from "underscore"
+import config from "../config"
 import { LookQueryRunner } from "../repliers/look_query_runner"
 import { ReplyContext } from "../reply_context"
 import { Listener } from "./listener"
+
+const datauri = require("datauri")
+const slackIcon = new datauri(path.resolve(__dirname, "..", "..", "images", "slack.svg")).content
 
 export class DataActionListener extends Listener {
 
@@ -11,25 +16,20 @@ export class DataActionListener extends Listener {
 
   public listen() {
 
-    let label
     this.server.post("/", (req, res) => {
 
-      let sass
       if (!this.validateToken(req, res)) { return }
 
-      label = process.env.DEV === "true" ?
-        (sass = "[DEVELOPMENT] Lookerbot")
-      :
-        "Lookerbot"
-
-      const baseUrl = req.protocol + "://" + req.get("host")
+      const label = config.unsafeLocalDev ? "[DEVELOPMENT] Lookerbot" : "Lookerbot"
+      const baseUrl = `https://${req.get("host")}`
 
       const out = {
-        destinations: [{
-          description: "Send data to Slack as the bot user configured for Lookerbot.",
+        integrations: [{
+          description: "Send data to Slack. The data will be posted as the Lookerbot user.",
           form_url: `${baseUrl}/data_actions/form`,
+          icon_data_uri: slackIcon,
           label: "Slack",
-          name: "lookerbot",
+          name: "post",
           supported_action_types: ["query"],
           url: `${baseUrl}/slack/post_from_query_action`,
         }],
@@ -44,7 +44,10 @@ export class DataActionListener extends Listener {
 
       if (!this.validateToken(req, res)) { return }
 
-      return this.bot.api.channels.list({exclude_archived: 1}, (err: any, response: any) => {
+      return this.bot.api.channels.list({
+        exclude_archived: 1,
+        exclude_members: 1,
+      }, (err: any, response: any) => {
         if (err) {
           console.error(err)
         }
@@ -54,8 +57,8 @@ export class DataActionListener extends Listener {
           channels = _.sortBy(channels, "name")
 
           response = [{
-            description: "The bot user must be a member of the channel.",
-            label: "Slack Channel",
+            description: "The Lookerbot user must be a member of the channel.",
+            label: "Channel",
             name: "channel",
             options: channels.map((channel: any) => ({name: channel.id, label: `#${channel.name}`})),
             required: true,
