@@ -1,3 +1,4 @@
+import * as bodyParser from "body-parser"
 import * as express from "express"
 import { LookQueryRunner } from "../repliers/look_query_runner"
 import { QueryRunner } from "../repliers/query_runner"
@@ -11,8 +12,8 @@ export class ScheduleListener extends Listener {
   }
 
   public listen() {
-    this.server.post("/slack/post/:post_type/:channel_name", (req, res) => this.handleRequest(req, res))
-    return this.server.post("/slack/post_from_query_action", (req, res) => this.handleRequest(req, res))
+    this.server.post("/slack/post/:post_type/:channel_name", bodyParser.json({limit: "1mb"}), (req, res) => this.handleRequest(req, res))
+    return this.server.post("/slack/post_from_query_action", bodyParser.json({limit: "1mb"}), (req, res) => this.handleRequest(req, res))
   }
 
   private handleRequest(req: express.Request, res: express.Response) {
