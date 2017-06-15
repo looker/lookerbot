@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "./node_modules/.bin/ts-node ./lib/index.ts",
+    "license-checker": "! license-checker --csv | grep -v -f .licenseignore | grep GPL && echo No GPL licenses found.",
     "snyk": "snyk test --org=UpsideTravel",
     "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --no-cache -- ./lib/index.ts",
     "test": "yarn test-ts && yarn lint",
