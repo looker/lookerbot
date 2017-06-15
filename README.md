@@ -4,7 +4,7 @@ Lookerbot integrates [Slack](https://slack.com) and [Looker](https://looker.com)
 
 With Lookerbot, everyone in your company can easily share data and answer questions instantly. Lookerbot can answer questions, send alerts, and more!
 
-[![](doc/readme-video-thumb.png)](https://vimeo.com/159130949)
+[![](images/readme-video-thumb.png)](https://vimeo.com/159130949)
 
 > For a free trial of Looker go to [looker.com/free-trial](https://looker.com/free-trial).
 
