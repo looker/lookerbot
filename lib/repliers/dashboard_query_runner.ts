@@ -20,16 +20,16 @@ export class DashboardQueryRunner extends QueryRunner {
     const elements = this.dashboard.dashboard_elements || this.dashboard.elements
 
     if (!elements || elements.length === 0) {
-      throw "Dashboard has no elements."
+      throw new Error("Dashboard has no elements.")
     }
 
     if (elements.length > 1) {
-      throw "Dashboards with more than one element aren't currently supported for Slack commands."
+      throw new Error("Dashboards with more than one element aren't currently supported for Slack commands.")
     }
 
     for (const element of elements) {
       if (!element.look) {
-        throw "Dashboard Element has no Look."
+        throw new Error("Dashboard Element has no Look.")
       }
 
       const look = element.look
@@ -46,12 +46,12 @@ export class DashboardQueryRunner extends QueryRunner {
       queryDef.filter_config = null
       queryDef.client_id = null
 
-      const query : IQuery = await this.replyContext.looker.client.postAsync(
+      const query: IQuery = await this.replyContext.looker.client.postAsync(
         "queries",
         this.replyContext,
-        queryDef
+        queryDef,
       )
-      this.runQuery(query);
+      this.runQuery(query)
     }
   }
 }
