@@ -15,7 +15,8 @@ export interface IDashboard {
 }
 
 export interface IDashboardElement {
-  look_id: number
+  look?: ILook
+  query?: IQuery
   listen: {[key: string]: string}
 }
 
