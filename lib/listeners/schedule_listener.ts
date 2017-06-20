@@ -45,7 +45,7 @@ export class ScheduleListener extends Listener {
 
           if (looker && this.validateTokenForLooker(req, res, looker)) {
 
-            const context = ReplyContext.forChannel(this.bot, channelName)
+            const context = this.service.replyContextForChannelId(channelName)
             context.looker = looker
             context.scheduled = true
 

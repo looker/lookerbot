@@ -1,6 +1,8 @@
-import "./config"
+import config from "./config"
 
 import { Commander } from "./commander"
+import { SlackService } from "./services/slack_service"
+import { HipchatService } from "./services/hipchat_service"
 import { Looker } from "./looker"
 import { VersionChecker } from "./version_checker"
 
@@ -20,19 +22,34 @@ setInterval(() => {
   }
 }, 30 * 60 * 1000)
 
-// Set up the commander and its listeners
-state.commander = new Commander({
-  commands: [
-    require("./commands/search_command").SearchCommand,
-    require("./commands/custom_command").CustomCommand,
-    require("./commands/help_command").HelpCommand,
-  ],
-  listeners: [
-    require("./listeners/static_listener").StaticListener,
-    require("./listeners/data_action_listener").DataActionListener,
-    require("./listeners/health_check_listener").HealthCheckListener,
-    require("./listeners/schedule_listener").ScheduleListener,
-    require("./listeners/slack_action_listener").SlackActionListener,
-    require("./listeners/slack_event_listener").SlackEventListener,
-  ],
-})
+const commands = [
+  require("./commands/search_command").SearchCommand,
+  require("./commands/custom_command").CustomCommand,
+  require("./commands/help_command").HelpCommand,
+]
+
+const listeners = [
+  require("./listeners/static_listener").StaticListener,
+  require("./listeners/data_action_listener").DataActionListener,
+  require("./listeners/health_check_listener").HealthCheckListener,
+  require("./listeners/schedule_listener").ScheduleListener,
+]
+
+if (config.hipchatAuthToken) {
+
+  state.commander = new Commander(new HipchatService(), {
+    commands,
+    listeners,
+  })
+
+} else {
+
+  listeners.push(require("./listeners/slack_action_listener").SlackActionListener)
+  listeners.push(require("./listeners/slack_event_listener").SlackEventListener)
+
+  state.commander = new Commander(new SlackService(), {
+    commands,
+    listeners,
+  })
+
+}

@@ -1,34 +1,44 @@
 import * as express from "express"
+import * as _ from "underscore"
+
 import config from "../config"
 import { Listener } from "../listeners/listener"
-import { Looker } from "../looker"
 import { Message, SentMessage } from "../message"
 import { ReplyContext } from "../reply_context"
 import { SlackUtils } from "../slack_utils"
+import { IChannel, Service } from "./service"
 
 const botkit = require("botkit")
 const getUrls = require("get-urls")
 
-export class SlackService {
+export class SlackService extends Service {
 
-  private listeners: Array<typeof Listener>
-  private runningListeners: Listener[]
-  private messageHandler: (context: ReplyContext) => void
-  private urlHandler: (context: ReplyContext, url: string) => void
   private controller: any
   private defaultBot: any
 
-  constructor(opts: {
-    listeners: Array<typeof Listener>,
-    messageHandler: (context: ReplyContext) => void,
-    urlHandler: (context: ReplyContext, url: string) => void,
-  }) {
-    this.listeners = opts.listeners
-    this.messageHandler = opts.messageHandler
-    this.urlHandler = opts.urlHandler
+  public usableChannels() {
+    return new Promise<IChannel[]>((resolve, reject) => {
+      this.defaultBot.api.channels.list({
+        exclude_archived: 1,
+        exclude_members: 1,
+      }, (err: any, response: any) => {
+        if (err || !response.ok) {
+          reject(err)
+        } else {
+          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
+          channels = _.sortBy(channels, "name")
+          const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
+          resolve(reformatted)
+        }
+      })
+    })
   }
 
-  public begin() {
+  public replyContextForChannelId(id: string): ReplyContext {
+    return new ReplyContext(this.defaultBot, this.defaultBot, {channel: id} as SentMessage)
+  }
+
+  protected start() {
 
     this.controller = botkit.slackbot({
       debug: config.debugMode,
@@ -43,27 +53,16 @@ export class SlackService {
 
     this.defaultBot.api.team.info({}, (err: any, response: any) => {
       if (response != null ? response.ok : undefined) {
-        return this.controller.saveTeam(response.team, () => console.log("Saved the team information..."))
+        this.controller.saveTeam(response.team, () => console.log("Saved the team information..."))
       } else {
         throw new Error(`Could not connect to the Slack API. Ensure your Slack API key is correct. (${err})`)
       }
     })
 
-    // Attach listeners. This should move elsewhere.
-    // Botkit builds its own webserver to handle slash commands, but this is an annoyance.
-    // Probably excising botkit is best.
-
-    this.runningListeners = []
-
     this.controller.setupWebserver(process.env.PORT || 3333,
       (err: any, expressWebserver: express.Application) => {
         this.controller.createWebhookEndpoints(expressWebserver)
-
-        for (const listener of this.listeners) {
-          const instance = new listener(expressWebserver, this.defaultBot, Looker.all)
-          instance.listen()
-          this.runningListeners.push(instance)
-        }
+        super.attachListeners(expressWebserver)
     })
 
     // Listen to the various events

@@ -40,65 +40,46 @@ export class DataActionListener extends Listener {
 
     })
 
-    this.server.post("/data_actions/form", (req, res) => {
+    this.server.post("/data_actions/form", async (req, res) => {
 
       if (!this.validateToken(req, res)) { return }
 
-      return this.bot.api.channels.list({
-        exclude_archived: 1,
-        exclude_members: 1,
-      }, (err: any, response: any) => {
-        if (err) {
-          console.error(err)
-        }
-        if (response != null ? response.ok : undefined) {
-
-          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
-          channels = _.sortBy(channels, "name")
-
-          response = [{
-            description: "The Lookerbot user must be a member of the channel.",
-            label: "Channel",
-            name: "channel",
-            options: channels.map((channel: any) => ({name: channel.id, label: `#${channel.name}`})),
-            required: true,
-            type: "select",
-          }]
-
-          this.reply(res, response)
-          return
-
-        } else {
-          throw new Error("Could not connect to the Slack API.")
-        }
-    })
+      const channels = await this.service.usableChannels()
+      const response = [{
+        description: "The Lookerbot user must be a member of the channel.",
+        label: "Channel",
+        name: "channel",
+        options: channels.map((channel) => ({name: channel.id, label: channel.label})),
+        required: true,
+        type: "select",
+      }]
 
     })
 
     return this.server.post("/data_actions", (req, res) => {
 
-      const getParam = (name: string) => (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined)
+      const getParam = (name: string): string | undefined => {
+        const val = (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined)
+        if (typeof(val) !== "string") {
+          this.reply(res, {looker: {success: false, message: `${name} must be a string.`}})
+          return undefined
+        }
+        return val
+      }
 
       if (!this.validateToken(req, res)) { return }
 
       const msg = getParam("message")
       const channel = getParam("channel")
 
-      if (typeof(channel) !== "string") {
-        this.reply(res, {looker: {success: false, message: "Channel must be a string."}})
+      if (!msg || !channel) {
         return
       }
 
-      const context = ReplyContext.forChannel(this.bot, channel)
+      const context = this.service.replyContextForChannelId(channel)
       context.dataAction = true
-
-      if (typeof(msg) === "string") {
-        context.replyPublic(msg)
-        return this.reply(res, {looker: {success: true, message: `Sent message to ${channel}!`}})
-      } else {
-        this.reply(res, {looker: {success: false, message: "Message must be a string."}})
-        return
-      }
+      context.replyPublic(msg)
+      return this.reply(res, {looker: {success: true, message: `Sent message to ${channel}!`}})
 
     })
   }

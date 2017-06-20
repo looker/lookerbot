@@ -1,6 +1,7 @@
 import * as express from "express"
 import config from "../config"
 import { Looker } from "../looker"
+import { Service } from "../services/service"
 
 const TOKEN_REGEX = new RegExp(/[T|t]oken token="(.*)"/)
 
@@ -8,11 +9,11 @@ export class Listener {
 
   constructor(
     protected server: express.Application,
-    protected bot: any,
+    protected service: Service,
     protected lookers: Looker[],
   ) {
     this.server = server
-    this.bot = bot
+    this.service = service
     this.lookers = lookers
   }
 
