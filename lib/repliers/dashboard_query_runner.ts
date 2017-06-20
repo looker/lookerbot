@@ -28,12 +28,16 @@ export class DashboardQueryRunner extends QueryRunner {
     }
 
     for (const element of elements) {
-      if (!element.look) {
-        throw new Error("Dashboard Element has no Look.")
-      }
 
-      const look = element.look
-      const queryDef = look.query
+      let queryDef: IQuery
+
+      if (element.query) {
+        queryDef = element.query
+      } else if (element.look) {
+        queryDef = element.look.query
+      } else {
+        throw new Error("Dashboard Element has no Look or Query.")
+      }
 
       for (const dashFilterName of Object.keys(element.listen)) {
         const fieldName = element.listen[dashFilterName]
