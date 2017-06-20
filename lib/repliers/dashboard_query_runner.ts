@@ -48,8 +48,9 @@ export class DashboardQueryRunner extends QueryRunner {
 
       const query: IQuery = await this.replyContext.looker.client.postAsync(
         "queries",
-        this.replyContext,
         queryDef,
+        {},
+        this.replyContext,
       )
       this.runQuery(query)
     }
