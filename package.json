@@ -38,8 +38,8 @@
     "request": "^2.66.0",
     "semver": "^5.3.0",
     "stream-buffers": "^3.0.1",
-    "ts-node": "^3.0.2",
-    "typescript": "rc",
+    "ts-node": "^3.1.0",
+    "typescript": "^2.4.1",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1"
   },
@@ -48,7 +48,7 @@
     "@types/mocha": "^2.2.41",
     "mocha": "^3.4.1",
     "nodemon": "^1.11.0",
-    "tslint": "^5.3.2"
+    "tslint": "^5.4.3"
   },
   "engines": {
     "node": "^6.10.3"
