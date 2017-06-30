@@ -5,10 +5,10 @@ dotenv.config()
 const config = {
   debugMode: process.env.DEBUG_MODE === "true",
   enableGuestUsers: process.env.ALLOW_SLACK_GUEST_USERS === "true",
+  hipchatAuthToken: process.env.HIPCHAT_AUTH_TOKEN,
   lookerbotAuthorizationToken: (process.env.LOOKERBOT_AUTH_TOKEN as string | undefined),
   npmPackage: require("./../package.json"),
   slackApiKey: process.env.SLACK_API_KEY,
-  hipchatAuthToken: process.env.HIPCHAT_AUTH_TOKEN,
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
 }
 

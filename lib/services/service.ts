@@ -33,7 +33,6 @@ export abstract class Service {
 
   protected abstract start(): void
 
-
   protected setWebserver(expressWebserver: express.Application) {
     for (const listener of this.listeners) {
       const instance = new listener(expressWebserver, this, Looker.all)

@@ -1,14 +1,17 @@
 import * as express from "express"
 
+import * as rp from "request-promise"
 import config from "../config"
 import { Message, SentMessage } from "../message"
-import { IChannel, Service } from "./service"
 import { ReplyContext } from "../reply_context"
-import * as rp from "request-promise"
+import { IChannel, Service } from "./service"
 
-const Hipchatter = require("hipchatter")
+const hipchatter = require("hipchatter")
 
 export class HipchatService extends Service {
+
+  private server: express.Application
+  private client: any
 
   public usableChannels() {
     return Promise.resolve<IChannel[]>([])
@@ -18,20 +21,17 @@ export class HipchatService extends Service {
     return new ReplyContext(null, null, {channel: id} as SentMessage)
   }
 
-  private server: express.Application
-  private hipchatter: any
-
   protected start() {
     this.server = express()
     super.setWebserver(this.server)
 
-    this.hipchatter = new Hipchatter(config.hipchatAuthToken)
+    this.client = new hipchatter(config.hipchatAuthToken)
 
-    this.hipchatter.capabilities(function(err: any, capabilities: any){
-      console.log(capabilities.capabilities.hipchatApiProvider.availableScopes);
-    });
+    this.client.capabilities((err: any, capabilities: any) => {
+      console.log(capabilities.capabilities.hipchatApiProvider.availableScopes)
+    })
 
-    this.hipchatter.rooms((err: any, rooms: any) => {
+    this.client.rooms((err: any, rooms: any) => {
       console.log(err)
       console.log(rooms)
     })
