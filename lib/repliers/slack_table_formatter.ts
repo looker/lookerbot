@@ -31,7 +31,7 @@ export class SlackTableFormatter {
     const calcs = this.result.fields.table_calculations || []
     const dimensions = this.result.fields.dimensions || []
     const measures = this.result.fields.measures || []
-    this.measureLike = measures.concat(calcs.filter((c) => typeof c.measure === "undefined" ? c.is_measure : c.is_measure))
+    this.measureLike = measures.concat(calcs.filter((c) => typeof c.measure === "undefined" ? c.is_measure : c.measure))
     this.dimensionLike = dimensions.concat(calcs.filter((c) => typeof c.measure === "undefined" ? !c.is_measure : !c.measure))
     this.fields = this.measureLike.concat(this.dimensionLike)
 
