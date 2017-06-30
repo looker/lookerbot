@@ -6,10 +6,6 @@ import { Listener } from "./listener"
 
 export class ScheduleListener extends Listener {
 
-  public type() {
-    return "schedule listener"
-  }
-
   public listen() {
     this.server.post("/slack/post/:post_type/:channel_name", (req, res) => this.handleRequest(req, res))
     return this.server.post("/slack/post_from_query_action", (req, res) => this.handleRequest(req, res))
@@ -45,7 +41,7 @@ export class ScheduleListener extends Listener {
 
           if (looker && this.validateTokenForLooker(req, res, looker)) {
 
-            const context = ReplyContext.forChannel(this.bot, channelName)
+            const context = this.service.replyContextForChannelId(channelName)
             context.looker = looker
             context.scheduled = true
 
