@@ -1,6 +1,7 @@
 import * as express from "express"
 import config from "../config"
 import { Looker } from "../looker"
+import { Service } from "../services/service"
 
 const TOKEN_REGEX = new RegExp(/[T|t]oken token="(.*)"/)
 
@@ -8,15 +9,14 @@ export class Listener {
 
   constructor(
     protected server: express.Application,
-    protected bot: any,
+    protected service: Service,
     protected lookers: Looker[],
   ) {
     this.server = server
-    this.bot = bot
+    this.service = service
     this.lookers = lookers
   }
 
-  public type(): string { throw new Error("implement") }
   public listen() { throw new Error("implement") }
 
   protected validateToken(req: express.Request, res: express.Response) {
@@ -51,7 +51,7 @@ export class Listener {
   protected reply(res: express.Response, json: any, code = 200) {
     res.status(code)
     res.json(json)
-    console.log(`Replied to ${this.type()}.`, json)
+    console.log(`Replied to ${this.constructor.name}.`, json)
   }
 
   private usesNewTokenAuth(req: express.Request) {
