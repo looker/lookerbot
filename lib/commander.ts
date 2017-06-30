@@ -15,7 +15,7 @@ export class Commander {
     service: Service,
     opts: {
       listeners: Array<typeof Listener>,
-      commands: Array<typeof Command>
+      commands: Array<typeof Command>,
     }) {
 
     this.service = service

@@ -10,10 +10,6 @@ const slackIcon = new datauri(path.resolve(__dirname, "..", "..", "images", "sla
 
 export class DataActionListener extends Listener {
 
-  public type() {
-    return "data action listener"
-  }
-
   public listen() {
 
     this.server.post("/", (req, res) => {

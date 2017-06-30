@@ -3,13 +3,9 @@ import { Listener } from "./listener"
 
 export class SlackActionListener extends Listener {
 
-  public type() {
-    return "slack action listener"
-  }
+  public bot: any
 
   public listen() {
-
-    if (!SlackUtils.slackButtonsEnabled) { return }
 
     this.server.post("/slack/action", async (req, res) => {
 

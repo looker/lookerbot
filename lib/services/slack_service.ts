@@ -3,6 +3,9 @@ import * as _ from "underscore"
 
 import config from "../config"
 import { Listener } from "../listeners/listener"
+import { SlackActionListener } from "../listeners/slack_action_listener"
+import { SlackEventListener } from "../listeners/slack_event_listener"
+import { Looker } from "../looker"
 import { Message, SentMessage } from "../message"
 import { ReplyContext } from "../reply_context"
 import { SlackUtils } from "../slack_utils"
@@ -61,8 +64,21 @@ export class SlackService extends Service {
 
     this.controller.setupWebserver(process.env.PORT || 3333,
       (err: any, expressWebserver: express.Application) => {
+
         this.controller.createWebhookEndpoints(expressWebserver)
-        super.attachListeners(expressWebserver)
+        super.setWebserver(expressWebserver)
+
+        if (SlackUtils.slackButtonsEnabled) {
+          const actionListener = new SlackActionListener(expressWebserver, this, Looker.all)
+          actionListener.bot = this.defaultBot
+          this.startListener(actionListener)
+        } else {
+          console.log("Slack buttons are disabled or not configured.")
+        }
+
+        const eventListener = new SlackEventListener(expressWebserver, this, Looker.all)
+        this.startListener(eventListener)
+
     })
 
     // Listen to the various events

@@ -36,20 +36,7 @@ const listeners = [
 ]
 
 if (config.hipchatAuthToken) {
-
-  state.commander = new Commander(new HipchatService(), {
-    commands,
-    listeners,
-  })
-
+  state.commander = new Commander(new HipchatService(), {commands, listeners})
 } else {
-
-  listeners.push(require("./listeners/slack_action_listener").SlackActionListener)
-  listeners.push(require("./listeners/slack_event_listener").SlackEventListener)
-
-  state.commander = new Commander(new SlackService(), {
-    commands,
-    listeners,
-  })
-
+  state.commander = new Commander(new SlackService(), {commands, listeners})
 }

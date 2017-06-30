@@ -17,7 +17,6 @@ export class Listener {
     this.lookers = lookers
   }
 
-  public type(): string { throw new Error("implement") }
   public listen() { throw new Error("implement") }
 
   protected validateToken(req: express.Request, res: express.Response) {
@@ -52,7 +51,7 @@ export class Listener {
   protected reply(res: express.Response, json: any, code = 200) {
     res.status(code)
     res.json(json)
-    console.log(`Replied to ${this.type()}.`, json)
+    console.log(`Replied to ${this.constructor.name}.`, json)
   }
 
   private usesNewTokenAuth(req: express.Request) {

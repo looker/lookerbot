@@ -31,7 +31,7 @@ export class SlackTableFormatter {
     const calcs = this.result.fields.table_calculations || []
     const dimensions = this.result.fields.dimensions || []
     const measures = this.result.fields.measures || []
-    this.measureLike = measures.concat(calcs.filter((c) => typeof c.measure === "undefined" ? c.is_measure : c.is_measure))
+    this.measureLike = measures.concat(calcs.filter((c) => typeof c.measure === "undefined" ? c.is_measure : c.measure))
     this.dimensionLike = dimensions.concat(calcs.filter((c) => typeof c.measure === "undefined" ? !c.is_measure : !c.measure))
     this.fields = this.measureLike.concat(this.dimensionLike)
 
@@ -110,10 +110,16 @@ export class SlackTableFormatter {
   }
 
   private renderFieldLabel(field: IQueryResponseField): string {
-    if (this.query.vis_config == null ? true : this.query.vis_config.show_view_names) {
-      return field.label_short || field.label
+    let showViewNames: boolean
+    if (!this.query.vis_config || typeof this.query.vis_config.show_view_names === "undefined") {
+      showViewNames = true
     } else {
+      showViewNames = this.query.vis_config.show_view_names
+    }
+    if (showViewNames) {
       return field.label
+    } else {
+      return field.label_short || field.label
     }
   }
 

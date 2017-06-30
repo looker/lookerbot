@@ -24,7 +24,7 @@ export class GoogleCloudStore extends Store {
     const bucketName = process.env.GOOGLE_CLOUD_BUCKET
     const bucket = storage.bucket(bucketName)
     const key = this.randomPath()
-    const file: string = bucket.file(key)
+    const file = bucket.file(key)
 
     return new Promise<string>((resolve, reject) => {
       blobStream

@@ -23,7 +23,7 @@ export class HipchatService extends Service {
 
   protected start() {
     this.server = express()
-    super.attachListeners(this.server)
+    super.setWebserver(this.server)
 
     this.hipchatter = new Hipchatter(config.hipchatAuthToken)
 

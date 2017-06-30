@@ -33,12 +33,18 @@ export abstract class Service {
 
   protected abstract start(): void
 
-  protected attachListeners(expressWebserver: express.Application) {
+
+  protected setWebserver(expressWebserver: express.Application) {
     for (const listener of this.listeners) {
       const instance = new listener(expressWebserver, this, Looker.all)
-      instance.listen()
-      this.runningListeners.push(instance)
+      this.startListener(instance)
     }
+  }
+
+  protected startListener(listener: Listener) {
+    listener.listen()
+    this.runningListeners.push(listener)
+    console.log(`Started ${listener.constructor.name}`)
   }
 
 }

@@ -3,10 +3,6 @@ import { Listener } from "./listener"
 
 export class SlackEventListener extends Listener {
 
-  public type() {
-    return "slack event listener"
-  }
-
   public listen() {
 
     return this.server.post("/slack/event", (req, res) => {
