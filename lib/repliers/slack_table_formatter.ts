@@ -110,10 +110,16 @@ export class SlackTableFormatter {
   }
 
   private renderFieldLabel(field: IQueryResponseField): string {
-    if (this.query.vis_config == null ? true : this.query.vis_config.show_view_names) {
-      return field.label_short || field.label
+    let showViewNames: boolean
+    if (!this.query.vis_config || typeof this.query.vis_config.show_view_names === "undefined") {
+      showViewNames = true
     } else {
+      showViewNames = this.query.vis_config.show_view_names
+    }
+    if (showViewNames) {
       return field.label
+    } else {
+      return field.label_short || field.label
     }
   }
 
