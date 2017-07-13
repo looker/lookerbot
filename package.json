@@ -51,7 +51,7 @@
     "tslint": "^5.4.3"
   },
   "engines": {
-    "node": "^6.10.3"
+    "node": "6.11.1"
   },
   "repository": {
     "type": "git",
