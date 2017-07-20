@@ -45,8 +45,8 @@ export class DataActionListener extends Listener {
 
       const channels = await this.service.usableChannels()
       const response = [{
-        description: "The Lookerbot user must be a member of the channel.",
-        label: "Channel",
+        description: "For channels, the Lookerbot user must be a member.",
+        label: "Share In",
         name: "channel",
         options: channels.map((channel) => ({name: channel.id, label: channel.label})),
         required: true,
