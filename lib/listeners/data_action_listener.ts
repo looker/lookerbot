@@ -50,9 +50,11 @@ export class DataActionListener extends Listener {
         type: "select",
       }]
 
+      this.reply(res, response)
+
     })
 
-    return this.server.post("/data_actions", (req, res) => {
+    this.server.post("/data_actions", (req, res) => {
 
       const getParam = (name: string): string | undefined => {
         const val = (req.body.form_params != null ? req.body.form_params[name] : undefined) || (req.body.data != null ? req.body.data[name] : undefined)
@@ -75,7 +77,8 @@ export class DataActionListener extends Listener {
       const context = this.service.replyContextForChannelId(channel)
       context.dataAction = true
       context.replyPublic(msg)
-      return this.reply(res, {looker: {success: true, message: `Sent message to ${channel}!`}})
+
+      this.reply(res, {looker: {success: true, message: `Sent message to ${channel}!`}})
 
     })
   }

@@ -19,22 +19,10 @@ export class SlackService extends Service {
   private controller: any
   private defaultBot: any
 
-  public usableChannels() {
-    return new Promise<IChannel[]>((resolve, reject) => {
-      this.defaultBot.api.channels.list({
-        exclude_archived: 1,
-        exclude_members: 1,
-      }, (err: any, response: any) => {
-        if (err || !response.ok) {
-          reject(err)
-        } else {
-          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
-          channels = _.sortBy(channels, "name")
-          const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
-          resolve(reformatted)
-        }
-      })
-    })
+  public async usableChannels() {
+    let channels = await this.usablePublicChannels()
+    channels = channels.concat(await this.usableDMs())
+    return channels
   }
 
   public replyContextForChannelId(id: string): ReplyContext {
@@ -129,6 +117,41 @@ export class SlackService extends Service {
       , {silent: true})
     })
 
+  }
+
+  private usablePublicChannels() {
+    return new Promise<IChannel[]>((resolve, reject) => {
+      this.defaultBot.api.channels.list({
+        exclude_archived: 1,
+        exclude_members: 1,
+      }, (err: any, response: any) => {
+        if (err || !response.ok) {
+          reject(err)
+        } else {
+          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
+          channels = _.sortBy(channels, "name")
+          const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
+          resolve(reformatted)
+        }
+      })
+    })
+  }
+
+  private usableDMs() {
+    return new Promise<IChannel[]>((resolve, reject) => {
+      this.defaultBot.api.users.list({}, (err: any, response: any) => {
+        if (err || !response.ok) {
+          reject(err)
+        } else {
+          let users = response.members.filter((u: any) => {
+            return !u.is_restricted && !u.is_ultra_restricted && !u.is_bot && !u.deleted
+          })
+          users = _.sortBy(users, "name")
+          const reformatted: IChannel[] = users.map((user: any) => ({id: user.id, label: `@${user.name}`}))
+          resolve(reformatted)
+        }
+      })
+    })
   }
 
   private ensureUserAuthorized(
