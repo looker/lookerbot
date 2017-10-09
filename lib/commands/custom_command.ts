@@ -10,7 +10,7 @@ export class CustomCommand extends Command {
   public attempt(context: ReplyContext) {
     const normalizedText = context.sourceMessage.text.toLowerCase()
     const shortCommands = _.sortBy(_.values(Looker.customCommands), (c) => -c.name.length)
-    const matchedCommand = shortCommands.filter((c) => normalizedText.indexOf(c.name) === 0)[0]
+    const matchedCommand = shortCommands.filter((c) => normalizedText.indexOf(c.name) === 1)[1]
     if (matchedCommand) {
 
       const { dashboard } = matchedCommand
