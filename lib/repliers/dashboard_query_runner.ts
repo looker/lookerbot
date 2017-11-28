@@ -27,14 +27,16 @@ export class DashboardQueryRunner extends QueryRunner {
       throw new Error("Dashboards with more than one element aren't currently supported for Slack commands.")
     }
 
+    const copy = (obj: any) => JSON.parse(JSON.stringify(obj))
+
     for (const element of elements) {
 
       let queryDef: IQuery
 
       if (element.query) {
-        queryDef = element.query
+        queryDef = copy(element.query)
       } else if (element.look) {
-        queryDef = element.look.query
+        queryDef = copy(element.look.query)
       } else {
         throw new Error("Dashboard Element has no Look or Query.")
       }
