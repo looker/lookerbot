@@ -4,12 +4,12 @@
   "description": "Lookerbot",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/ts-node ./lib/index.ts",
-    "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --no-cache -- ./lib/index.ts",
-    "test": "yarn test-ts && yarn lint",
+    "start": "./node_modules/.bin/ts-node ./src/index.ts",
+    "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --type-check --no-cache -- ./src/index.ts",
+    "test": "yarn test-ts && ./node_modules/.bin/tsc --noEmit && yarn lint",
     "test-ts": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/test.ts",
-    "lint": "./node_modules/.bin/tslint -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'",
-    "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'"
+    "lint": "./node_modules/.bin/tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'src/**/*.ts' 'test/**/*.ts'"
   },
   "author": {
     "name": "Looker",
@@ -21,7 +21,7 @@
     "@types/dotenv": "^4.0.0",
     "@types/express": "^4.0.35",
     "@types/node": "^7.0.18",
-    "@types/request": "^0.0.43",
+    "@types/request": "^0.0.45",
     "@types/request-promise-native": "^1.0.5",
     "@types/semver": "^5.3.31",
     "@types/stream-buffers": "^3.0.2",
@@ -38,7 +38,7 @@
     "request": "^2.66.0",
     "semver": "^5.3.0",
     "stream-buffers": "^3.0.1",
-    "ts-node": "^3.3.0",
+    "ts-node": "^4.0.1",
     "typescript": "^2.6.2",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1"
@@ -51,7 +51,7 @@
     "tslint": "^5.8.0"
   },
   "engines": {
-    "node": "6.11.1"
+    "node": ">= 6.11.1"
   },
   "repository": {
     "type": "git",
