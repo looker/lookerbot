@@ -4,12 +4,12 @@
   "description": "Lookerbot",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/ts-node ./lib/index.ts",
-    "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --no-cache -- ./lib/index.ts",
+    "start": "./node_modules/.bin/ts-node ./src/index.ts",
+    "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --no-cache -- ./src/index.ts",
     "test": "yarn test-ts && yarn lint",
     "test-ts": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/test.ts",
-    "lint": "./node_modules/.bin/tslint -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'",
-    "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'lib/**/*.ts' 'test/**/*.ts'"
+    "lint": "./node_modules/.bin/tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint-fix": "./node_modules/.bin/tslint --fix -c tslint.json 'src/**/*.ts' 'test/**/*.ts'"
   },
   "author": {
     "name": "Looker",
