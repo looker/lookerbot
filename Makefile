@@ -1,10 +1,11 @@
 TEST_COMMANDS := yarn license-checker
+CIRCLE_BUILD_NUM ?= latest
 CIRCLECI := ${CIRCLECI}
 current_dir := $(shell pwd)
 project := $(notdir $(current_dir))
 gitsha := $(shell git rev-parse HEAD)
 image_name := $(shell git remote show origin | sed -n "s/.*Push.*git@github.com.*\/\(.*\)\.git.*/\1/p")
-version := $(shell echo `head -1 VERSION`.${CIRCLE_BUILD_NUM})
+version := $(CIRCLE_BUILD_NUM)
 build_date := $(shell date -Iseconds)
 artifactory_api_url := https://upsidetravel.jfrog.io/upsidetravel/api/storage/docker-local
 
