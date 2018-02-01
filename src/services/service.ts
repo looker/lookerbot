@@ -11,9 +11,9 @@ export interface IChannel {
 
 export abstract class Service {
 
-  protected listeners: Array<typeof Listener>
-  protected messageHandler: (context: ReplyContext) => void
-  protected urlHandler: (context: ReplyContext, url: string) => void
+  protected listeners!: Array<typeof Listener>
+  protected messageHandler!: (context: ReplyContext) => void
+  protected urlHandler!: (context: ReplyContext, url: string) => void
   private runningListeners: Listener[] = []
 
   public begin(opts: {

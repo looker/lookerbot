@@ -4,7 +4,7 @@ import { Message, SentMessage } from "./message"
 
 export class ReplyContext {
 
-  public looker: Looker
+  public looker!: Looker
   public sourceMessage: SentMessage
   public isDM = false
   public scheduled = false
