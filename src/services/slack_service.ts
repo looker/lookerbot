@@ -144,7 +144,7 @@ export class SlackService extends Service {
           reject(err)
         } else {
           let users = response.members.filter((u: any) => {
-            return !u.is_restricted && !u.is_ultra_restricted && !u.is_bot && !u.deleted
+            return !u.is_restricted && !u.is_ultra_restricted && !u.is_bot && !u.is_app_user && !u.deleted
           })
           users = _.sortBy(users, "name")
           const reformatted: IChannel[] = users.map((user: any) => ({id: user.id, label: `@${user.name}`}))
@@ -173,7 +173,11 @@ export class SlackService extends Service {
         const user = response.user
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`)
-        } else if (user.is_bot) {
+        } else if (!config.enableSharedWorkspaces && user.team_id !== this.defaultBot.team_info.id) {
+          reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)
+        } else if (user.is_stranger) {
+          reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)
+        } else if (user.is_bot || user.is_app_user) {
           reply(`Sorry @${user.name}, as a bot you're not able to use this command.`)
         } else {
           callback()
