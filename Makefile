@@ -6,7 +6,7 @@ project := $(notdir $(current_dir))
 gitsha := $(shell git rev-parse HEAD)
 image_name := $(shell git remote show origin | sed -n "s/.*Push.*git@github.com.*\/\(.*\)\.git.*/\1/p")
 version := $(CIRCLE_BUILD_NUM)
-build_date := $(shell date -Iseconds)
+build_date := $(shell date +%Y-%m-%d)
 artifactory_api_url := https://upsidetravel.jfrog.io/upsidetravel/api/storage/docker-local
 
 all: image runtests
