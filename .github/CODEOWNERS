@@ -1,4 +1,4 @@
-*                                       @PotomacInnovation/owners-devops
-/.circleci/*                            @PotomacInnovation/owners-devops
-Dockerfile                              @PotomacInnovation/owners-devops
-Makefile                                @PotomacInnovation/owners-devops
+*                                       @PotomacInnovation/owners-sre
+/.circleci/*                            @PotomacInnovation/owners-sre
+Dockerfile                              @PotomacInnovation/owners-sre
+Makefile                                @PotomacInnovation/owners-sre
