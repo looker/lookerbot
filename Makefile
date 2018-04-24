@@ -11,9 +11,45 @@ artifactory_api_url := https://upsidetravel.jfrog.io/upsidetravel/api/storage/do
 
 all: image runtests
 
+define create_volume
+$(call delete_volume,$(1))
+docker volume create $(1)
+endef
+
+define delete_volume
+$(call unmount_volume,$(1))
+docker volume rm $(1) > /dev/null 2>&1 || true
+endef
+
+define mount_volume
+docker create --mount source=$(1),target=$(2) --name $(1) alpine:3.4 /bin/true
+endef
+
+define unmount_volume
+docker rm -f $(1) > /dev/null 2>&1 || true
+endef
+
 upstream:
 	git remote add upstream https://github.com/looker/lookerbot.git || true
 	git pull upstream master
+
+define create_volume
+$(call delete_volume,$(1))
+docker volume create $(1)
+endef
+
+define delete_volume
+$(call unmount_volume,$(1))
+docker volume rm $(1) > /dev/null 2>&1 || true
+endef
+
+define mount_volume
+docker create --mount source=$(1),target=$(2) --name $(1) alpine:3.4 /bin/true
+endef
+
+define unmount_volume
+docker rm -f $(1) > /dev/null 2>&1 || true
+endef
 
 image:
 ifeq ($(CIRCLECI), true)
@@ -61,3 +97,17 @@ runtests: testprep
 		--entrypoint /bin/sh \
 		upsidetravel-docker.jfrog.io/$(image_name):latest \
 		-c "$(TEST_COMMANDS)"
+
+snyk:
+	$(call create_volume,$(image_name)-snyk)
+	$(call mount_volume,$(image_name)-snyk,/src)
+	docker cp . $(image_name)-snyk:/src
+	docker run --rm -ti \
+		--volumes-from $(image_name)-snyk \
+		-e ARTIFACTORY_USERNAME \
+		-e ARTIFACTORY_PASSWORD \
+		-e SNYK_LEVEL \
+		-e SNYK_TOKEN \
+		-e WORKING_PATH=/src \
+		upsidetravel-docker.jfrog.io/snyk-upside:latest
+	$(call delete_volume,$(image_name)-snyk)

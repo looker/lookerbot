@@ -21,6 +21,9 @@ jobs:
       - run:
           name: Tests
           command: make runtests
+      - run:
+          name: Snyk
+          command: make snyk
       - deploy:
           command: |
             if [[ `echo $CIRCLE_BRANCH | grep -E "^(master|hotfix)$"` ]]; then 
