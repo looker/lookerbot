@@ -1,9 +1,10 @@
 version: 2
 jobs:
   build:
+    parallelism: 2
     working_directory: ~/src
     docker:
-      - image: docker:17.05.0-ce
+      - image: docker:17.06.0-ce
     steps:
       - setup_remote_docker:
           reusable: true
@@ -13,22 +14,24 @@ jobs:
           command: apk add --no-cache curl git jq make openssh
       - run:
           name: Artifactory Login
-          command: docker login -u ${ARTIFACTORY_USERNAME} -p ${ARTIFACTORY_PASSWORD} -e engineering+circleci@upside.com upsidetravel-docker.jfrog.io
+          command: docker login -u ${ARTIFACTORY_USERNAME} -p ${ARTIFACTORY_PASSWORD} upsidetravel-docker.jfrog.io
       - checkout
       - run:
-          name: Build container
-          command: make image
-      - run:
-          name: Tests
-          command: make runtests
-      - run:
-          name: Snyk
-          command: make snyk
+          name: Build and Test
+          command: |
+            case $CIRCLE_NODE_INDEX in
+              0) make image runtests
+              ;;
+              1) make snyk
+              ;;
+            esac
       - deploy:
           command: |
-            if [[ `echo $CIRCLE_BRANCH | grep -E "^(master|hotfix)$"` ]]; then 
-              make push
-            fi
-            if [[ `echo $CIRCLE_BRANCH | grep -E "^(master)$"` ]]; then 
-              make deploy
+            if [ -z "${CIRCLE_NO_DEPLOY}" ]; then
+              if [[ `echo $CIRCLE_BRANCH | grep -E "^(master|hotfix)$"` ]]; then 
+                make push
+              fi
+              if [[ `echo $CIRCLE_BRANCH | grep -E "^(master)$"` ]]; then 
+                make deploy
+              fi
             fi
