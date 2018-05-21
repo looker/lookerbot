@@ -37,17 +37,10 @@ curl -k \
 endef
 
 define deploy_image
-$(eval data := '{ \
-	 "name"  : "$(1)", \
-	 "version" : "$(2)", \
-	 "type": "k8s", \
-	 "token": "${SISYPHUS_TOKEN}" \
-}')
 curl -k \
 	-X POST \
-	-H "Content-Type: application/json" \
-	-d $(data) \
-	"${SISYPHUS_URL}"
+	-u ${JENKINS_USERNAME}:${JENKINS_PASSWORD} \
+	"${JENKINS_URL}?ARTIFACT=$(1)&VERSION=$(2)&ENVIRONMENT=dev&cause=circleci"
 endef
 
 define create_volume
