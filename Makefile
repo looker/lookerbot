@@ -12,8 +12,8 @@ all: image runtests
 
 define build_image
 docker build \
-	--build-arg ARTIFACTORY_USERNAME=${ARTIFACTORY_USERNAME} \
-	--build-arg ARTIFACTORY_PASSWORD=${ARTIFACTORY_PASSWORD} \
+	--build-arg ARTIFACTORY_USERNAME \
+	--build-arg ARTIFACTORY_PASSWORD \
 	--build-arg VERSION=$(version) \
 	--build-arg GITSHA=$(gitsha) \
 	-t upsidetravel-docker.jfrog.io/$(image_name):$(1) .
@@ -31,7 +31,7 @@ endef
 
 define jfrog_tags
 curl -k \
-	-u ${ARTIFACTORY_USERNAME}:${ARTIFACTORY_PASSWORD} \
+	-u $$ARTIFACTORY_USERNAME:$$ARTIFACTORY_PASSWORD \
 	-X PUT \
 	"$(artifactory_api_url)/$(image_name)/$(1)?properties=build-date=$(build_date);version=$(2);gitsha=$(gitsha)"
 endef
@@ -39,7 +39,7 @@ endef
 define deploy_image
 curl -k \
 	-X POST \
-	-u ${JENKINS_USERNAME}:${JENKINS_PASSWORD} \
+	-u $$JENKINS_USERNAME:$$JENKINS_PASSWORD \
 	"${JENKINS_URL}?ARTIFACT=$(1)&VERSION=$(2)&ENVIRONMENT=dev&cause=circleci"
 endef
 
