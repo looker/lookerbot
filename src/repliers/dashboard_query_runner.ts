@@ -1,4 +1,4 @@
-import { IDashboard, ILook, IQuery } from "../looker_api_types"
+import { IDashboard, IQuery } from "../looker_api_types"
 import { ReplyContext } from "../reply_context"
 import { QueryRunner } from "./query_runner"
 
@@ -30,27 +30,34 @@ export class DashboardQueryRunner extends QueryRunner {
     const copy = (obj: any) => JSON.parse(JSON.stringify(obj))
 
     for (const element of elements) {
-
       let queryDef: IQuery
 
-      if (element.query) {
-        queryDef = copy(element.query)
-      } else if (element.look) {
-        queryDef = copy(element.look.query)
-      } else {
-        throw new Error("Dashboard Element has no Look or Query.")
-      }
+      if (element.query || (element.look && element.look.query)) {
+        queryDef = copy(element.query || element.look!.query)
+        queryDef.filter_config = null
+        queryDef.client_id = null
 
-      for (const dashFilterName of Object.keys(element.listen)) {
-        const fieldName = element.listen[dashFilterName]
-        if (this.filters[dashFilterName]) {
-          if (!queryDef.filters) { queryDef.filters = {} }
-          queryDef.filters[fieldName] = this.filters[dashFilterName]
+        if (element.listen) {
+          for (const dashFilterName of Object.keys(element.listen)) {
+            const fieldName = element.listen[dashFilterName]
+            if (this.filters[dashFilterName]) {
+              if (!queryDef.filters) { queryDef.filters = {} }
+              queryDef.filters[fieldName] = this.filters[dashFilterName]
+            }
+          }
+        } else if (element.result_maker &&
+                   element.result_maker.filterables &&
+                   element.result_maker.filterables.length &&
+                   element.result_maker.filterables[0].listen) {
+          element.result_maker!.filterables![0].listen.forEach((listen) => {
+            if (this.filters[listen.dashboard_filter_name]) {
+              queryDef.filters[listen.field] = this.filters[listen.dashboard_filter_name]
+            }
+          })
         }
+      } else {
+        throw new Error("Dashboard Element has no Look, Query.")
       }
-
-      queryDef.filter_config = null
-      queryDef.client_id = null
 
       const query: IQuery = await this.replyContext.looker.client.postAsync(
         "queries",
