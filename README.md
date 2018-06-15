@@ -81,7 +81,7 @@ If you'd like to put these configuration variables on the filesystem instead, yo
 
 There are a couple environment variables that can be used to tweak behavior:
 
-- `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to.
+[//]: # "- `LOOKER_SLACKBOT_EXPAND_URLS` – Set this to `true` to have the bot expand Link and Share URLs in any channel the bot is invited to."
 
 - `LOOKER_SLACKBOT_LOADING_MESSAGES` – Set this to `false` to disable posting loading messages.
 
