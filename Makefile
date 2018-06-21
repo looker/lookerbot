@@ -65,6 +65,26 @@ upstream:
 	git remote add upstream https://github.com/looker/lookerbot.git || true
 	git pull upstream master
 
+greenkeeper:
+	$(call create_volume,$(image_name)-greenkeeper)
+	$(call mount_volume,$(image_name)-greenkeeper,/src)
+	docker cp . $(image_name)-greenkeeper:/src
+	docker run --rm -ti \
+		--volumes-from $(image_name)-greenkeeper \
+		-e ARTIFACTORY_USERNAME \
+		-e ARTIFACTORY_PASSWORD \
+		-e CI_PULL_REQUEST \
+		-e CIRCLE_BRANCH \
+		-e CIRCLE_NODE_INDEX \
+		-e CIRCLE_PREVIOUS_BUILD_NUM \
+		-e CIRCLE_PROJECT_REPONAME \
+		-e CIRCLE_PROJECT_USERNAME \
+		-e CIRCLECI \
+		-e GH_TOKEN \
+		--workdir /src \
+		upsidetravel-docker.jfrog.io/greenkeeper-lockfile-upside:latest
+	$(call delete_volume,$(image_name)-greenkeeper)
+
 image:
 	$(call build_image,$(version))
 	$(call tag_image,$(version),latest)

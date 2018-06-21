@@ -17,6 +17,15 @@ jobs:
           command: docker login -u ${ARTIFACTORY_USERNAME} -p ${ARTIFACTORY_PASSWORD} upsidetravel-docker.jfrog.io
       - checkout
       - run:
+         name: greenkeeper
+         command: |
+            case $CIRCLE_NODE_INDEX in
+              0) if [[ `echo $CIRCLE_BRANCH | grep -E "^greenkeeper.*$"` ]]; then
+                   make greenkeeper
+                 fi
+              ;;
+            esac
+      - run:
           name: Build and Test
           command: |
             case $CIRCLE_NODE_INDEX in
