@@ -4,15 +4,26 @@ import { Looker } from "./looker"
 import { LookQueryRunner } from "./repliers/look_query_runner"
 import { QueryRunner } from "./repliers/query_runner"
 import { ReplyContext } from "./reply_context"
-import { SlackService } from "./services/slack_service"
+import { Service } from "./services/service"
 
 export class Commander {
 
-  private service: SlackService
+  private service: Service
   private commands: Command[]
 
-  constructor(opts: {listeners: Array<typeof Listener>, commands: Array<typeof Command>}) {
-    this.service = new SlackService({
+  constructor(
+    service: Service,
+    opts: {
+      listeners: Array<typeof Listener>,
+      commands: Array<typeof Command>,
+    }) {
+
+    this.service = service
+    this.commands = opts.commands.map((c) => new c())
+
+    console.log(`Starting ${service.constructor.name}`)
+
+    this.service.begin({
       listeners: opts.listeners,
       messageHandler: (context: ReplyContext) => {
         return this.handleMessage(context)
@@ -21,9 +32,7 @@ export class Commander {
         return this.handleUrlExpansion(context, url)
       },
     })
-    this.service.begin()
 
-    this.commands = opts.commands.map((c) => new c())
   }
 
   private handleMessage(context: ReplyContext) {

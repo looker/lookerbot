@@ -140,7 +140,7 @@ export class LookerAPIClient {
   public postAsync(
     path: string,
     body: any,
-    options?: any,
+    options?: ILookerRequestOptions,
     replyContext?: ReplyContext,
   ): Promise<any> {
     return new Promise((resolve, reject) => {

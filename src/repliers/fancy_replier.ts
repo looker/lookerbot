@@ -50,7 +50,7 @@ const sassyMessages = [
 export abstract class FancyReplier {
 
   public replyContext: ReplyContext
-  private loadingMessage: SentMessage
+  private loadingMessage?: SentMessage
 
   constructor(replyContext: ReplyContext) {
     this.replyContext = replyContext
