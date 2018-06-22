@@ -7,6 +7,8 @@
     "start": "./node_modules/.bin/ts-node ./src/index.ts",
     "dev": "./node_modules/.bin/nodemon --exec ./node_modules/.bin/ts-node --type-check --no-cache -- ./src/index.ts",
     "test": "yarn test-ts && ./node_modules/.bin/tsc --noEmit && yarn lint",
+    "license-checker": "! license-checker --csv | grep -v -f .licenseignore | grep GPL && echo No GPL licenses found.",
+    "snyk": "snyk test --org=UpsideTravel",
     "test-ts": "./node_modules/.bin/mocha -r ./node_modules/ts-node/register test/**/test.ts",
     "lint": "tsc --noEmit && tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
     "lint-fix": "tsc --noEmit && tslint --fix -c tslint.json 'src/**/*.ts' 'test/**/*.ts'"
