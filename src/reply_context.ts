@@ -4,11 +4,7 @@ import { Message, SentMessage } from "./message"
 
 export class ReplyContext {
 
-  public static forChannel(bot: any, channel: string) {
-    return new ReplyContext(bot, bot, {channel} as SentMessage)
-  }
-
-  public looker: Looker
+  public looker!: Looker
   public sourceMessage: SentMessage
   public isDM = false
   public scheduled = false

@@ -15,8 +15,25 @@ export interface IDashboard {
 }
 
 export interface IDashboardElement {
-  look_id: number
-  listen: {[key: string]: string}
+  look?: ILook
+  query?: IQuery
+  listen?: {[key: string]: string} // deprecated
+  result_maker_id?: number
+  result_maker?: {
+    id: number,
+    query_id?: number,
+    merge_result_id?: number,
+    filterables?: IDashboardElementResultMakerFilterable[],
+  }
+}
+
+export interface IDashboardElementResultMakerFilterable {
+  listen: IDashboardElementResultMakerFilterableListen[]
+}
+
+export interface IDashboardElementResultMakerFilterableListen {
+  dashboard_filter_name: string
+  field: string
 }
 
 export interface IDashboardFilter {
@@ -26,6 +43,10 @@ export interface IDashboardFilter {
 export interface ILook {
   id: number
   query: IQuery
+}
+
+export interface IQueryFilters {
+  [key: string]: string
 }
 
 export interface IQuery {
@@ -40,7 +61,7 @@ export interface IQuery {
   }
   client_id?: string | null // deprecated
   filter_config: any
-  filters: {[key: string]: string}
+  filters: IQueryFilters
 }
 
 export interface IQueryResponse {

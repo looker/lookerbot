@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import "mocha"
-import { SlackUtils } from "../lib/slack_utils"
+import { SlackUtils } from "../src/slack_utils"
 
 it("passes through basic text", () => {
   expect(SlackUtils.stripMessageText("hello")).to.equal("hello")

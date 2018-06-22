@@ -1,4 +1,42 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.7.1
-ignore: {}
+version: v1.12.0
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  'npm:debug:20170905':
+    - node-pre-gyp > tar-pack > debug:
+        reason: None given
+        expires: '2018-07-22T14:19:11.467Z'
+  'npm:hoek:20180212':
+    - node-pre-gyp > request > hawk > hoek:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+    - node-pre-gyp > request > hawk > boom > hoek:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+    - node-pre-gyp > request > hawk > sntp > hoek:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+    - node-pre-gyp > request > hawk > cryptiles > boom > hoek:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+  'npm:ms:20170412':
+    - node-pre-gyp > tar-pack > debug > ms:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+  'npm:tough-cookie:20170905':
+    - node-pre-gyp > request > tough-cookie:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+  'npm:deep-extend:20180409':
+    - node-pre-gyp > rc > deep-extend:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+  'npm:sshpk:20180409':
+    - node-pre-gyp > request > http-signature > sshpk:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
+  'npm:stringstream:20180511':
+    - node-pre-gyp > request > stringstream:
+        reason: None given
+        expires: '2018-07-22T14:19:11.468Z'
 patch: {}
