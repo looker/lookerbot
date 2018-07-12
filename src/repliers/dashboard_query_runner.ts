@@ -51,6 +51,7 @@ export class DashboardQueryRunner extends QueryRunner {
                    element.result_maker.filterables[0].listen) {
           element.result_maker!.filterables![0].listen.forEach((listen) => {
             if (this.filters[listen.dashboard_filter_name]) {
+              if (!queryDef.filters) { queryDef.filters = {} }
               queryDef.filters[listen.field] = this.filters[listen.dashboard_filter_name]
             }
           })
