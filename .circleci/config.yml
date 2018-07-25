@@ -4,7 +4,7 @@ jobs:
     parallelism: 2
     working_directory: ~/src
     docker:
-      - image: docker:17.06.0-ce
+      - image: docker:18.06.0-ce
     steps:
       - setup_remote_docker:
           reusable: true
