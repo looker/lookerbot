@@ -14,7 +14,7 @@ jobs:
           command: apk add --no-cache curl git jq make openssh
       - run:
           name: Artifactory Login
-          command: docker login -u ${ARTIFACTORY_USERNAME} -p ${ARTIFACTORY_PASSWORD} upsidetravel-docker.jfrog.io
+          command: echo ${ARTIFACTORY_PASSWORD} | docker login -u ${ARTIFACTORY_USERNAME} --password-stdin upsidetravel-docker.jfrog.io
       - checkout
       - run:
          name: greenkeeper
