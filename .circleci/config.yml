@@ -37,7 +37,7 @@ jobs:
       - deploy:
           command: |
             if [ -z "${CIRCLE_NO_DEPLOY}" ]; then
-              if [[ `echo $CIRCLE_BRANCH | grep -E "^(master|hotfix)$"` ]]; then 
+              if [[ `echo $CIRCLE_BRANCH | grep -E "^(master|.*hotfix.*)$"` ]]; then 
                 make push
               fi
               if [[ `echo $CIRCLE_BRANCH | grep -E "^(master)$"` ]]; then 
