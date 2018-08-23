@@ -9,6 +9,14 @@ export interface ICustomCommand {
   category: string
   helptext?: string
   hidden: boolean
+  config: IQueryConfig
+}
+
+export interface IQueryConfig {
+  tableAsImage?: boolean | false
+  image_height?: number | null
+  image_width?: number | null
+  description: string | ""
 }
 
 interface ILookerOptions {
@@ -96,6 +104,16 @@ export class Looker {
           hidden: false,
           looker: this,
           name: dashboard.title.toLowerCase().trim(),
+          config: {}
+        }
+
+        if(dashboard.description && dashboard.description.trim().startsWith("{")){
+          try{
+            command.config = JSON.parse(dashboard.description);
+            command.description = command.config.description
+          }catch(e) {
+            console.warn("dashboard description is not valid json or starts with {")
+          }
         }
 
         command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1)

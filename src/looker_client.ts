@@ -3,6 +3,7 @@ import * as request from "request"
 import * as _ from "underscore"
 import config from "./config"
 import { ReplyContext } from "./reply_context"
+import { IQueryConfig } from "./looker";
 
 export interface ILookerRequestConfig {
   method: string
@@ -13,6 +14,7 @@ export interface ILookerRequestConfig {
 
 export interface ILookerRequestOptions {
   encoding?: string | null
+  params?: IQueryConfig | null
 }
 
 export class LookerAPIClient {
@@ -59,12 +61,17 @@ export class LookerAPIClient {
       url: `${this.options.baseUrl}/${requestConfig.path}`,
     }
 
+    if (typeof requestConfig.params !== "undefined") {
+      newConfig.formData = requestConfig.params
+    }
+
     if (typeof requestConfig.encoding !== "undefined") {
       newConfig.encoding = requestConfig.encoding
     }
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {})
 
+    console.log(newConfig);
     request(newConfig, (error, response, body: string | Buffer) => {
       if (error) {
         errorCallback(error)
@@ -117,8 +124,9 @@ export class LookerAPIClient {
   public getBinaryAsync(
     path: string,
     replyContext?: ReplyContext,
+    options?: ILookerRequestOptions,
   ): Promise<Buffer> {
-    return this.getAsync(path, replyContext, {encoding: null})
+    return this.getAsync(path, replyContext, options)
   }
 
   public post(path: string, body: any, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
