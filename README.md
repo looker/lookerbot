@@ -87,8 +87,6 @@ There are a couple environment variables that can be used to tweak behavior:
 
 - `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES` – Set this to `false` to disable making data action buttons available to Slack users.
 
-- `LOOKERBOT_PRINT_TABLES_AS_IMAGES` – Set this to `true` to handle tables as images instead of text mode.
-
 ##### (optional) Storage Services for Visualization Images
 
 ###### Amazon S3
@@ -128,6 +126,21 @@ If your Looker instance uses a self-signed certificate, Lookerbot will refuse to
 Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will instruct Lookerbot to accept connections with invalid certificates. Please ensure you have thoroughly evaluated the security implications of this action for your infrastructure before setting this variable.
 
 This should only impact on-premise deployments of Looker. Do not set this environment variable if Looker hosts your instance.
+
+##### Using Dashboard configs
+
+Dashboard description can be used to store json config:
+
+```
+{
+   "image_width": 1024,
+   "image_height": 512,
+   "description": "this is a dashboard to do magic"
+   "tableAsImage": true
+}
+```
+
+If the description is not JSON it will be used in the help text
 
 ##### Connecting the bot to multiple Looker instances
 
