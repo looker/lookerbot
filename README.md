@@ -87,6 +87,8 @@ There are a couple environment variables that can be used to tweak behavior:
 
 - `LOOKERBOT_DATA_ACTIONS_IN_MESSAGES` – Set this to `false` to disable making data action buttons available to Slack users.
 
+- `LOOKERBOT_PRINT_TABLES_AS_IMAGES` – Set this to `true` to handle tables as images instead of text mode.
+
 ##### (optional) Storage Services for Visualization Images
 
 ###### Amazon S3

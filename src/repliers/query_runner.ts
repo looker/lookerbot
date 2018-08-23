@@ -5,6 +5,7 @@ import { SlackUtils } from "../slack_utils"
 import blobStores from "../stores/index"
 import { FancyReplier } from "./fancy_replier"
 import { SlackTableFormatter } from "./slack_table_formatter"
+import config from "../config";
 
 export class QueryRunner extends FancyReplier {
 
@@ -100,7 +101,7 @@ export class QueryRunner extends FancyReplier {
   protected async runQuery(query: IQuery) {
     const visType: string = query.vis_config && query.vis_config.type ? query.vis_config.type : "table"
 
-    if (visType === "table" || visType === "looker_single_record" || visType === "single_value") {
+    if ((visType === "table" && !config.showTablesAsImages) || visType === "looker_single_record" || visType === "single_value") {
       try {
         const result = await this.replyContext.looker.client.getAsync(
           `queries/${query.id}/run/unified`,
