@@ -10,6 +10,7 @@ const config = {
   npmPackage: require("./../package.json"),
   slackApiKey: process.env.SLACK_API_KEY,
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
+  showTablesAsImages: process.env.LOOKERBOT_PRINT_TABLES_AS_IMAGES === "true",
 }
 
 if (config.unsafeLocalDev) {
