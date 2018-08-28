@@ -61,8 +61,17 @@ export class LookerAPIClient {
       url: `${this.options.baseUrl}/${requestConfig.path}`,
     }
 
-    if (typeof requestConfig.params !== "undefined") {
-      newConfig.formData = requestConfig.params
+    if (requestConfig.params) {
+
+        newConfig.formData = {};
+
+        if(requestConfig.params.image_height){
+          newConfig.formData.image_width= requestConfig.params.image_height;
+        }
+        
+        if(requestConfig.params.image_width){
+          newConfig.formData.image_width= requestConfig.params.image_width;
+        }
     }
 
     if (typeof requestConfig.encoding !== "undefined") {

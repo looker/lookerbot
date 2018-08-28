@@ -14,8 +14,8 @@ export interface ICustomCommand {
 
 export interface IQueryConfig {
   tableAsImage?: boolean | false
-  image_height?: number | null
-  image_width?: number | null
+  image_height?: number
+  image_width?: number
   description: string | ""
 }
 
