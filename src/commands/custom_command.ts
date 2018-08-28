@@ -24,7 +24,7 @@ export class CustomCommand extends Command {
       for (const filter of dashboardFilters) {
         filters[filter.name] = query
       }
-      const runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
+      const runner = new DashboardQueryRunner(context, matchedCommand.dashboard, matchedCommand.config, filters)
       runner.start()
 
       return true
