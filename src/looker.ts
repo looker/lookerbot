@@ -9,6 +9,14 @@ export interface ICustomCommand {
   category: string
   helptext?: string
   hidden: boolean
+  config: IQueryConfig
+}
+
+export interface IQueryConfig {
+  tableAsImage?: boolean | false
+  image_height?: number
+  image_width?: number
+  description: string | ""
 }
 
 interface ILookerOptions {
@@ -96,16 +104,30 @@ export class Looker {
           hidden: false,
           looker: this,
           name: dashboard.title.toLowerCase().trim(),
+          config: {}
         }
+
+        var helpTextItems = []
 
         command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1)
 
-        command.helptext = ""
-
         const dashboardFilters = dashboard.dashboard_filters || dashboard.filters
         if (dashboardFilters && dashboardFilters.length > 0) {
-          command.helptext = `<${dashboardFilters[0].title.toLowerCase()}>`
+          helpTextItems.push(`<${dashboardFilters[0].title.toLowerCase()}>`)
         }
+
+        if(dashboard.description && dashboard.description.trim().startsWith("{")){
+          try{
+            command.config = JSON.parse(dashboard.description);
+            command.description = command.config.description
+          }catch(e) {
+            helpTextItems.push("WARNING: dashboard description is not valid json or starts with {")
+            //gives cleaner output, if dashboard has an error
+            command.description = ""
+          }
+        }
+
+        command.helptext = helpTextItems.join(" — ")
 
         Looker.customCommands[command.name] = command
       },

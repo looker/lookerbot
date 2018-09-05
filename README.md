@@ -127,6 +127,21 @@ Setting the `NODE_TLS_REJECT_UNAUTHORIZED` environment variable to `0` will inst
 
 This should only impact on-premise deployments of Looker. Do not set this environment variable if Looker hosts your instance.
 
+##### Using Dashboard configs
+
+Dashboard description can be used to store json config:
+
+```
+{
+   "image_width": 1024,
+   "image_height": 512,
+   "description": "this is a dashboard to do magic"
+   "tableAsImage": true
+}
+```
+
+If the description is not JSON it will be used in the help text
+
 ##### Connecting the bot to multiple Looker instances
 
 If you would like the bot to connect to multiple instances of Looker, then you can configure the bot with the `LOOKERS` environment variable. This variable should be JSON array of JSON objects, each representing a Looker instance and its authentication information.
