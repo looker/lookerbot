@@ -2,8 +2,8 @@ import * as crypto from "crypto"
 import * as request from "request"
 import * as _ from "underscore"
 import config from "./config"
+import { IQueryConfig } from "./looker"
 import { ReplyContext } from "./reply_context"
-import { IQueryConfig } from "./looker";
 
 export interface ILookerRequestConfig {
   method: string
@@ -63,14 +63,14 @@ export class LookerAPIClient {
 
     if (requestConfig.params) {
 
-        newConfig.formData = {};
+        newConfig.formData = {}
 
-        if(requestConfig.params.image_height){
-          newConfig.formData.image_width= requestConfig.params.image_height;
+        if (requestConfig.params.image_height) {
+          newConfig.formData.image_width = requestConfig.params.image_height
         }
-        
-        if(requestConfig.params.image_width){
-          newConfig.formData.image_width= requestConfig.params.image_width;
+
+        if (requestConfig.params.image_width) {
+          newConfig.formData.image_width = requestConfig.params.image_width
         }
     }
 

@@ -1,11 +1,10 @@
 import * as _ from "underscore"
+import { IQueryConfig } from "../looker"
 import { IQuery, IQueryResponse } from "../looker_api_types"
 import { ReplyContext } from "../reply_context"
-import { SlackUtils } from "../slack_utils"
 import blobStores from "../stores/index"
 import { FancyReplier } from "./fancy_replier"
 import { SlackTableFormatter } from "./slack_table_formatter"
-import { IQueryConfig } from "../looker";
 
 export class QueryRunner extends FancyReplier {
 
@@ -13,7 +12,7 @@ export class QueryRunner extends FancyReplier {
   protected queryId?: number
   protected queryConfig: IQueryConfig
 
-  constructor(replyContext: ReplyContext, queryConfig:IQueryConfig, queryParam: {slug?: string, id?: number} = {}) {
+  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: number} = {}, queryConfig: IQueryConfig = {} as IQueryConfig) {
     super(replyContext)
     this.querySlug = queryParam.slug
     this.queryId = queryParam.id
@@ -118,7 +117,7 @@ export class QueryRunner extends FancyReplier {
         const imageData = await this.replyContext.looker.client.getBinaryAsync(
           `queries/${query.id}/run/png`,
           this.replyContext,
-          { encoding: null, params: this.queryConfig }
+          { encoding: null, params: this.queryConfig },
         )
         this.postImage(query, imageData)
       } catch (e) {
