@@ -107,23 +107,27 @@ export class Looker {
           config: {}
         }
 
+        var helpTextItems = []
+
+        command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1)
+
+        const dashboardFilters = dashboard.dashboard_filters || dashboard.filters
+        if (dashboardFilters && dashboardFilters.length > 0) {
+          helpTextItems.push(`<${dashboardFilters[0].title.toLowerCase()}>`)
+        }
+
         if(dashboard.description && dashboard.description.trim().startsWith("{")){
           try{
             command.config = JSON.parse(dashboard.description);
             command.description = command.config.description
           }catch(e) {
-            console.warn("dashboard description is not valid json or starts with {")
+            helpTextItems.push("WARNING: dashboard description is not valid json or starts with {")
+            //gives cleaner output, if dashboard has an error
+            command.description = ""
           }
         }
 
-        command.hidden = (category.toLowerCase().indexOf("[hidden]") !== -1) || (command.name.indexOf("[hidden]") !== -1)
-
-        command.helptext = ""
-
-        const dashboardFilters = dashboard.dashboard_filters || dashboard.filters
-        if (dashboardFilters && dashboardFilters.length > 0) {
-          command.helptext = `<${dashboardFilters[0].title.toLowerCase()}>`
-        }
+        command.helptext = helpTextItems.join(" — ")
 
         Looker.customCommands[command.name] = command
       },

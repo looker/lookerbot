@@ -80,7 +80,6 @@ export class LookerAPIClient {
 
     newConfig.headers = _.extend(newConfig.headers, requestConfig.headers || {})
 
-    console.log(newConfig);
     request(newConfig, (error, response, body: string | Buffer) => {
       if (error) {
         errorCallback(error)
