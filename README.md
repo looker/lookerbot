@@ -135,7 +135,7 @@ Dashboard description can be used to store json config:
 {
    "image_width": 1024,
    "image_height": 512,
-   "description": "this is a dashboard to do magic"
+   "description": "this is a dashboard to do magic",
    "tableAsImage": true
 }
 ```
