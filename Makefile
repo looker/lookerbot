@@ -30,14 +30,14 @@ docker push upsidetravel-docker.jfrog.io/$(image_name):$(1)
 endef
 
 define jfrog_tags
-curl -k \
+curl \
 	-u $$ARTIFACTORY_USERNAME:$$ARTIFACTORY_PASSWORD \
 	-X PUT \
 	"$(artifactory_api_url)/$(image_name)/$(1)?properties=build-date=$(build_date);version=$(2);gitsha=$(gitsha)"
 endef
 
 define deploy_image
-curl -k \
+curl \
 	-X POST \
 	-u $$JENKINS_USERNAME:$$JENKINS_PASSWORD \
 	"${JENKINS_URL}?ARTIFACT=$(1)&VERSION=$(2)&ENVIRONMENT=dev&cause=circleci"
