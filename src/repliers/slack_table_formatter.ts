@@ -78,8 +78,10 @@ export class SlackTableFormatter {
     } else {
       const attachment: IAttachment = {
         fallback: shareUrl,
-        text: result.data.map((d) => this.fields.map((f) => this.renderField(f, d)).join(" – ")).join("\n"),
-        title: this.fields.map((f) => this.renderFieldLabel(f)).join(" – "),
+        text: result.data.map((d) => {
+           return `*${this.renderField(this.fields[0], d)}*\n` + this.fields.slice(1).map((f) => this.renderFieldLabel(f) + ": `" + this.renderField(f, d) + "`").join("\n") + "\n"
+        }).join("\n"),
+        title: `Lookerbot Returned ${result.data.length} Results`,
       }
       attachment.color = "#64518A"
       return({attachments: [attachment], text: shareUrl ? shareUrl : ""})
