@@ -43,7 +43,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Heroku Deployment
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master) [![Greenkeeper badge](https://badges.greenkeeper.io/PotomacInnovation/looker-slackbot.svg)](https://greenkeeper.io/)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
 
 The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot. This will prompt you to give the app a unique name, add the Slack API key and configure all of the required variables (see "Environment Variables" below).
 
