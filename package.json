@@ -19,7 +19,6 @@
     "url": "https://looker.com/"
   },
   "dependencies": {
-    "@google-cloud/storage": "^0.8.0",
     "@types/dotenv": "^4.0.0",
     "@types/express": "^4.0.35",
     "@types/node": "^7.0.18",
@@ -29,15 +28,10 @@
     "@types/stream-buffers": "^3.0.2",
     "@types/underscore": "^1.8.0",
     "@types/uuid": "^2.0.29",
-    "aws-sdk": "^2.54.0",
-    "azure-storage": "^2.1.0",
-    "botkit": "0.0.15",
     "chai": "^3.5.0",
-    "datauri": "^1.0.5",
     "dotenv": "^4.0.0",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^7.0.0",
-    "request": "^2.66.0",
     "semver": "^5.3.0",
     "stream-buffers": "^3.0.1",
     "ts-node": "^4.1.0",
