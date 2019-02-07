@@ -1,10 +1,3 @@
-FROM node:6.10.3-alpine
-
-ADD . /app
-WORKDIR /app
-
-RUN yarn install
-
-ENTRYPOINT ["yarn", "start"]
-
-EXPOSE 3333
+FROM upsidetravel-docker.jfrog.io/node-upside:10
+ENV TS_NODE_FILES true
+CMD [ "./node_modules/.bin/ts-node", "./src/index.ts" ]
