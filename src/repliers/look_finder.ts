@@ -25,6 +25,9 @@ export class LookFinder extends QueryRunner {
           selected = item.value
         }
       })
+
+      console.log("before:")
+      console.log(AlertsState.savedAlerts)
       const text = `Okay! When ${this.alert.baseField} ${this.alert.conditional} ${this.alert.compareField}, I will notify you!`
       AlertsState.addAlert({
         lookTitle: selected.title,
@@ -41,6 +44,7 @@ export class LookFinder extends QueryRunner {
           compareField: this.alert.compareField,
         },
       })
+      console.log("AFTER:")
       console.log(AlertsState.savedAlerts)
       this.reply({
         text,

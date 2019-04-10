@@ -3,6 +3,7 @@ import { Looker } from "../looker"
 import { LookFinder } from "../repliers/look_finder"
 import { ReplyContext } from "../reply_context"
 import { Command } from "./command"
+import { an, getOptions, set } from "./set_alert_command"
 
 export class AddAlertCommand extends Command {
 
@@ -10,7 +11,10 @@ export class AddAlertCommand extends Command {
 
     const msg = context.sourceMessage.text.toLowerCase()
 
-    const match = msg.match(/(set|create|make|add) (an |the |a |some |one  )*(alert|notification) for (.*) when (.*) (is equal to|is greater than| is less than) (.*)/)
+    const regexp = new RegExp(
+      `(${getOptions(set)}) (${getOptions(an)})*(alert|notification) for (.*) when (.*) (is equal to|is greater than|is less than) (.*)`)
+
+    const match = msg.match(regexp)
     const query = match && match[4]
     const alert = {
       baseField: match && match[5],
