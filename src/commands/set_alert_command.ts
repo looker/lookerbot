@@ -8,13 +8,13 @@ export class SetAlertCommand extends Command {
 
   public attempt(context: ReplyContext) {
 
-    const msg = context.sourceMessage.text
+    const msg = context.sourceMessage.text.toLowerCase()
 
-    const match = msg.match(/(set|create|make) (an |the |a |some |one  )*(alert|notification|)/)
+    const match = msg.match(/(set|create|make|add) (an |the |a |some |one  )*(alert|notification)/)
 
     if (match) {
       context.looker =  Looker.all[0]
-      new LookFinder(context, "", "", true).start()
+      new LookFinder(context, "", "", "set").start()
 
       return true
     } else {
