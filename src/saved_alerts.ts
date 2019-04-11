@@ -17,14 +17,17 @@ interface IAlert {
 }
 
 interface IAlertsState {
-  numAlerts: number
   savedAlerts: IAlert[]
   addAlert: (alert: IAlert) => void
+  deleteAlert: (index: number) => void
 }
 
 export const AlertsState: IAlertsState = {
   savedAlerts: [],
   addAlert(alert: IAlert) {
     this.savedAlerts.push(alert)
+  },
+  deleteAlert(index: number) {
+    this.savedAlerts.splice(index, 1)
   },
 }

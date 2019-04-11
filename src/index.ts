@@ -27,6 +27,7 @@ const commands = [
   require("./commands/add_alert_command").AddAlertCommand,
   require("./commands/set_alert_command").SetAlertCommand,
   require("./commands/status_report_command").StatusReportCommand,
+  require("./commands/delete_alert_command").DeleteAlertCommand,
   require("./commands/help_command").HelpCommand,
 ]
 
