@@ -16,7 +16,7 @@ interface IAlertItem {
     msg: string,
 }
 
-const options = ["display all alerts", " all alerts", "show all", "status"]
+const options = ["display all alerts", "all alerts", "show all", "status"]
 const noResults = "\n*¯\\_(ツ)_/¯* There are currently no alerts set. Here is a pretty picture instead.\n https://picsum.photos/200"
 
 const codeBlock = (content: string) => `\`\`\`${content}\`\`\``
@@ -49,7 +49,7 @@ const generateAlertListText = () => {
     const {count, titles, details} = AlertsState.savedAlerts.reduce((accumulator: IAccumulatorItem, currentValue: IAlert) => {
         accumulator.count = accumulator.count + 1
         accumulator.titles = `${accumulator.titles}\n - ${formatAlertTitle(currentValue)}`
-        accumulator.details = `${accumulator.details}\n\ndetail for ${bold(currentValue.lookTitle)}\n${codeBlock(JSON.stringify(currentValue))}`
+        accumulator.details = `${accumulator.details}\n\ndetail for ${bold(currentValue.lookTitle)}\n${codeBlock(JSON.stringify(currentValue, null, "\t"))}`
         return accumulator
     }, {
         count: 0,
