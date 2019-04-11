@@ -29,6 +29,6 @@ export const AlertsState: IAlertsState = {
     this.savedAlerts.push(alert)
   },
   deleteAlert(index: number) {
-    this.savedAlerts.splice(index, 1)
+    this.savedAlerts.splice(index - 1, 1)
   },
 }

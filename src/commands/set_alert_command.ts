@@ -37,7 +37,7 @@ export class SetAlertCommand extends Command {
 
     if (match) {
       context.looker =  Looker.all[0]
-      new LookFinder(context, "", "", "set").start()
+      new LookFinder(context, "", "order top age", "set").start()
 
       return true
     } else {
