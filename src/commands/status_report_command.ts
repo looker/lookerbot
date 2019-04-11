@@ -21,7 +21,7 @@ const noResults = "\n*¯\\_(ツ)_/¯* There are currently no alerts set. Here is
 
 const codeBlock = (content: string) => `\`\`\`${content}\`\`\``
 const countMessage = (count: number) => {
-    let msg = "";
+    let msg = ""
     switch (count) {
         case 1:
             msg = `There is ${count} alert`
@@ -32,18 +32,17 @@ const countMessage = (count: number) => {
             break
     }
 
-    return msg;
+    return msg
 }
 const italics = (str: string) => `_${str}_`
 const bold = (str: string) => `*${str}*`
 const formatAlertTitle = (stateItem: IAlert) => {
-    let itemMsg = stateItem.alert.message;
+    let itemMsg = stateItem.alert.message
     itemMsg = itemMsg.replace(stateItem.alert.compareField, bold(stateItem.alert.compareField))
     itemMsg = itemMsg.replace(stateItem.lookTitle, italics(stateItem.lookTitle.toUpperCase()))
     itemMsg = itemMsg.replace(stateItem.alert.baseField, italics(stateItem.alert.baseField.toUpperCase()))
 
-
-    return itemMsg;
+    return itemMsg
 }
 
 const generateAlertListText = () => {
@@ -65,9 +64,9 @@ export class StatusReportCommand extends Command {
 
         const msg = context.sourceMessage.text.toLowerCase()
         const match = msg.match(new RegExp(`${getOptions(options)}`))
-        if(match) {
+        if (match) {
             generateAlertListText()
-            const replyText = (AlertsState.savedAlerts.length > 0) ? `${generateAlertListText()}` : noResults;
+            const replyText = (AlertsState.savedAlerts.length > 0) ? `${generateAlertListText()}` : noResults
             context.replyPublic({ text: replyText})
             return true
         } else {
