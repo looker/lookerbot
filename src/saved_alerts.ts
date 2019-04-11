@@ -1,6 +1,6 @@
 type Conditional = 'greater than' | 'less than' | 'equal to'
 
-interface IAlert {
+export interface IAlert {
   lookTitle: string
   lookId: number
   lookLink: string
@@ -12,7 +12,8 @@ interface IAlert {
   alert: {
     baseField: string
     conditional: Conditional | string
-    compareField: string
+    compareField: string,
+    message: string,
   }
 }
 
