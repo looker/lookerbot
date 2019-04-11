@@ -20,6 +20,7 @@ export class AddAlertCommand extends Command {
       baseField: match && match[5],
       conditional: match && match[6],
       compareField: match && match[7],
+      message: msg,
     }
 
     if (query) {

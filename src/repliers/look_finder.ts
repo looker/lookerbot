@@ -42,6 +42,7 @@ export class LookFinder extends QueryRunner {
           baseField: this.alert.baseField,
           conditional: this.alert.conditional,
           compareField: this.alert.compareField,
+          message: this.alert.message,
         },
       })
       console.log("AFTER:")
