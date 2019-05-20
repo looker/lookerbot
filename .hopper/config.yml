@@ -1,0 +1,9 @@
+version: ‘1’
+
+services:
+ web:
+   containerDefinitions:
+     web:
+       cpu: 256
+       memory: 256
+       essential: true
