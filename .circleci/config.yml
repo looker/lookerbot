@@ -1,0 +1,92 @@
+version: 2
+
+defaults: &defaults
+  docker:
+    - image: deliveroo/circleci:0.1.10
+
+build_steps: &build_steps
+  steps:
+    # Require a version of docker with multi-stage builds
+    - setup_remote_docker:
+        docker_layer_caching: true
+        reusable: true
+        version: 17.11.0-ce
+
+    # git clone to project/ dir
+    - checkout
+
+    # Build using `docker-compose.ci.yml`.
+    - run:
+        name: Build CI image
+        command: ci build app
+
+    # Run tests via Docker Compose.
+    - run:
+        name: Run tests
+        command: ci run app npm test
+
+push_steps: &push_steps
+  steps:
+    # Require a version of docker with multi-stage builds
+    - setup_remote_docker:
+        docker_layer_caching: true
+        reusable: true
+        version: 17.11.0-ce
+
+    # git clone to project/ dir
+    - checkout
+
+    # Ensure we're deploying last commit.
+    - run:
+        name: Ensure we are on HEAD
+        command: ensure_head
+
+    # Build using `docker-compose.ci.yml`.
+    - run:
+        name: Build deploy image
+        command: |
+          ci build app
+          docker tag ${CIRCLE_PROJECT_REPONAME} ${CIRCLE_PROJECT_REPONAME}:${CIRCLE_SHA1}
+
+    # The ECR repository to push docker images is controlled by hopper.
+    # Select which environment to use with the TARGET variable.
+    - run:
+        name: Push to Image Repository
+        command: |
+          `print_env ${TARGET}`
+          push_image_to_ecr \
+            --image-name ${CIRCLE_PROJECT_REPONAME} \
+            --ecr-repo $AWS_ECR_REPO_URL \
+            --ecr-region $AWS_REGION
+
+jobs:
+  build:
+    <<: *defaults
+    <<: *build_steps
+
+    environment:
+      TARGET: test
+
+  push:
+    <<: *defaults
+    <<: *push_steps
+
+    environment:
+      TARGET: production
+
+workflows:
+  version: 2
+
+  # Run the `build` job on all branches.
+  # Only push to ECR for builds on master.
+  build_and_push:
+    jobs:
+      - build
+
+      - push:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - master
