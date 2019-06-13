@@ -1,4 +1,5 @@
 import { ILook } from "../looker_api_types"
+import {LookerAPIClient} from "../looker_client"
 import { ReplyContext } from "../reply_context"
 import { QueryRunner } from "./query_runner"
 
@@ -14,7 +15,11 @@ export class LookFinder extends QueryRunner {
   }
 
   protected async work() {
-    const results = await this.matchLooks()
+    let client = this.replyContext.looker.client
+    if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+      client = this.replyContext.looker.client2
+    }
+    const results = await this.matchLooks(client)
     if (results) {
       const shortResults = results.slice(0, 5)
       this.reply({
@@ -33,8 +38,8 @@ export class LookFinder extends QueryRunner {
     }
   }
 
-  private async matchLooks() {
-    const looks = await this.replyContext.looker.client.getAsync(
+  private async matchLooks(client: LookerAPIClient) {
+    const looks = await client.getAsync(
       "looks?fields=id,title,short_url,space(name,id)",
       this.replyContext,
     )

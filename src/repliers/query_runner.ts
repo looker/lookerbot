@@ -76,8 +76,12 @@ export class QueryRunner extends FancyReplier {
   }
 
   protected async work() {
+    let client = this.replyContext.looker.client
+    if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+      client = this.replyContext.looker.client2
+    }
     if (this.querySlug) {
-      this.replyContext.looker.client.get(
+      client.get(
         `queries/slug/${this.querySlug}`,
         (query: IQuery) => this.runQuery(query),
         (r: any) => this.replyError(r),
@@ -85,7 +89,7 @@ export class QueryRunner extends FancyReplier {
         this.replyContext,
       )
     } else if (this.queryId) {
-      this.replyContext.looker.client.get(
+      client.get(
         `queries/${this.queryId}`,
         (query: IQuery) => this.runQuery(query),
         (r: any) => this.replyError(r),
@@ -100,9 +104,14 @@ export class QueryRunner extends FancyReplier {
   protected async runQuery(query: IQuery) {
     const visType: string = query.vis_config && query.vis_config.type ? query.vis_config.type : "table"
 
+    let client = this.replyContext.looker.client
+    if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+      client = this.replyContext.looker.client2
+    }
+
     if (visType === "table" || visType === "looker_single_record" || visType === "single_value") {
       try {
-        const result = await this.replyContext.looker.client.getAsync(
+        const result = await client.getAsync(
           `queries/${query.id}/run/unified`,
           this.replyContext,
         )
@@ -112,7 +121,7 @@ export class QueryRunner extends FancyReplier {
       }
     } else {
       try {
-        const imageData = await this.replyContext.looker.client.getBinaryAsync(
+        const imageData = await client.getBinaryAsync(
           `queries/${query.id}/run/png`,
           this.replyContext,
         )

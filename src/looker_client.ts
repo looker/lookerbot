@@ -19,11 +19,13 @@ export class LookerAPIClient {
 
   private token?: string
   private tokenError?: string
+  private userToken?: string
 
   constructor(private options: {
     baseUrl: string,
     clientId: string,
     clientSecret: string,
+    userId: string,
     afterConnect?: () => void,
   }) {
     this.options = options
@@ -172,6 +174,39 @@ export class LookerAPIClient {
       } else {
         this.token = undefined
         console.warn(`Failed fetchAccessToken for Looker ${this.options.baseUrl}: ${body}`)
+      }
+
+      if (this.options.afterConnect) {
+        this.options.afterConnect()
+        // this.fetchUserAccessToken()
+      }
+
+    })
+  }
+
+  public fetchUserAccessToken() {
+
+    const options = {
+      form: {
+        access_token: this.token,
+      },
+      method: "POST",
+      url: `${this.options.baseUrl}/login_user/2`,
+    }
+
+    request(options, (error, response, body) => {
+      this.tokenError = undefined
+      if (error) {
+        console.warn(`Couldn't fetchUserAccessToken for Looker ${this.options.baseUrl}: ${error}`)
+        this.tokenError = error
+        this.userToken = undefined
+      } else if (response.statusCode === 200) {
+        const json = JSON.parse(body)
+        this.userToken = json.access_token
+        console.log(`Updated API token for ${this.options.baseUrl}`)
+      } else {
+        this.userToken = undefined
+        console.warn(`Failed fetchUserAccessToken for Looker ${this.options.baseUrl}: ${body}`)
       }
 
       if (this.options.afterConnect) {

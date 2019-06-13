@@ -27,6 +27,7 @@ export class SlackActionListener extends Listener {
       message.channel = message.channel_id
       message.type = "action"
 
+
       console.log(`Received slack action: ${JSON.stringify(message)}`)
 
       if (!SlackUtils.checkToken(this.bot, message)) {
@@ -54,10 +55,16 @@ export class SlackActionListener extends Listener {
 
       // Return OK immediately
       res.send("")
+      // TODO check user and use the correct client based on user
+
+      let client = looker.client
+      if (message.user === "UJN3N1SGM") {
+        client = looker.client2
+      }
 
       try {
 
-        const actionResult = await looker.client.postAsync(
+        const actionResult = await client.postAsync(
           "data_actions",
           {action: payload.action},
         )

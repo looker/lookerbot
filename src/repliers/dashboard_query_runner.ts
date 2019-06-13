@@ -59,8 +59,12 @@ export class DashboardQueryRunner extends QueryRunner {
       } else {
         throw new Error("Dashboard Element has no Look, Query.")
       }
-
-      const query: IQuery = await this.replyContext.looker.client.postAsync(
+      // TODO check the user and flip to the appropriate user.
+      let client = this.replyContext.looker.client
+      if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+        client = this.replyContext.looker.client2
+      }
+      const query: IQuery = await client.postAsync(
         "queries",
         queryDef,
         {},

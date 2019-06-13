@@ -9,6 +9,7 @@ export class SlackUtils {
   }
 
   public static checkToken(bot: any, message: SentMessage) {
+    // TODO this should change to check the SIGNING SECRET see here https://api.slack.com/docs/verifying-requests-from-slack
     if (process.env.SLACK_SLASH_COMMAND_TOKEN && message.token && (process.env.SLACK_SLASH_COMMAND_TOKEN === message.token)) {
       return true
     } else {

@@ -19,7 +19,7 @@ setInterval(() => {
   for (const looker of Looker.all) {
     looker.client.fetchAccessToken()
   }
-}, 30 * 60 * 1000)
+}, 30 * 60 * 10000)
 
 const commands = [
   require("./commands/search_command").SearchCommand,

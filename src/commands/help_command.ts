@@ -11,8 +11,11 @@ export class HelpCommand extends Command {
   public attempt(context: ReplyContext) {
     const helpAttachments: any = []
 
-    const groups = _.groupBy(Looker.customCommandList(), "category")
+    let groups = _.groupBy(Looker.customCommandList(), "category")
 
+    if (context.sourceMessage.user === "UJN3N1SGM") {
+      groups = _.groupBy(Looker.customCommandList2(), "category")
+    }
     for (const groupName of Object.keys(groups)) {
       const groupCommmands = groups[groupName]
       let groupText = ""
@@ -47,10 +50,16 @@ export class HelpCommand extends Command {
       text: defaultText,
       title: "Built-in Commands",
     })
-
-    const spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
-      return `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`
-    }).join(" or ")
+    let spaces
+    if (context.sourceMessage.user === "UJN3N1SGM") {
+      spaces = Looker.all.filter((l) => l.customCommandSpaceId2).map((l) => {
+        return `<${l.url}/spaces/${l.customCommandSpaceId2}|this space>`
+      }).join(" or ")
+    } else {
+      spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
+        return `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`
+      }).join(" or ")
+    }
 
     if (spaces) {
       helpAttachments.push({
@@ -74,7 +83,7 @@ export class HelpCommand extends Command {
     }
 
     for (const looker of Array.from(Looker.all)) {
-      looker.refreshCommands()
+      looker.refreshCommands2(context.sourceMessage.user)
     }
 
     return true
