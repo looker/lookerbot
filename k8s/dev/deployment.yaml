@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: lookerbot
+  name: lookerbot
+  namespace: lookerbot-dev
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: lookerbot
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lookerbot
+        purpose: viz-bot
+    spec:
+      containers:
+        - name: lookerbot
+          image: 274199647570.dkr.ecr.us-east-1.amazonaws.com/lookerbot:latest
+          imagePullPolicy: Always
+          env:
+           - name: LOOKER_URL
+             value: https://looker.kargo.com
+           - name: LOOKER_API_BASE_URL
+             value: https://looker.kargo.com:19999/api/3.0
+           - name: SLACKBOT_S3_BUCKET
+             value: lookerbot-kargo-com
+           - name: SLACK_API_KEY
+             valueFrom:
+               secretKeyRef:
+                 key: SLACK_API_KEY
+                 name: lookerbot-credentials
+           - name: LOOKER_API_3_CLIENT_ID
+             valueFrom:
+               secretKeyRef:
+                 key: LOOKER_API_3_CLIENT_ID
+                 name: lookerbot-credentials
+           - name: LOOKER_API_3_CLIENT_SECRET
+             valueFrom:
+               secretKeyRef:
+                 key: LOOKER_API_3_CLIENT_SECRET
+                 name: lookerbot-credentials
+           - name: LOOKER_WEBHOOK_TOKEN
+             valueFrom:
+               secretKeyRef:
+                 key: LOOKER_WEBHOOK_TOKEN
+                 name: lookerbot-credentials
+           - name: SLACK_SLASH_COMMAND_TOKEN
+             valueFrom:
+               secretKeyRef:
+                 key: SLACK_SLASH_COMMAND_TOKEN
+                 name: lookerbot-credentials
+           - name: AWS_ACCESS_KEY_ID
+             valueFrom:
+               secretKeyRef:
+                 key: AWS_ACCESS_KEY_ID
+                 name: lookerbot-credentials
+           - name: AWS_SECRET_ACCESS_KEY
+             valueFrom:
+               secretKeyRef:
+                 key: AWS_SECRET_ACCESS_KEY
+                 name: lookerbot-credentials
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status: {}
