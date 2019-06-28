@@ -10,6 +10,7 @@ const config = {
   npmPackage: require("./../package.json"),
   slackApiKey: process.env.SLACK_API_KEY,
   unsafeLocalDev: process.env.UNSAFE_LOCAL_DEV === "true",
+  slackUserId: process.env.SLACK_USER_ID,
 }
 
 if (config.unsafeLocalDev) {

@@ -1,6 +1,7 @@
 import { IDashboard, IQuery } from "../looker_api_types"
 import { ReplyContext } from "../reply_context"
 import { QueryRunner } from "./query_runner"
+import config from '../config'
 
 export class DashboardQueryRunner extends QueryRunner {
 
@@ -61,7 +62,7 @@ export class DashboardQueryRunner extends QueryRunner {
       }
       // TODO check the user and flip to the appropriate user.
       let client = this.replyContext.looker.client
-      if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+      if (this.replyContext.sourceMessage.user === config.slackUserId) {
         client = this.replyContext.looker.client2
       }
       const query: IQuery = await client.postAsync(

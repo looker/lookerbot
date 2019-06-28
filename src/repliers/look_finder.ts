@@ -2,6 +2,7 @@ import { ILook } from "../looker_api_types"
 import {LookerAPIClient} from "../looker_client"
 import { ReplyContext } from "../reply_context"
 import { QueryRunner } from "./query_runner"
+import config from "../config"
 
 const fuzzySearch = require("fuzzysearch-js")
 const levenshteinFS = require("fuzzysearch-js/js/modules/LevenshteinFS")
@@ -16,7 +17,7 @@ export class LookFinder extends QueryRunner {
 
   protected async work() {
     let client = this.replyContext.looker.client
-    if (this.replyContext.sourceMessage.user === "UJN3N1SGM") {
+    if (this.replyContext.sourceMessage.user === config.slackUserId) {
       client = this.replyContext.looker.client2
     }
     const results = await this.matchLooks(client)

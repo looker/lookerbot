@@ -1,5 +1,6 @@
 import { SlackUtils } from "../slack_utils"
 import { Listener } from "./listener"
+import config from '../config'
 
 export class SlackActionListener extends Listener {
 
@@ -58,7 +59,7 @@ export class SlackActionListener extends Listener {
       // TODO check user and use the correct client based on user
 
       let client = looker.client
-      if (message.user === "UJN3N1SGM") {
+      if (message.user === config.slackUserId) {
         client = looker.client2
       }
 

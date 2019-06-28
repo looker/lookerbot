@@ -1,5 +1,6 @@
 import { IDashboard, ISpace } from "./looker_api_types"
 import { LookerAPIClient } from "./looker_client"
+import config from './config'
 
 export interface ICustomCommand {
   name: string
@@ -79,7 +80,7 @@ export class Looker {
 
     this.client2 = new LookerAPIClient({
       afterConnect: () => {
-        return this.refreshCommands2("UJN3N1SGM")
+        return this.refreshCommands2(config.slackUserId)
       },
       baseUrl: options.apiBaseUrl,
       clientId: options.clientId2,
@@ -108,7 +109,7 @@ export class Looker {
   public refreshCommands2(userId: string) {
     let client = this.client
     let customCommandSpaceId = this.customCommandSpaceId
-    if (userId === "UJN3N1SGM") {
+    if (userId === config.slackUserId) {
       client = this.client2
       customCommandSpaceId = this.customCommandSpaceId2
     }
@@ -117,7 +118,7 @@ export class Looker {
       return
     }
     console.log(`Refreshing custom commands for ${this.url}...${customCommandSpaceId}`)
-    if (userId === "UJN3N1SGM") {
+    if (userId === config.slackUserId) {
       client.get(`spaces/${customCommandSpaceId}`, (space: ISpace) => {
             this.addCommandsForSpace2(space, "Shortcuts", client)
             client.get(`spaces/${customCommandSpaceId}/children`, (children: ISpace[]) => {

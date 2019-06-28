@@ -13,7 +13,7 @@ export class HelpCommand extends Command {
 
     let groups = _.groupBy(Looker.customCommandList(), "category")
 
-    if (context.sourceMessage.user === "UJN3N1SGM") {
+    if (context.sourceMessage.user === config.slackUserId) {
       groups = _.groupBy(Looker.customCommandList2(), "category")
     }
     for (const groupName of Object.keys(groups)) {
@@ -51,7 +51,7 @@ export class HelpCommand extends Command {
       title: "Built-in Commands",
     })
     let spaces
-    if (context.sourceMessage.user === "UJN3N1SGM") {
+    if (context.sourceMessage.user === config.slackUserId) {
       spaces = Looker.all.filter((l) => l.customCommandSpaceId2).map((l) => {
         return `<${l.url}/spaces/${l.customCommandSpaceId2}|this space>`
       }).join(" or ")
