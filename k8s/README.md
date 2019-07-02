@@ -7,7 +7,7 @@ We forked the lookerbot code base from Looker's GitHub repository and set it up 
 ## Deployment Instructions
 Prerequisite: You have the proper Kubernetes access set up.
 
-Assuming the docker image in the dev/prod deployment.yaml is what you want, from this directory, use one of the following based on the targeted environment:
+Assuming the docker image in the dev/prod deployment.yaml is what you want, from this directory, use one of the following based on the targeted environment.  Note that `context` name may differ depending on your local Kubernetes configs.
 
 * Production  
   ```bash
@@ -21,9 +21,12 @@ Assuming the docker image in the dev/prod deployment.yaml is what you want, from
 
 If existing secrets need update, you can use `template/secrets-template.yaml` as a template.  Update all the `FIXME` values.  Then apply the updated file to the applicable environment.
 
-After a deployment, you should check the container logs (or use papertrail) to confirm the deployment was successful.
+After you apply a deployment, you should use either Papertrail or the following command to verify the deployment was successful.
+```bash
+$ kubectl get pods -w --namespace=lookerbot --context=production.us-east-1.kops.kargo.com
+```
 
-Other ways to quickly check if the production Looker bot is active:
+Ways to quickly check if the production Looker bot is active.  Note that unless you've confirmed the Looker bot you deployed was made active, the following methods may just mean the last active Looker bot is still running:
 * Open https://lookerbot.kargo.com in browser.  You should see `Lookerbot is go` message.
 * `curl https://lookerbot.kargo.com/health_check` from terminal.  You should see `Healthy` in the response.
 * In Slack, type in `/looker find dashboard` should return a response.
