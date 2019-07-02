@@ -72,6 +72,26 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          livenessProbe:
+            httpGet:
+              path: /health_check
+              port: 3333
+              httpHeaders:
+                - name: Host
+                  value: KubernetesLivenessProbe
+            initialDelaySeconds: 60
+            timeoutSeconds: 1
+            periodSeconds: 60
+          readinessProbe:
+            httpGet:
+              path: /health_check
+              port: 3333
+              httpHeaders:
+                - name: Host
+                  value: KubernetesReadinessProbe
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 60
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
