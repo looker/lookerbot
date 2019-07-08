@@ -4,7 +4,7 @@ metadata:
   labels:
     app: lookerbot
   name: lookerbot
-  namespace: lookerbot-dev
+  namespace: lookerbot
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
