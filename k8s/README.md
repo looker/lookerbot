@@ -19,14 +19,15 @@ Assuming the docker image in the dev/prod deployment.yaml is what you want, from
   $ kubectl apply -f prod --context=staging.us-east-1.kops.kargo.com --namespace=lookerbot-dev 
   ```
 
-If existing secrets need update, you can use `template/secrets-template.yaml` as a template.  Update all the `FIXME` values.  Then apply the updated file to the applicable environment.
+If existing secrets need an update, you can use `template/secrets-template.yaml` as a template.  Update all the `FIXME` values.  Then apply the updated file to the applicable environment.
 
 After you apply a deployment, you should use either Papertrail or the following command to verify the deployment was successful.
 ```bash
 $ kubectl get pods -w --namespace=lookerbot --context=production.us-east-1.kops.kargo.com
 ```
 
-Ways to quickly check if the production Looker bot is active.  Note that unless you've confirmed the Looker bot you deployed was made active, the following methods may just mean the last active Looker bot is still running:
+## Ways to check for active production Looker bot.
+Note that unless you've confirmed the Looker bot you deployed was made active, the following methods may just mean the last active Looker bot is still running:
 * Open https://lookerbot.kargo.com in browser.  You should see `Lookerbot is go` message.
-* `curl https://lookerbot.kargo.com/health_check` from terminal.  You should see `Healthy` in the response.
+* `curl https://lookerbot.kargo.com/health_check` from terminal.  You should see `Healthy` as the `reason` in the response.
 * In Slack, type in `/looker find dashboard` should return a response.
