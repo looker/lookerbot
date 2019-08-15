@@ -22,7 +22,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 - (optional) To display chart images, credentials for a supported storage service:
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
     - [Documentation](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
-    - The access keys need the `s3:PutObjectAcl` permission.
+    - The access keys need the `s3:PutObjectAcl` and `s3:PutObject` permissions.
   - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
       - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/)
   - [Google Cloud Storage](https://cloud.google.com/storage/) account and credentials
