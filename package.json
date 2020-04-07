@@ -54,7 +54,7 @@
     "node": ">= 6.11.1"
   },
   "resolutions": {
-    "**/request":"https://github.com/request/request/archive/392db7d127536ff296fb06492db9430790a32d6c.tar.gz"
+    "**/request": "https://github.com/request/request/archive/392db7d127536ff296fb06492db9430790a32d6c.tar.gz"
   },
   "repository": {
     "type": "git",
