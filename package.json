@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/chai": "^3.5.2",
     "@types/mocha": "^2.2.41",
-    "mocha": "^5.2.0",
+    "mocha": "^6.2.3",
     "nodemon": "^1.19.4",
     "tslint": "^5.9.1"
   },
