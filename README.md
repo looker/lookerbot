@@ -99,6 +99,8 @@ There are a couple environment variables that can be used to tweak behavior:
 
 - `AWS_SECRET_ACCESS_KEY` (optional) – If you want to use Lookerbot to post visualization images, provide an Amazon S3 secret access key that can write to the provided bucket.
 
+You can find an example how to configure access to S3 bucket [here](s3-bucket-access.md)
+
 ###### Microsoft Azure
 
 - `AZURE_STORAGE_ACCOUNT` (optional) - If you want to use Microsoft Azure Storage to store visualization images posted by Lookerbot, provide the name of your Azure Storage account.
