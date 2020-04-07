@@ -20,7 +20,7 @@ export class Listener {
   public listen() { throw new Error("implement") }
 
   protected validateToken(req: express.Request, res: express.Response) {
-    if (this.usesNewTokenAuth(req)) {
+    if (this.usesNewTokenAuth(req) && req.headers.authorization) {
       const tokenMatch = req.headers.authorization.match(TOKEN_REGEX)
       if (tokenMatch && config.lookerbotAuthorizationToken === tokenMatch[1]) {
         return true
@@ -67,7 +67,7 @@ export class Listener {
       this.replyBadAuth(res)
       return false
     }
-    if (this.lookers.map((l) => l.webhookToken).indexOf(req.headers["x-looker-webhook-token"]) === -1) {
+    if (this.lookers.map((l) => l.webhookToken).indexOf(req.headers["x-looker-webhook-token"] as string) === -1) {
       this.replyBadAuth(res)
       return false
     }
