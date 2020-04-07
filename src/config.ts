@@ -14,7 +14,7 @@ const config = {
 
 if (config.unsafeLocalDev) {
   // Allow communicating with Lookers running on localhost with self-signed certificates
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 }
 
 /* tslint:disable:no-default-export */

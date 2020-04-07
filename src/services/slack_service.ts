@@ -44,6 +44,13 @@ export class SlackService extends Service {
 
     this.defaultBot.api.team.info({}, (err: any, response: any) => {
       if (response != null ? response.ok : undefined) {
+        // TODO: remove this fix once https://github.com/howdyai/botkit/pull/1453 is in
+        // FIX: This is a workaround for https://github.com/howdyai/botkit/issues/590
+        response.team.bot = {
+          id: "lookerbot",
+          name: "lookerbot",
+        }
+        // FIX
         this.controller.saveTeam(response.team, () => console.log("Saved the team information..."))
       } else {
         throw new Error(`Could not connect to the Slack API. Ensure your Slack API key is correct. (${err})`)

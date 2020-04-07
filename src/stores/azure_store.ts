@@ -10,6 +10,10 @@ export class AzureStore extends Store {
   public storeImage(buffer: Buffer): Promise<string> {
     const key = this.randomPath()
     const container = process.env.SLACKBOT_AZURE_CONTAINER
+
+    if (!container) {
+      return Promise.reject("ENV `SLACKBOT_AZURE_CONTAINER` isn't configured.")
+    }
     const options = {contentSettings: {contentType: "image/png"}}
     const wasb = azure.createBlobService()
 
