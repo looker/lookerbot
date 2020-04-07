@@ -44,6 +44,7 @@ export class SlackService extends Service {
 
     this.defaultBot.api.team.info({}, (err: any, response: any) => {
       if (response != null ? response.ok : undefined) {
+        // TODO: remove this fix once https://github.com/howdyai/botkit/pull/1453 is in
         // FIX: This is a workaround for https://github.com/howdyai/botkit/issues/590
         response.team.bot = {
           id: 'lookerbot',
