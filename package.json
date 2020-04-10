@@ -53,8 +53,8 @@
     "tslint": "^5.9.1"
   },
   "engines": {
-    "node": ">= 12.13.0",
-    "yarn": ">= 1.19.1"
+    "node": "12.13.0",
+    "yarn": "1.19.1"
   },
   "resolutions": {
     "**/request": "https://github.com/request/request/archive/392db7d127536ff296fb06492db9430790a32d6c.tar.gz"
