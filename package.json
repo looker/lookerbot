@@ -50,6 +50,7 @@
     "@types/mocha": "^2.2.41",
     "mocha": "^6.2.3"
   },
+  "devDependencies": {},
   "engines": {
     "node": ">= 12.13.0",
     "yarn": ">= 1.19.1"
