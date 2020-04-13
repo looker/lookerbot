@@ -49,6 +49,11 @@ The quickest way to deploy the bot is to use Heroku's one-click deploy button, w
 
 Once the environment variables have been set and the server has been deployed, the bot should be ready to go! You can also optionally [configure slash commands](#configuring-slash-commands).
 
+> **Troubleshooting**
+>
+> See dependency issues on heroku?
+> Apply `YARN_PRODUCTION=false` as env. to the deployment. See [heroku skip-pruning](https://devcenter.heroku.com/articles/nodejs-support#skip-pruning) for more details.
+
 #### Manual Deployment
 
 The bot is a simple Node.js application. The application needs to be able to reach both your Looker instance's API and Slack's API. If you have a self-hosted instance of Looker, be sure to open up port 19999 (or your `core_port`) in order to accesss the Looker API.
