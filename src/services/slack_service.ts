@@ -180,7 +180,7 @@ export class SlackService extends Service {
         const user = response.user
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`)
-        } else if (!config.enableSharedWorkspaces && user.team_id !== this.defaultBot.team_info.id) {
+        } else if (!config.enableSharedWorkspaces && user.team_id !== this.defaultBot.team_info.id && !(user.teams && user.teams.includes(this.defaultBot.team_info.id))) {
           reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)
         } else if (user.is_stranger) {
           reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)
