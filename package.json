@@ -17,7 +17,7 @@
     "url": "https://looker.com/"
   },
   "dependencies": {
-    "@google-cloud/storage": "^0.8.0",
+    "@google-cloud/storage": "^5.3.0",
     "@types/dotenv": "^4.0.0",
     "@types/express": "^4.0.35",
     "@types/form-data": "^2.5.0",
@@ -30,13 +30,13 @@
     "@types/uuid": "^2.0.29",
     "aws-sdk": "2.54.0",
     "azure-storage": "2.10.3",
-    "botkit": "0.6.19",
+    "botkit": "^0.7.6",
     "chai": "^3.5.0",
     "datauri": "^1.0.5",
     "dotenv": "^4.0.0",
     "form-data": "^3.0.0",
     "fuzzysearch-js": "^0.2.0",
-    "get-urls": "^7.0.0",
+    "get-urls": "^10.0.0",
     "request": "https://github.com/request/request/archive/392db7d127536ff296fb06492db9430790a32d6c.tar.gz",
     "semver": "^5.3.0",
     "stream-buffers": "^3.0.1",
@@ -49,7 +49,7 @@
     "@types/chai": "^3.5.2",
     "@types/mocha": "^2.2.41",
     "mocha": "^6.2.3",
-    "nodemon": "^2.0.2",
+    "nodemon": "^2.0.4",
     "tslint": "^5.9.1"
   },
   "engines": {
