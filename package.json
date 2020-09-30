@@ -30,7 +30,7 @@
     "@types/uuid": "^2.0.29",
     "aws-sdk": "2.54.0",
     "azure-storage": "2.10.3",
-    "botkit": "0.6.19",
+    "botkit": "^0.7.6",
     "chai": "^3.5.0",
     "datauri": "^1.0.5",
     "dotenv": "^4.0.0",
