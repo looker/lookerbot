@@ -32,11 +32,17 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Create a new bot in Slack
 
-1. Go to https://api.slack.com/apps and create a new app. We call it **Looker** but it's up to you.
-2. Choose "Bot Users" and click "Add a bot user".
-3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
-4. Under settings, choose "Install App", then "Install App to Team" and authenticate.
-5. Copy the Bot User OAuth Access Token (you'll need this later)
+1. Go to https://api.slack.com/apps?new_classic_app=1 and create a new Classic Slack App. Lookerbot uses the (Real Time Messaging API)[https://api.slack.com/rtm#classic] so it must be a Classic Slack App. We call it **Looker** but it's up to you.
+2. Click on the "OAuth and Permissions" tab and in the Scopes section add the following scopes:
+   1. `channels:read`
+   2. `chat:write:bot`
+   3. `files:write:user`
+   4. `team:read`
+   5. `users:read`
+   6. `commands` (if you plan on [configuring slash commands](#Configuring-Slash-Commands))
+3. At the top of the "OAuth & Permissions" page, click "Install App to Workspace."
+4. Click "Allow" to allow the Slack workspace to use the newly created app.
+5. At the top of the "OAuth & Permissions" page, copied the "Bot User OAuth Access Token."
 6. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
 > By default, Slack Apps are internal to your team. Don't "distribute" your Slack App – that will make it available to all Slack users in the world.
 
