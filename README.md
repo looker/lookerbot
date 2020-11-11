@@ -33,7 +33,7 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 #### Create a new bot in Slack
 
 1. Go to https://api.slack.com/apps?new_classic_app=1 and create a new Classic Slack App. Lookerbot uses the [Real Time Messaging API](https://api.slack.com/rtm#classic) so it must be a Classic Slack App. We call the app **Looker** but it's up to you.
-2. Click on the "OAuth and Permissions" tab and in the Scopes section add the following scopes:
+2. Click on the "OAuth and Permissions" tab and in the Scopes section add the following scopes **using the "Add An OAuth Scope" button - don't click the green "Update Scopes" button, as this will convert the app to the new scopes workflow and will break your app!** :
    1. `channels:read`
    2. `chat:write:bot`
    3. `files:write:user`
