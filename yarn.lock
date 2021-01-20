@@ -4368,6 +4368,14 @@ sisteransi@^1.0.0:
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
+skills-validator@./node_modules/botbuilder/skills-validator/skills-validator-1.0.0.tgz:
+  version "1.0.0"
+  resolved "./node_modules/botbuilder/skills-validator/skills-validator-1.0.0.tgz#70d30269e20b283770a18c3562ea58e45eef9a13"
+  dependencies:
+    "@types/node-fetch" "^2.5.4"
+    adal-node "^0.2.1"
+    node-fetch "^2.6.0"
+
 snakeize@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/snakeize/-/snakeize-0.1.0.tgz#10c088d8b58eb076b3229bb5a04e232ce126422d"
