@@ -11,6 +11,7 @@ import { ReplyContext } from "../reply_context"
 import { SlackUtils } from "../slack_utils"
 import { IChannel, Service } from "./service"
 
+const { WebClient } = require("@slack/web-api")
 const botkit = require("botkit")
 const getUrls = require("get-urls")
 
@@ -18,6 +19,7 @@ export class SlackService extends Service {
 
   private controller: any
   private defaultBot: any
+  private webClient: any
 
   public async usableChannels() {
     let channels = await this.usablePublicChannels()
@@ -39,6 +41,8 @@ export class SlackService extends Service {
       retry: 10,
       token: config.slackApiKey,
     }).startRTM()
+
+    this.webClient = new WebClient(config.slackApiKey)
 
     // This is a workaround to how Botkit handles teams, but this server manages only a single team.
 
