@@ -42,7 +42,7 @@ export class SlackService extends Service {
       token: config.slackApiKey,
     }).startRTM()
 
-    this.webClient = new WebClient(config.slackApiKey)
+    this.webClient = this.getSlackWebClient(config.slackApiKey)
 
     // This is a workaround to how Botkit handles teams, but this server manages only a single team.
 
@@ -130,22 +130,17 @@ export class SlackService extends Service {
 
   }
 
-  private usablePublicChannels() {
-    return new Promise<IChannel[]>((resolve, reject) => {
-      this.defaultBot.api.channels.list({
-        exclude_archived: 1,
-        exclude_members: 1,
-      }, (err: any, response: any) => {
-        if (err || !response.ok) {
-          reject(err)
-        } else {
-          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
-          channels = _.sortBy(channels, "name")
-          const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
-          resolve(reformatted)
-        }
-      })
-    })
+  // this constructor is moved here for testability
+  private getSlackWebClient(token: any) {
+    return new WebClient(token)
+  }
+
+  private async usablePublicChannels() {
+    const result = await this.webClient.conversations.list({ exclude_archived: true })
+    let channels = result.channels.filter((c: any) => c.is_member && !c.is_archived)
+    channels = _.sortBy(channels, "name")
+    const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
+    return reformatted
   }
 
   private usableDMs() {

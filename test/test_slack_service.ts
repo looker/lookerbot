@@ -6,6 +6,8 @@ import { SlackService } from "../src/services/slack_service"
 const botkit = require("botkit")
 
 describe("Slack Service", () => {
+  let webClient: any
+
   beforeEach(() => {
     const bot = {
       startRTM: () => ({
@@ -175,6 +177,65 @@ describe("Slack Service", () => {
         },
       }),
     }
+    webClient = {
+      conversations: {
+        // https://api.slack.com/methods/conversations.list
+        list: async () => ({
+          ok: true,
+          channels: [
+            {
+              id: "C0G9QKBBL",
+              name: "general",
+              is_channel: true,
+              is_group: false,
+              is_im: false,
+              created: 1449252889,
+              creator: "U012A3CDE",
+              is_archived: false,
+              is_general: true,
+              unlinked: 0,
+              name_normalized: "general",
+              is_shared: false,
+              is_ext_shared: false,
+              is_org_shared: false,
+              pending_shared: [],
+              is_pending_ext_shared: false,
+              is_member: true,
+              is_private: false,
+              is_mpim: false,
+              previous_names: [],
+              num_members: 4,
+            },
+            {
+              id: "C0G9QF9GW",
+              name: "random",
+              is_channel: true,
+              is_group: false,
+              is_im: false,
+              created: 1449252889,
+              creator: "U061F7AUR",
+              is_archived: false,
+              is_general: false,
+              unlinked: 0,
+              name_normalized: "random",
+              is_shared: false,
+              is_ext_shared: false,
+              is_org_shared: false,
+              pending_shared: [],
+              is_pending_ext_shared: false,
+              is_member: true,
+              is_private: false,
+              is_mpim: false,
+              previous_names: [],
+              num_members: 4,
+            },
+          ],
+          response_metadata: {
+            next_cursor: "dGVhbTpDMDYxRkE1UEI=",
+          },
+        }),
+      },
+    }
     const slackbot = {
       on: sinon.stub().returns({}),
       setupWebserver: sinon.stub().returns({}),
@@ -186,13 +247,13 @@ describe("Slack Service", () => {
 
   it("usableChannels works", async () => {
     const service = new SlackService()
+    sinon.stub(service, "getSlackWebClient" as any).returns(webClient)
     service.begin({
       listeners: [],
       messageHandler: (context: ReplyContext) => undefined,
       urlHandler: (context: ReplyContext, url: string) => undefined,
     })
     const result = await service.usableChannels()
-    console.log("result", result)
     expect(result.length).to.equal(4)
     expect(result).to.deep.equal([
       { id: "C0G9QKBBL", label: "#general" },
