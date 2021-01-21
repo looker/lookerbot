@@ -40,10 +40,11 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
    4. `team:read`
    5. `users:read`
    6. `commands` (if you plan on [configuring slash commands](#Configuring-Slash-Commands))
-3. At the top of the "OAuth & Permissions" page, click "Install App to Workspace."
-4. Click "Allow" to allow the Slack workspace to use the newly created app.
-5. At the top of the "OAuth & Permissions" page, copy the "Bot User OAuth Access Token" (you'll need this later).
-6. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
+3. Navigate to "App Home" and click "Add Legacy Bot User"
+4. At the top of the "OAuth & Permissions" page, click "Install App to Workspace."
+5. Click "Allow" to allow the Slack workspace to use the newly created app.
+6. At the top of the "OAuth & Permissions" page, copy the "Bot User OAuth Access Token" (you'll need this later). Note: bot token should start with `xoxb-`.
+7. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
 > By default, Slack Apps are internal to your team. Don't "distribute" your Slack App – that will make it available to all Slack users in the world.
 
 

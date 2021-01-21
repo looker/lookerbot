@@ -5,6 +5,7 @@
     "jsRules": {},
     "rules": {
       "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore"],
+      "object-literal-sort-keys": false,
       "prefer-const": [true, {"destructuring": "all"}],
       "max-line-length": false,
       "no-console": false,
