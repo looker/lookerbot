@@ -3,7 +3,6 @@ import "mocha"
 import * as sinon from "sinon"
 import { ReplyContext } from "../src/reply_context"
 import { SlackService } from "../src/services/slack_service"
-const channelsListJson = require("./slack/channels_list.json")
 const conversationsListJson = require("./slack/conversations_list.json")
 const teamInfoJson = require("./slack/team_info.json")
 const usersListJson = require("./slack/users_list.json")
@@ -19,7 +18,7 @@ describe("Slack Service", () => {
           channels: {
             // https://api.slack.com/methods/channels.list
             list: (opts: {}, fn: (err: any, response: any) => any) => {
-              return fn(null, channelsListJson)
+              throw Error("This function is deprecated and should not be called.")
             },
           },
           users: {
