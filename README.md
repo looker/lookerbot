@@ -6,16 +6,15 @@ With Lookerbot, everyone in your company can easily share data and answer questi
 
 [![](images/readme-video-thumb.png)](https://vimeo.com/159130949)
 
-> For a free trial of Looker go to [looker.com/free-trial](https://looker.com/free-trial).
+> For a free trial of Looker go to [looker.com/free-trial](https://looker.com/demo/free-trial).
 
 ### Features
 
-Detailed information on how to interact with Lookerbot [can be found on Looker Discourse](https://discourse.looker.com/t/using-the-lookerbot/2302).
+Detailed information on how to interact with Lookerbot [can be found in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
 
 ### Requirements
 
-- [Looker](https://looker.com) 4.12 or later (note that Looker standard allows only a limited number of API calls. Upgrade to Looker Advanced to get past this bottleneck.)
-  - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
+- [Looker](https://looker.com) 4.12 or later
 - A web server capable of running [Node.js](https://nodejs.org/) applications to deploy the bot application to
   - [Node.js](https://nodejs.org/) 6.10.3 is required
   - [Yarn](https://yarnpkg.com/) is required
@@ -79,7 +78,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
 
-- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands on Looker Discourse](https://discourse.looker.com/t/2302).
+- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
