@@ -69,7 +69,7 @@ export class LookerAPIClient {
       if (error) {
         errorCallback(error)
       } else if (response.statusCode === 200) {
-        if (response.headers["content-type"].indexOf("application/json") !== -1) {
+        if (response.headers["content-type"] && response.headers["content-type"].indexOf("application/json") !== -1) {
           successCallback(JSON.parse(body as string))
         } else {
           successCallback(body)

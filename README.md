@@ -6,23 +6,22 @@ With Lookerbot, everyone in your company can easily share data and answer questi
 
 [![](images/readme-video-thumb.png)](https://vimeo.com/159130949)
 
-> For a free trial of Looker go to [looker.com/free-trial](https://looker.com/free-trial).
+> For a free trial of Looker go to [looker.com/free-trial](https://looker.com/demo/free-trial).
 
 ### Features
 
-Detailed information on how to interact with Lookerbot [can be found on Looker Discourse](https://discourse.looker.com/t/using-the-lookerbot/2302).
+Detailed information on how to interact with Lookerbot [can be found in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
 
 ### Requirements
 
 - [Looker](https://looker.com) 4.12 or later
-  - The "PDF Download & Scheduling and Scheduled Visualizations" Labs feature in Looker must be enabled to display chart images
 - A web server capable of running [Node.js](https://nodejs.org/) applications to deploy the bot application to
   - [Node.js](https://nodejs.org/) 6.10.3 is required
   - [Yarn](https://yarnpkg.com/) is required
 - (optional) To display chart images, credentials for a supported storage service:
   - [Amazon S3](https://aws.amazon.com/s3/) account, bucket, and access keys
     - [Documentation](https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html)
-    - The access keys need the `s3:PutObjectAcl` permission.
+    - The access keys need the `s3:PutObjectAcl` and `s3:PutObject` permissions.
   - [Microsoft Azure Storage](https://azure.microsoft.com/en-us/services/storage/) account and access key
       - [Documentation](https://azure.microsoft.com/en-us/documentation/articles/storage-introduction/)
   - [Google Cloud Storage](https://cloud.google.com/storage/) account and credentials
@@ -32,12 +31,19 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 
 #### Create a new bot in Slack
 
-1. Go to https://api.slack.com/apps and create a new app. We call it **Looker** but it's up to you.
-2. Choose "Bot Users" and click "Add a bot user".
-3. Create a username for your Lookerbot. We use **@looker** but it's up to you.
-4. Under settings, choose "Install App", then "Install App to Team" and authenticate.
-5. Copy the Bot User OAuth Access Token (you'll need this later)
-6. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
+1. Go to https://api.slack.com/apps?new_classic_app=1 and create a new Classic Slack App. Lookerbot uses the [Real Time Messaging API](https://api.slack.com/rtm#classic) so it must be a Classic Slack App. We call the app **Looker** but it's up to you.
+2. Click on the "OAuth and Permissions" tab and in the Scopes section add the following scopes **using the "Add An OAuth Scope" button - don't click the green "Update Scopes" button, as this will convert the app to the new scopes workflow and will break your app!** :
+   1. `channels:read`
+   2. `chat:write:bot`
+   3. `files:write:user`
+   4. `team:read`
+   5. `users:read`
+   6. `commands` (if you plan on [configuring slash commands](#Configuring-Slash-Commands))
+3. Navigate to "App Home" and click "Add Legacy Bot User"
+4. At the top of the "OAuth & Permissions" page, click "Install App to Workspace."
+5. Click "Allow" to allow the Slack workspace to use the newly created app.
+6. At the top of the "OAuth & Permissions" page, copy the "Bot User OAuth Access Token" (you'll need this later). Note: bot token should start with `xoxb-`.
+7. Under "Basic Information", you can add an icon and description for Lookerbot. [Here's the icon we use](looker-bot-icon-512.png).
 > By default, Slack Apps are internal to your team. Don't "distribute" your Slack App – that will make it available to all Slack users in the world.
 
 
@@ -48,6 +54,11 @@ Detailed information on how to interact with Lookerbot [can be found on Looker D
 The quickest way to deploy the bot is to use Heroku's one-click deploy button, which will provision a server for your bot. This will prompt you to give the app a unique name, add the Slack API key and configure all of the required variables (see "Environment Variables" below).
 
 Once the environment variables have been set and the server has been deployed, the bot should be ready to go! You can also optionally [configure slash commands](#configuring-slash-commands).
+
+> **Troubleshooting**
+>
+> See dependency issues on heroku?
+> Apply `YARN_PRODUCTION=false` as env. to the deployment. See [heroku skip-pruning](https://devcenter.heroku.com/articles/nodejs-support#skip-pruning) for more details.
 
 #### Manual Deployment
 
@@ -67,7 +78,7 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
 
-- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands on Looker Discourse](https://discourse.looker.com/t/2302).
+- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 

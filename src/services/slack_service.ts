@@ -11,6 +11,7 @@ import { ReplyContext } from "../reply_context"
 import { SlackUtils } from "../slack_utils"
 import { IChannel, Service } from "./service"
 
+const { WebClient } = require("@slack/web-api")
 const botkit = require("botkit")
 const getUrls = require("get-urls")
 
@@ -18,6 +19,7 @@ export class SlackService extends Service {
 
   private controller: any
   private defaultBot: any
+  private webClient: any
 
   public async usableChannels() {
     let channels = await this.usablePublicChannels()
@@ -40,10 +42,19 @@ export class SlackService extends Service {
       token: config.slackApiKey,
     }).startRTM()
 
+    this.webClient = this.getSlackWebClient(config.slackApiKey)
+
     // This is a workaround to how Botkit handles teams, but this server manages only a single team.
 
     this.defaultBot.api.team.info({}, (err: any, response: any) => {
       if (response != null ? response.ok : undefined) {
+        // TODO: remove this fix once https://github.com/howdyai/botkit/pull/1453 is in
+        // FIX: This is a workaround for https://github.com/howdyai/botkit/issues/590
+        response.team.bot = {
+          id: "lookerbot",
+          name: "lookerbot",
+        }
+        // FIX
         this.controller.saveTeam(response.team, () => console.log("Saved the team information..."))
       } else {
         throw new Error(`Could not connect to the Slack API. Ensure your Slack API key is correct. (${err})`)
@@ -119,22 +130,17 @@ export class SlackService extends Service {
 
   }
 
-  private usablePublicChannels() {
-    return new Promise<IChannel[]>((resolve, reject) => {
-      this.defaultBot.api.channels.list({
-        exclude_archived: 1,
-        exclude_members: 1,
-      }, (err: any, response: any) => {
-        if (err || !response.ok) {
-          reject(err)
-        } else {
-          let channels = response.channels.filter((c: any) => c.is_member && !c.is_archived)
-          channels = _.sortBy(channels, "name")
-          const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
-          resolve(reformatted)
-        }
-      })
-    })
+  // this constructor is moved here for testability
+  private getSlackWebClient(token: any) {
+    return new WebClient(token)
+  }
+
+  private async usablePublicChannels() {
+    const result = await this.webClient.conversations.list({ exclude_archived: true })
+    let channels = result.channels.filter((c: any) => c.is_member && !c.is_archived)
+    channels = _.sortBy(channels, "name")
+    const reformatted: IChannel[] = channels.map((channel: any) => ({id: channel.id, label: `#${channel.name}`}))
+    return reformatted
   }
 
   private usableDMs() {
@@ -173,7 +179,7 @@ export class SlackService extends Service {
         const user = response.user
         if (!config.enableGuestUsers && (user.is_restricted || user.is_ultra_restricted)) {
           reply(`Sorry @${user.name}, as a guest user you're not able to use this command.`)
-        } else if (!config.enableSharedWorkspaces && user.team_id !== this.defaultBot.team_info.id) {
+        } else if (!config.enableSharedWorkspaces && user.team_id !== this.defaultBot.team_info.id && !(user.teams && user.teams.includes(this.defaultBot.team_info.id))) {
           reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)
         } else if (user.is_stranger) {
           reply(`Sorry @${user.name}, as a user from another workspace you're not able to use this command.`)

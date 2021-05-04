@@ -1,5 +1,10 @@
+.idea/
+*.iml
+
 node_modules
 .env
 docker-compose.yml
 npm-debug.log
 Makefile
+
+yarn-error.log

@@ -75,6 +75,11 @@
     "GOOGLE_CLOUD_CREDENTIALS_JSON": {
       "description": "If using Google Cloud to store visualization images posted by Lookerbot, provide the content of the credentials JSON file you got from the Google Cloud website.",
       "required": false
+    },
+    "YARN_PRODUCTION": {
+      "description": "Set to false by default to skip npm dependency pruning, which may unintentionally omit the installation of some required packages. See https://devcenter.heroku.com/articles/nodejs-support#skip-pruning for more details.",
+      "required": false,
+      "value": "false"
     }
   }
 }
