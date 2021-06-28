@@ -1,3 +1,4 @@
+import { IQueryConfig } from "../looker"
 import { IDashboard, IQuery } from "../looker_api_types"
 import { ReplyContext } from "../reply_context"
 import { QueryRunner } from "./query_runner"
@@ -7,9 +8,10 @@ export class DashboardQueryRunner extends QueryRunner {
   constructor(
     replyContext: ReplyContext,
     private dashboard: IDashboard,
+    private config?: IQueryConfig,
     private filters: {[key: string]: string} = {},
   ) {
-    super(replyContext)
+    super(replyContext, undefined, config)
     this.dashboard = dashboard
     this.filters = filters
   }
@@ -66,6 +68,7 @@ export class DashboardQueryRunner extends QueryRunner {
         {},
         this.replyContext,
       )
+
       this.runQuery(query)
     }
   }

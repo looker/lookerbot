@@ -2,6 +2,7 @@ import * as crypto from "crypto"
 import * as request from "request"
 import * as _ from "underscore"
 import config from "./config"
+import { IQueryConfig } from "./looker"
 import { ReplyContext } from "./reply_context"
 
 export interface ILookerRequestConfig {
@@ -13,6 +14,7 @@ export interface ILookerRequestConfig {
 
 export interface ILookerRequestOptions {
   encoding?: string | null
+  params?: IQueryConfig | null
 }
 
 export class LookerAPIClient {
@@ -57,6 +59,19 @@ export class LookerAPIClient {
       },
       method: requestConfig.method,
       url: `${this.options.baseUrl}/${requestConfig.path}`,
+    }
+
+    if (requestConfig.params) {
+
+        newConfig.formData = {}
+
+        if (requestConfig.params.image_height) {
+          newConfig.formData.image_width = requestConfig.params.image_height
+        }
+
+        if (requestConfig.params.image_width) {
+          newConfig.formData.image_width = requestConfig.params.image_width
+        }
     }
 
     if (typeof requestConfig.encoding !== "undefined") {
@@ -117,8 +132,9 @@ export class LookerAPIClient {
   public getBinaryAsync(
     path: string,
     replyContext?: ReplyContext,
+    options?: ILookerRequestOptions,
   ): Promise<Buffer> {
-    return this.getAsync(path, replyContext, {encoding: null})
+    return this.getAsync(path, replyContext, options)
   }
 
   public post(path: string, body: any, successCallback?: any, errorCallback?: any, replyContext?: ReplyContext) {
