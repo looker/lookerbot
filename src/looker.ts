@@ -104,7 +104,12 @@ export class Looker {
 
         const dashboardFilters = dashboard.dashboard_filters || dashboard.filters
         if (dashboardFilters && dashboardFilters.length > 0) {
-          command.helptext = `<${dashboardFilters[0].title.toLowerCase()}>`
+          let descText = ""
+          dashboardFilters.forEach(function (value: any) {
+            descText += `<${value.title.toLowerCase()}>`
+            descText += ";"
+          })
+          command.helptext = descText.substring(0, descText.length - 1)
         }
 
         Looker.customCommands[command.name] = command

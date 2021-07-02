@@ -21,9 +21,14 @@ export class CustomCommand extends Command {
 
       const filters: {[key: string]: string} = {}
       const dashboardFilters = dashboard.dashboard_filters || dashboard.filters
-      for (const filter of dashboardFilters) {
-        filters[filter.name] = query
-      }
+      const params = query.split(";")
+      const usedFilters = dashboardFilters.slice(0, params.length)
+      var iterator = params.values()
+
+      usedFilters.forEach(function (value: any) {
+        filters[value.name] = iterator.next().value
+      })
+
       const runner = new DashboardQueryRunner(context, matchedCommand.dashboard, filters)
       runner.start()
 
