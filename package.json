@@ -29,7 +29,7 @@
     "@types/stream-buffers": "^3.0.2",
     "@types/underscore": "^1.8.0",
     "@types/uuid": "^2.0.29",
-    "aws-sdk": "2.54.0",
+    "aws-sdk": "2.814.0",
     "azure-storage": "2.10.3",
     "botkit": "^0.7.6",
     "chai": "^3.5.0",
