@@ -1,5 +1,8 @@
 # Lookerbot
 
+NOTE:
+As of 8/8/2022, the Lookerbot is no longer in service.  Please refer to https://kargo1.atlassian.net/browse/KDW-5267.  This code repo will be kept around.
+
 Lookerbot integrates [Slack](https://slack.com) and [Looker](https://looker.com) to put all your data at your fingertips. 
 
 With Lookerbot, everyone in your company can easily share data and answer questions instantly. Lookerbot can answer questions, send alerts, and more!
