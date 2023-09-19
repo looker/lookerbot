@@ -21,7 +21,7 @@ export class LookFinder extends QueryRunner {
         attachments: shortResults.map((v: any) => {
           const look = v.value
           return {
-            text: `in ${look.space.name}`,
+            text: `in ${look.folder.name}`,
             title: look.title,
             title_link: `${this.replyContext.looker.url}${look.short_url}`,
           }
@@ -35,7 +35,7 @@ export class LookFinder extends QueryRunner {
 
   private async matchLooks() {
     const looks = await this.replyContext.looker.client.getAsync(
-      "looks?fields=id,title,short_url,space(name,id)",
+      "looks?fields=id,title,short_url,folder(name,id)",
       this.replyContext,
     )
 

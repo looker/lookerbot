@@ -48,14 +48,14 @@ export class HelpCommand extends Command {
       title: "Built-in Commands",
     })
 
-    const spaces = Looker.all.filter((l) => l.customCommandSpaceId).map((l) => {
-      return `<${l.url}/spaces/${l.customCommandSpaceId}|this space>`
+    const folders = Looker.all.filter((l) => l.customCommandFolderId).map((l) => {
+      return `<${l.url}/folders/${l.customCommandFolderId}|this folder>`
     }).join(" or ")
 
-    if (spaces) {
+    if (folders) {
       helpAttachments.push({
         mrkdwn_in: ["text"],
-        text: `\n_To add your own commands, add a dashboard to ${spaces}._`,
+        text: `\n_To add your own commands, add a dashboard to ${folders}._`,
       })
     }
 

@@ -9,9 +9,9 @@ import { SlackTableFormatter } from "./slack_table_formatter"
 export class QueryRunner extends FancyReplier {
 
   protected querySlug?: string
-  protected queryId?: number
+  protected queryId?: string
 
-  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: number} = {}) {
+  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: string} = {}) {
     super(replyContext)
     this.querySlug = queryParam.slug
     this.queryId = queryParam.id
@@ -117,7 +117,7 @@ export class QueryRunner extends FancyReplier {
           this.replyContext,
         )
         this.postImage(query, imageData)
-      } catch (e) {
+      } catch (e: any) {
         if (e.error && e.error === "Received empty response from Looker.") {
           this.replyError("Did not receive an image from Looker.\nThe \"PDF Download & Scheduling and Scheduled Visualizations\" Labs feature must be enabled to render images.")
         } else {
