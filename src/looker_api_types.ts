@@ -1,11 +1,11 @@
-export interface ISpace {
+export interface IFolder {
   id: string
   name: string
   dashboards: IDashboard[]
 }
 
 export interface IDashboard {
-  id: string | number
+  id: string
   description: string
   title: string
   filters?: IDashboardFilter[]
@@ -18,11 +18,11 @@ export interface IDashboardElement {
   look?: ILook
   query?: IQuery
   listen?: {[key: string]: string} // deprecated
-  result_maker_id?: number
+  result_maker_id?: string
   result_maker?: {
-    id: number,
-    query_id?: number,
-    merge_result_id?: number,
+    id: string,
+    query_id?: string,
+    merge_result_id?: string,
     filterables?: IDashboardElementResultMakerFilterable[],
   }
 }
@@ -41,7 +41,7 @@ export interface IDashboardFilter {
 }
 
 export interface ILook {
-  id: number
+  id: string
   query: IQuery
 }
 
@@ -50,7 +50,7 @@ export interface IQueryFilters {
 }
 
 export interface IQuery {
-  id: number
+  id: string
   slug: string
   share_url: string
   vis_config: {

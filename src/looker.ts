@@ -1,4 +1,4 @@
-import { IDashboard, ISpace } from "./looker_api_types"
+import { IDashboard, IFolder } from "./looker_api_types"
 import { LookerAPIClient } from "./looker_client"
 
 export interface ICustomCommand {
@@ -15,7 +15,7 @@ interface ILookerOptions {
   apiBaseUrl: string
   clientId: string
   clientSecret: string
-  customCommandSpaceId: string
+  customCommandFolderId: string
   url: string
   webhookToken: string
 }
@@ -37,9 +37,9 @@ export class Looker {
       (console.log("Using Looker information specified in individual environment variables."),
       [{
         apiBaseUrl: process.env.LOOKER_API_BASE_URL,
-        clientId: process.env.LOOKER_API_3_CLIENT_ID,
-        clientSecret: process.env.LOOKER_API_3_CLIENT_SECRET,
-        customCommandSpaceId: process.env.LOOKER_CUSTOM_COMMAND_SPACE_ID,
+        clientId: process.env.LOOKER_API_CLIENT_ID,
+        clientSecret: process.env.LOOKER_API_CLIENT_SECRET,
+        customCommandFolderId: process.env.LOOKER_CUSTOM_COMMAND_FOLDER_ID,
         url: process.env.LOOKER_URL,
         webhookToken: process.env.LOOKER_WEBHOOK_TOKEN,
       }])
@@ -47,14 +47,14 @@ export class Looker {
   }
 
   public url: string
-  public customCommandSpaceId: string
+  public customCommandFolderId: string
   public webhookToken: string
   public client: LookerAPIClient
 
   constructor(options: ILookerOptions) {
 
     this.url = options.url
-    this.customCommandSpaceId = options.customCommandSpaceId
+    this.customCommandFolderId = options.customCommandFolderId
     this.webhookToken = options.webhookToken
 
     this.client = new LookerAPIClient({
@@ -68,25 +68,25 @@ export class Looker {
   }
 
   public refreshCommands() {
-    if (!this.customCommandSpaceId) {
+    if (!this.customCommandFolderId) {
       console.log(`No commands specified for ${this.url}...`)
       return
     }
     console.log(`Refreshing custom commands for ${this.url}...`)
 
-    this.client.get(`spaces/${this.customCommandSpaceId}`, (space: ISpace) => {
-      this.addCommandsForSpace(space, "Shortcuts")
-      this.client.get(`spaces/${this.customCommandSpaceId}/children`, (children: ISpace[]) => {
+    this.client.get(`folders/${this.customCommandFolderId}`, (folder: IFolder) => {
+      this.addCommandsForFolder(folder, "Shortcuts")
+      this.client.get(`folders/${this.customCommandFolderId}/children`, (children: IFolder[]) => {
         children.map((child) =>
-          this.addCommandsForSpace(child, child.name))
+          this.addCommandsForFolder(child, child.name))
       },
       console.log)
     },
     console.log)
   }
 
-  private addCommandsForSpace(space: ISpace, category: string) {
-    space.dashboards.forEach((partialDashboard) =>
+  private addCommandsForFolder(folder: IFolder, category: string) {
+    folder.dashboards.forEach((partialDashboard) =>
       this.client.get(`dashboards/${partialDashboard.id}`, (dashboard: IDashboard) => {
 
         const command: ICustomCommand = {
