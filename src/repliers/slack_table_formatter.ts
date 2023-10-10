@@ -11,6 +11,7 @@ export class SlackTableFormatter {
   private fields: any[]
   private query: IQuery
   private result: IQueryResponse
+  private customLabels: { [key: string]: string }
 
   constructor(
     private options: {query: IQuery, result: IQueryResponse, baseUrl: string, shareUrl: string},
@@ -27,6 +28,9 @@ export class SlackTableFormatter {
         this.result.fields[k] = v.filter((field) => hiddenFields.indexOf(field.name) === -1)
       }
     }
+
+    // get custom labels
+    this.customLabels = this.query.vis_config.series_labels
 
     const calcs = this.result.fields.table_calculations || []
     const dimensions = this.result.fields.dimensions || []
@@ -110,6 +114,11 @@ export class SlackTableFormatter {
   }
 
   private renderFieldLabel(field: IQueryResponseField): string {
+
+    if (this.customLabels[field.name]) {
+      return this.customLabels[field.name]
+    }
+
     let showViewNames: boolean
     if (!this.query.vis_config || typeof this.query.vis_config.show_view_names === "undefined") {
       showViewNames = true
