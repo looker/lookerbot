@@ -47,6 +47,9 @@ Detailed information on how to interact with Lookerbot [can be found in the Look
 > By default, Slack Apps are internal to your team. Don't "distribute" your Slack App – that will make it available to all Slack users in the world.
 
 
+> [!IMPORTANT]
+> Please note: some of the Environment Variables below have changed. You may need to adjust them in order to keep this working.  
+
 #### Heroku Deployment
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
