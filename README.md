@@ -47,6 +47,9 @@ Detailed information on how to interact with Lookerbot [can be found in the Look
 > By default, Slack Apps are internal to your team. Don't "distribute" your Slack App – that will make it available to all Slack users in the world.
 
 
+> [!IMPORTANT]
+> Please note: some of the Environment Variables below have changed. You may need to adjust them in order to keep this working.  
+
 #### Heroku Deployment
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/looker/looker-slackbot/tree/master)
@@ -72,13 +75,13 @@ The bot is configured entirely via environment variables. You'll want to set up 
 
 - `LOOKER_URL` (required) – The web url of your Looker instance.
 
-- `LOOKER_API_BASE_URL` (required) – The API 3.0 endpoint of your Looker instance. In most cases, this will be the web url followed by `:19999/api/3.0` (replace `19999` with your `core_port` if it is different).
+- `LOOKER_API_BASE_URL` (required) – The API endpoint of your Looker instance. In most cases, this will be the web url followed by `:19999/api/4.0` (replace `19999` with your `core_port` if it is different).
 
-- `LOOKER_API_3_CLIENT_ID` (required) – The API 3.0 client ID for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
+- `LOOKER_API_CLIENT_ID` (required) – The API client ID for the user you want the bot to run as. This requires creating an API user or an API key for an existing user in Looker.
 
-- `LOOKER_API_3_CLIENT_SECRET` (required) – The API 3.0 client secret for the user you want the bot to run as. This requires creating an API 3.0 user or an API 3.0 key for an existing user in Looker.
+- `LOOKER_API_CLIENT_SECRET` (required) – The API client secret for the user you want the bot to run as. This requires creating an API user or an API key for an existing user in Looker.
 
-- `LOOKER_CUSTOM_COMMAND_SPACE_ID` (optional) – The ID of a Space that you would like the bot to use to define custom commands. [Read about using custom commands in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
+- `LOOKER_CUSTOM_COMMAND_FOLDER_ID` (optional) – The ID of a Folder that you would like the bot to use to define custom commands. [Read about using custom commands in the Looker Help Center](https://help.looker.com/hc/en-us/articles/360023685434-Using-Lookerbot-for-Slack).
 
 - `LOOKER_WEBHOOK_TOKEN` (optional) – The webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
@@ -145,19 +148,19 @@ If you would like the bot to connect to multiple instances of Looker, then you c
 The JSON objects should have the following keys:
 
 - `url` should be the web url of the instance
-- `apiBaseUrl` should be the API 3.0 endpoint
-- `clientID` should be the API 3.0 client ID for the user you want the bot to run as
-- `clientSecret` should be the secret for that API 3.0 key
-- `customCommandSpaceId` is an optional parameter, representing a Space that you would like the bot to use to define custom commands.
+- `apiBaseUrl` should be the API endpoint
+- `clientID` should be the API client ID for the user you want the bot to run as
+- `clientSecret` should be the secret for that API key
+- `customCommandFolderId` is an optional parameter, representing a Folder that you would like the bot to use to define custom commands.
 - `webhookToken` is an optional parameter. It's the webhook validation token found in Looker's admin panel. This is only required if you're using the bot to send scheduled webhooks.
 
 Here's an example JSON that connects to two Looker instances:
 
 ```json
-[{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/3.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
+[{"url": "https://me.looker.com", "apiBaseUrl": "https://me.looker.com:19999/api/4.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"},{"url": "https://me-staging.looker.com", "apiBaseUrl": "https://me-staging.looker.com:19999/api/4.0", "clientId": "abcdefghjkl", "clientSecret": "abcdefghjkl"}]
 ```
 
-The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_3_CLIENT_ID`, `LOOKER_API_3_CLIENT_SECRET`, `LOOKER_WEBHOOK_TOKEN`, and `LOOKER_CUSTOM_COMMAND_SPACE_ID` variables are ignored when `LOOKERS` is set.
+The `LOOKER_URL`, `LOOKER_API_BASE_URL`, `LOOKER_API_CLIENT_ID`, `LOOKER_API_CLIENT_SECRET`, `LOOKER_WEBHOOK_TOKEN`, and `LOOKER_CUSTOM_COMMAND_FOLDER_ID` variables are ignored when `LOOKERS` is set.
 
 ##### Running the Server
 

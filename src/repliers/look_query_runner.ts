@@ -8,8 +8,8 @@ export class LookQueryRunner extends QueryRunner {
 
   constructor(
     replyContext: ReplyContext,
-    private lookId: number | string,
-    private filterInfo?: {queryId: number, url: string},
+    private lookId: string,
+    private filterInfo?: {queryId: string, url: string},
    ) {
     super(replyContext)
     this.lookId = lookId

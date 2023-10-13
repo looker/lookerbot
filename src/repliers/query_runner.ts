@@ -9,9 +9,9 @@ import { SlackTableFormatter } from "./slack_table_formatter"
 export class QueryRunner extends FancyReplier {
 
   protected querySlug?: string
-  protected queryId?: number
+  protected queryId?: string
 
-  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: number} = {}) {
+  constructor(replyContext: ReplyContext, queryParam: {slug?: string, id?: string} = {}) {
     super(replyContext)
     this.querySlug = queryParam.slug
     this.queryId = queryParam.id
