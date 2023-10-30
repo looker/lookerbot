@@ -43,7 +43,7 @@
     "stream-buffers": "^3.0.1",
     "ts-node": "^8.8.2",
     "typescript": "^3.7.5",
-    "underscore": "^1.8.3",
+    "underscore": "^1.12.1",
     "uuid": "^3.0.1"
   },
   "devDependencies": {
