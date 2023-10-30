@@ -123,6 +123,8 @@ There are a couple environment variables that can be used to tweak behavior:
 
 ###### Google Cloud Storage
 
+Requires that the Cloud Storage Bucket isn't preventing public access and that `Access Control` is set to `Fine-Grained` and `Object-level ACLs enabled` is set.
+
 - `GOOGLE_CLOUD_BUCKET` (optional) - If you want to use Google Cloud to store visualization images posted by Lookerbot, provide the name of your bucket.
 
 If Lookerbot is running on Google Compute Engine, [no further information should be needed if the approprate API scopes are set up](https://github.com/GoogleCloudPlatform/google-cloud-node#on-google-cloud-platform).
