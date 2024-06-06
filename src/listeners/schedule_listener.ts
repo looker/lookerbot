@@ -24,7 +24,7 @@ export class ScheduleListener extends Listener {
     if (req.body.scheduled_plan) {
       if (req.body.scheduled_plan.type === "Look") {
 
-        const qid = req.body.scheduled_plan.query_id
+        const qid = req.body.scheduled_plan.query.slug
         const lookMatches = req.body.scheduled_plan.url.match(/\/looks\/([0-9]+)/)
         const lookId = lookMatches ? lookMatches[1] : undefined
 
