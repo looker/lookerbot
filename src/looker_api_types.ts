@@ -57,6 +57,7 @@ export interface IQuery {
     type?: string;
     hidden_fields?: string[];
     show_view_names: boolean;
+    series_labels: { [key: string]: string };
     [key: string]: any;
   }
   client_id?: string | null // deprecated
