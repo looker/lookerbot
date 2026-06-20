@@ -35,7 +35,7 @@
     "chai": "^3.5.0",
     "datauri": "^1.0.5",
     "dotenv": "^4.0.0",
-    "form-data": "^3.0.0",
+    "form-data": "^3.0.5",
     "fuzzysearch-js": "^0.2.0",
     "get-urls": "^10.0.0",
     "request": "https://github.com/request/request/archive/392db7d127536ff296fb06492db9430790a32d6c.tar.gz",
